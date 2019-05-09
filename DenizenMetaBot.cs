@@ -184,7 +184,7 @@ namespace DenizenBot
         /// <summary>
         /// Informational replies names available, only including the primary names.
         /// </summary>
-        public List<string> InformationalDataNames;
+        public List<string> InformationalDataNames = new List<string>(128);
 
         /// <summary>
         /// Fills fields with data from the config file.
