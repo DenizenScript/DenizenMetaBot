@@ -36,16 +36,6 @@ namespace DenizenBot
         public const string CONFIG_FILE = CONFIG_FOLDER + "config.fds";
 
         /// <summary>
-        /// Prefix for when the bot successfully handles user input.
-        /// </summary>
-        public const string SUCCESS_PREFIX = "+++ ";
-
-        /// <summary>
-        /// Prefix for when the bot refuses user input.
-        /// </summary>
-        public const string REFUSAL_PREFIX = "--- ";
-
-        /// <summary>
         /// Bot token, read from config data.
         /// </summary>
         public static readonly string TOKEN = File.ReadAllText(TOKEN_FILE).Replace('\n', ' ').Replace('\r', ' ').Replace('\t', ' ').Replace(" ", "");
@@ -89,94 +79,27 @@ namespace DenizenBot
             Console.WriteLine("Found input from: (" + message.Author.Username + "), in channel: " + message.Channel.Name + ": " + fullMessageCleaned);
             string commandNameLowered = cmds[0].ToLowerInvariant();
             cmds.RemoveAt(0);
-            if (UserCommands.TryGetValue(commandNameLowered, out Action<string[], SocketMessage> acto))
+            if (ChatCommands.TryGetValue(commandNameLowered, out Action<string[], SocketMessage> acto))
             {
                 acto.Invoke(cmds.ToArray(), message);
             }
             else
             {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Unknown command. Consider the __**help**__ command?").Wait();
+                message.Channel.SendMessageAsync(UserCommands.REFUSAL_PREFIX + "Unknown command. Consider the __**help**__ command?").Wait();
             }
         }
 
         /// <summary>
         /// All valid user commands in a map of typable command name -> command method.
         /// </summary>
-        public readonly Dictionary<string, Action<string[], SocketMessage>> UserCommands = new Dictionary<string, Action<string[], SocketMessage>>(1024);
-
-        /// <summary>
-        /// Simple output string for general public commands.
-        /// </summary>
-        public static string CmdsHelp =
-                "`help` shows help output, `hello` shows a source code link, "
-                + "...";
-
-        /// <summary>
-        /// Simple output string for admin commands.
-        /// </summary>
-        public static string CmdsAdminHelp =
-                "`restart` restarts the bot, "
-                + "...";
-
-        /// <summary>
-        /// User command to get help (shows a list of valid bot commands).
-        /// </summary>
-        void CMD_Help(string[] cmds, SocketMessage message)
-        {
-            string outputMessage = "Available Commands: " + CmdsHelp;
-            if (IsBotCommander(message.Author as SocketGuildUser))
-            {
-                outputMessage += "\nAvailable admin commands: " + CmdsAdminHelp;
-            }
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + outputMessage).Wait();
-        }
-
-        /// <summary>
-        /// User command to say 'hello' and get a source link.
-        /// </summary>
-        void CMD_Hello(string[] cmds, SocketMessage message)
-        {
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot").Wait();
-        }
+        public readonly Dictionary<string, Action<string[], SocketMessage>> ChatCommands = new Dictionary<string, Action<string[], SocketMessage>>(1024);
 
         /// <summary>
         /// Returns whether a Discord user is a bot commander (via role check).
         /// </summary>
-        bool IsBotCommander(SocketGuildUser user)
+        public bool IsBotCommander(SocketGuildUser user)
         {
             return user.Roles.Any((role) => role.Name.ToLowerInvariant() == "botcommander");
-        }
-
-        /// <summary>
-        /// Bot restart user command.
-        /// </summary>
-        void CMD_Restart(string[] cmds, SocketMessage message)
-        {
-            // NOTE: This implies a one-guild bot. A multi-guild bot probably shouldn't have this "BotCommander" role-based verification.
-            // But under current scale, a true-admin confirmation isn't worth the bother.
-            if (!IsBotCommander(message.Author as SocketGuildUser))
-            {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Nope! That's not for you!").Wait();
-                return;
-            }
-            if (!File.Exists("./start.sh"))
-            {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Nope! That's not valid for my current configuration!").Wait();
-            }
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Yes, boss. Restarting now...").Wait();
-            Process.Start("bash", "./start.sh " + message.Channel.Id);
-            Task.Factory.StartNew(() =>
-            {
-                Console.WriteLine("Shutdown start...");
-                for (int i = 0; i < 15; i++)
-                {
-                    Console.WriteLine("T Minus " + (15 - i));
-                    Task.Delay(1000).Wait();
-                }
-                Console.WriteLine("Shutdown!");
-                Environment.Exit(0);
-            });
-            Client.StopAsync().Wait();
         }
         
         /// <summary>
@@ -200,26 +123,28 @@ namespace DenizenBot
         /// </summary>
         void DefaultCommands()
         {
+            AdminCommands adminCmds = new AdminCommands() { Bot = this };
+            InformationCommands infoCmds = new InformationCommands() { Bot = this };
             // Various
-            UserCommands["help"] = CMD_Help;
-            UserCommands["halp"] = CMD_Help;
-            UserCommands["helps"] = CMD_Help;
-            UserCommands["halps"] = CMD_Help;
-            UserCommands["hel"] = CMD_Help;
-            UserCommands["hal"] = CMD_Help;
-            UserCommands["h"] = CMD_Help;
-            UserCommands["hello"] = CMD_Hello;
-            UserCommands["hi"] = CMD_Hello;
-            UserCommands["hey"] = CMD_Hello;
-            UserCommands["source"] = CMD_Hello;
-            UserCommands["src"] = CMD_Hello;
-            UserCommands["github"] = CMD_Hello;
-            UserCommands["git"] = CMD_Hello;
-            UserCommands["hub"] = CMD_Hello;
+            ChatCommands["help"] = infoCmds.CMD_Help;
+            ChatCommands["halp"] = infoCmds.CMD_Help;
+            ChatCommands["helps"] = infoCmds.CMD_Help;
+            ChatCommands["halps"] = infoCmds.CMD_Help;
+            ChatCommands["hel"] = infoCmds.CMD_Help;
+            ChatCommands["hal"] = infoCmds.CMD_Help;
+            ChatCommands["h"] = infoCmds.CMD_Help;
+            ChatCommands["hello"] = infoCmds.CMD_Hello;
+            ChatCommands["hi"] = infoCmds.CMD_Hello;
+            ChatCommands["hey"] = infoCmds.CMD_Hello;
+            ChatCommands["source"] = infoCmds.CMD_Hello;
+            ChatCommands["src"] = infoCmds.CMD_Hello;
+            ChatCommands["github"] = infoCmds.CMD_Hello;
+            ChatCommands["git"] = infoCmds.CMD_Hello;
+            ChatCommands["hub"] = infoCmds.CMD_Hello;
             // TODO: CMD_DScript
             // TODO: CMD_Command/Tag/Event/Mechanism/Language/Tutorial/Action
             // Admin
-            UserCommands["restart"] = CMD_Restart;
+            ChatCommands["restart"] = adminCmds.CMD_Restart;
             // TODO: CMD_Reload
         }
 
@@ -303,7 +228,7 @@ namespace DenizenBot
                 {
                     ISocketMessageChannel channelToNotify = Client.GetChannel(argument1) as ISocketMessageChannel;
                     Console.WriteLine("Restarted as per request in channel: " + channelToNotify.Name);
-                    channelToNotify.SendMessageAsync(SUCCESS_PREFIX + "Connected and ready!").Wait();
+                    channelToNotify.SendMessageAsync(UserCommands.SUCCESS_PREFIX + "Connected and ready!").Wait();
                 }
                 BotMonitor.ConnectedOnce = true;
                 return Task.CompletedTask;
