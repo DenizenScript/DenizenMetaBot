@@ -23,6 +23,7 @@ To configure the bot:
     - To create a bot token, refer to official Discord documentation. Alternately, you can follow the bot-user-creation parts of https://discord.foxbot.me/docs/guides/getting_started/intro.html (ignore the coding parts, just follow the first bits about creating a bot user on the Discord application system, and getting the token).
 - Within the `config` directory, create file `config.fds` (a FreneticDataSyntax file) with the following options (See also the full file text sample below):
     - `valid_channels` set to a whitelist of channels the bot responds in (blank = responds anywhere).
+    - `info_replies` set to a submapping of info commands and their replies, which allows comma-separated list keys. The first listed name on each line is the primary name. Type `\n` to add a line break.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -31,6 +32,8 @@ valid_channels:
 - 315163488085475337
 # bot-spam
 - 315616018846318593
+info_replies:
+    new,newb,noob,newbie: Welcome new user! Please read the rules at the bottom of the #info channel, and feel free after that to ask for help in the most relevant channel!
 ```
 
 To start the bot up:

@@ -30,6 +30,9 @@ namespace DenizenBot
         /// </summary>
         public const string REFUSAL_PREFIX = "--- ";
 
+        /// <summary>
+        /// The backing meta bot instance.
+        /// </summary>
         public DenizenMetaBot Bot;
     }
 }

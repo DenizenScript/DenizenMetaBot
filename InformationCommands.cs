@@ -12,6 +12,7 @@ using Discord.WebSocket;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
+using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot
 {
@@ -24,7 +25,9 @@ namespace DenizenBot
         /// Simple output string for general public commands.
         /// </summary>
         public static string CmdsHelp =
-                "`help` shows help output, `hello` shows a source code link, "
+                "`help` shows help output, "
+                + "`hello` shows a source code link, "
+                + "`info <name>` shows a prewritten informational notice reply, "
                 + "...";
 
         /// <summary>
@@ -53,6 +56,45 @@ namespace DenizenBot
         public void CMD_Hello(string[] cmds, SocketMessage message)
         {
             message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot").Wait();
+        }
+
+        /// <summary>
+        /// User command to get some predefined informational output.
+        /// </summary>
+        public void CMD_Info(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 1)
+            {
+                string commandSearch = cmds[0].ToLowerFast().Trim();
+                if (commandSearch == "list")
+                {
+                    string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
+                    message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Available info names: " + fullList).Wait();
+                }
+                else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+                {
+                    message.Channel.SendMessageAsync(SUCCESS_PREFIX + infoOutput).Wait();
+                }
+                else
+                {
+                    int lowestDistance = 20;
+                    string lowestName = null;
+                    foreach (string option in Bot.InformationalData.Keys)
+                    {
+                        int currentDistance = StringConversionHelper.GetLevenshteinDistance(commandSearch, option);
+                        if (currentDistance < lowestDistance)
+                        {
+                            lowestDistance = currentDistance;
+                            lowestName = option;
+                        }
+                    }
+                    message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Unknown info name. " + (lowestName == null ? "" : "Did you mean `" + lowestName + "`?")).Wait();
+                }
+            }
+            else
+            {
+                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "!info <info item or 'list'>").Wait();
+            }
         }
     }
 }

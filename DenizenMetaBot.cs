@@ -141,6 +141,9 @@ namespace DenizenBot
             ChatCommands["github"] = infoCmds.CMD_Hello;
             ChatCommands["git"] = infoCmds.CMD_Hello;
             ChatCommands["hub"] = infoCmds.CMD_Hello;
+            ChatCommands["info"] = infoCmds.CMD_Info;
+            ChatCommands["notice"] = infoCmds.CMD_Info;
+            ChatCommands["alert"] = infoCmds.CMD_Info;
             // TODO: CMD_DScript
             // TODO: CMD_Command/Tag/Event/Mechanism/Language/Tutorial/Action
             // Admin
@@ -174,6 +177,16 @@ namespace DenizenBot
         public HashSet<ulong> ValidChannels = new HashSet<ulong>(32);
 
         /// <summary>
+        /// Informational replies available, as a map of name to full text.
+        /// </summary>
+        public Dictionary<string, string> InformationalData = new Dictionary<string, string>(512);
+
+        /// <summary>
+        /// Informational replies names available, only including the primary names.
+        /// </summary>
+        public List<string> InformationalDataNames;
+
+        /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
         public void PopulateFromConfig()
@@ -182,6 +195,17 @@ namespace DenizenBot
             foreach (string channel in ConfigFile.GetStringList("valid_channels"))
             {
                 ValidChannels.Add(ulong.Parse(channel.Trim()));
+            }
+            FDSSection infoSection = ConfigFile.GetSection("info_replies");
+            foreach (string key in infoSection.GetRootKeys())
+            {
+                string infoValue = infoSection.GetString(key);
+                string[] keysSplit = key.SplitFast(',');
+                InformationalDataNames.Add(keysSplit[0]);
+                foreach (string name in keysSplit)
+                {
+                    InformationalData[name.Trim()] = infoValue;
+                }
             }
         }
 
