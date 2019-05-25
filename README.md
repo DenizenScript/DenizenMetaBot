@@ -24,6 +24,10 @@ To configure the bot:
 - Within the `config` directory, create file `config.fds` (a FreneticDataSyntax file) with the following options (See also the full file text sample below):
     - `valid_channels` set to a whitelist of channels the bot responds in (blank = responds anywhere).
     - `info_replies` set to a submapping of info commands and their replies, which allows comma-separated list keys. The first listed name on each line is the primary name. Type `\n` to add a line break.
+    - `update_projects` set to a submapping of project names to update messages.
+    - `channel_updates` set to a submapping of channels to what projects they correspond to (for the update command).
+    - `project_names` set to a list of project names, in their correct original casing.
+    - `project_icons` set to a submapping of project names to `.png` icon image URLs.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -34,6 +38,14 @@ valid_channels:
 - 315616018846318593
 info_replies:
     new,newb,noob,newbie: Welcome new user! Please read the rules at the bottom of the #info channel, and feel free after that to ask for help in the most relevant channel!
+update_projects:
+    denizen: Latest **Denizen** dev builds are at <https://ci.citizensnpcs.co/job/Denizen_Developmental/>.\nLatest Denizen stable release builds are at <https://ci.citizensnpcs.co/job/Denizen/>.\nSpigot release of Denizen are at <https://www.spigotmc.org/resources/denizen.21039/>.
+channel_updates:
+    315163488085475337: denizen spigot
+project_names:
+    - Denizen
+project_icons:
+    denizen: https://i.alexgoodwin.media/i/for_real_usage/ec5694.png
 ```
 
 To start the bot up:

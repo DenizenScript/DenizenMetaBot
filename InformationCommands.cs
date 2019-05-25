@@ -28,6 +28,7 @@ namespace DenizenBot
                 "`help` shows help output, "
                 + "`hello` shows a source code link, "
                 + "`info <name>` shows a prewritten informational notice reply, "
+                + "`update [project ...]` shows an update link for the named project(s), "
                 + "...";
 
         /// <summary>
@@ -56,6 +57,36 @@ namespace DenizenBot
         public void CMD_Hello(string[] cmds, SocketMessage message)
         {
             message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot").Wait();
+        }
+
+        /// <summary>
+        /// User command to see information on how to update projects.
+        /// </summary>
+        public void CMD_Update(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                if (!Bot.ChannelToProject.TryGetValue(message.Channel.Id, out cmds))
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Update command", "Please specify which project(s) you want the update link for.")).Wait();
+                    return;
+                }
+            }
+            StringBuilder toOutput = new StringBuilder();
+            foreach (string projectName in cmds)
+            {
+                string projectNameLower = projectName.ToLowerFast();
+                if (Bot.UpdateMessages.TryGetValue(projectNameLower, out string updateMessage))
+                {
+                    Embed embed = new EmbedBuilder().WithTitle("Update " + Bot.ProjectNames[projectNameLower]).WithColor(0, 255, 255)
+                        .WithThumbnailUrl(Bot.ProjectImageUrls[projectNameLower]).WithDescription(updateMessage).Build();
+                    message.Channel.SendMessageAsync(embed: embed).Wait();
+                }
+                else
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for Update command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                }
+            }
         }
 
         /// <summary>

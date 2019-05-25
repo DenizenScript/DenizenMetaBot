@@ -144,6 +144,13 @@ namespace DenizenBot
             ChatCommands["info"] = infoCmds.CMD_Info;
             ChatCommands["notice"] = infoCmds.CMD_Info;
             ChatCommands["alert"] = infoCmds.CMD_Info;
+            ChatCommands["update"] = infoCmds.CMD_Update;
+            ChatCommands["latest"] = infoCmds.CMD_Update;
+            ChatCommands["current"] = infoCmds.CMD_Update;
+            ChatCommands["build"] = infoCmds.CMD_Update;
+            ChatCommands["builds"] = infoCmds.CMD_Update;
+            ChatCommands["download"] = infoCmds.CMD_Update;
+            ChatCommands["version"] = infoCmds.CMD_Update;
             // TODO: CMD_DScript
             // TODO: CMD_Command/Tag/Event/Mechanism/Language/Tutorial/Action
             // Admin
@@ -187,6 +194,26 @@ namespace DenizenBot
         public List<string> InformationalDataNames = new List<string>(128);
 
         /// <summary>
+        /// A mapping from channel IDs to project names for the update command.
+        /// </summary>
+        public Dictionary<ulong, string[]> ChannelToProject = new Dictionary<ulong, string[]>(512);
+
+        /// <summary>
+        /// A map of project names to the relevant update messages.
+        /// </summary>
+        public Dictionary<string, string> UpdateMessages = new Dictionary<string, string>(512);
+
+        /// <summary>
+        /// A map of project names (all lower) to their properly cased names.
+        /// </summary>
+        public Dictionary<string, string> ProjectNames = new Dictionary<string, string>(512);
+
+        /// <summary>
+        /// A map of project names to image URLs.
+        /// </summary>
+        public Dictionary<string, string> ProjectImageUrls = new Dictionary<string, string>(512);
+
+        /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
         public void PopulateFromConfig()
@@ -206,6 +233,25 @@ namespace DenizenBot
                 {
                     InformationalData[name.Trim()] = infoValue;
                 }
+            }
+            FDSSection channelUpdatesSection = ConfigFile.GetSection("channel_updates");
+            foreach (string key in channelUpdatesSection.GetRootKeys())
+            {
+                ChannelToProject.Add(ulong.Parse(key), channelUpdatesSection.GetString(key).Split(' '));
+            }
+            FDSSection updateProjectsSection = ConfigFile.GetSection("update_projects");
+            foreach (string key in updateProjectsSection.GetRootKeys())
+            {
+                UpdateMessages.Add(key, updateProjectsSection.GetString(key));
+            }
+            foreach (string project in ConfigFile.GetStringList("project_names"))
+            {
+                ProjectNames.Add(project.ToLowerFast(), project);
+            }
+            FDSSection projectIconsSection = ConfigFile.GetSection("project_icons");
+            foreach (string key in projectIconsSection.GetRootKeys())
+            {
+                ProjectImageUrls.Add(key, projectIconsSection.GetString(key));
             }
         }
 

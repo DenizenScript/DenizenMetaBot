@@ -34,5 +34,15 @@ namespace DenizenBot
         /// The backing meta bot instance.
         /// </summary>
         public DenizenMetaBot Bot;
+
+        public const string WARNING_EMOJI = "https://i.alexgoodwin.media/i/for_real_usage/13993d.png";
+
+        /// <summary>
+        /// Creates an Embed object for an error message.
+        /// </summary>
+        public Embed GetErrorMessageEmbed(string title, string message)
+        {
+            return new EmbedBuilder().WithTitle(title).WithColor(255, 64, 32).WithThumbnailUrl(WARNING_EMOJI).WithDescription(message).Build();
+        }
     }
 }
