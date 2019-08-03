@@ -71,15 +71,15 @@ namespace DenizenBot.CommandHandlers
             {
                 List<string> matched = new List<string>();
                 List<string> strongMatched = new List<string>();
-                foreach (string cmd in docs.Keys)
+                foreach (string name in docs.Keys)
                 {
-                    if (cmd.Contains(search) || (secondarySearch != null && cmd.Contains(secondarySearch)))
+                    if (name.Contains(search) || (secondarySearch != null && name.Contains(secondarySearch)))
                     {
-                        matched.Add(cmd);
+                        matched.Add(name);
                     }
-                    if (secondaryMatcher != null && secondaryMatcher(docs[cmd]))
+                    if (secondaryMatcher != null && secondaryMatcher(docs[name]))
                     {
-                        strongMatched.Add(cmd);
+                        strongMatched.Add(name);
                     }
                 }
                 if (strongMatched.Count > 0)
@@ -160,9 +160,13 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Event(string[] cmds, SocketMessage message)
         {
-            string secondarySearch = string.Join(" ", cmds);
-            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondarySearch,
-                (e) => e.RegexMatcher.IsMatch(secondarySearch));
+            string secondarySearch = string.Join(" ", cmds).ToLowerFast();
+            if (cmds.Length > 0)
+            {
+                cmds[0] = secondarySearch;
+            }
+            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, null,
+            (e) => e.RegexMatcher.IsMatch(secondarySearch));
         }
     }
 }
