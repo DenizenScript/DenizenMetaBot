@@ -48,6 +48,10 @@ namespace DenizenBot.CommandHandlers
         /// <param name="message">The Discord message object.</param>
         public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message) where T: MetaObject
         {
+            if (CheckMetaDenied(message))
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 SendErrorMessageReply(message, $"Need input for '{type.Name}' command",
