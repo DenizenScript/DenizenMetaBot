@@ -12,6 +12,7 @@ using Discord.WebSocket;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
+using DenizenBot.CommandHandlers;
 
 namespace DenizenBot
 {
@@ -34,6 +35,11 @@ namespace DenizenBot
         /// Configuration file path.
         /// </summary>
         public const string CONFIG_FILE = CONFIG_FOLDER + "config.fds";
+
+        /// <summary>
+        /// The base for the meta docs URL.
+        /// </summary>
+        public const string URL_BASE = "https://one.denizenscript.com/denizen/";
 
         /// <summary>
         /// Bot token, read from config data.
@@ -85,7 +91,7 @@ namespace DenizenBot
             }
             else
             {
-                message.Channel.SendMessageAsync(UserCommands.REFUSAL_PREFIX + "Unknown command. Consider the __**help**__ command?").Wait();
+                message.Channel.SendMessageAsync(embed: UserCommands.GetErrorMessageEmbed("Unknown Command", "Unknown command. Consider the __**help**__ command?")).Wait();
             }
         }
 
@@ -125,7 +131,8 @@ namespace DenizenBot
         {
             AdminCommands adminCmds = new AdminCommands() { Bot = this };
             InformationCommands infoCmds = new InformationCommands() { Bot = this };
-            // ========= Various =========
+            MetaCommands metaCmds = new MetaCommands() { Bot = this };
+            // ========= Informational =========
             // help
             ChatCommands["help"] = infoCmds.CMD_Help;
             ChatCommands["halp"] = infoCmds.CMD_Help;
@@ -167,8 +174,14 @@ namespace DenizenBot
             ChatCommands["error"] = infoCmds.CMD_Issues;
             ChatCommands["ghissues"] = infoCmds.CMD_Issues;
             ChatCommands["githubissues"] = infoCmds.CMD_Issues;
+            // ========= Meta Docs =========
+            ChatCommands["command"] = metaCmds.CMD_Command;
+            ChatCommands["commands"] = metaCmds.CMD_Command;
+            ChatCommands["cmd"] = metaCmds.CMD_Command;
+            ChatCommands["cmds"] = metaCmds.CMD_Command;
+            ChatCommands["c"] = metaCmds.CMD_Command;
+            // TODO: CMD_Tag/Event/Mechanism/Language/Tutorial/Action
             // TODO: CMD_DScript
-            // TODO: CMD_Command/Tag/Event/Mechanism/Language/Tutorial/Action
             // ========= Admin =========
             ChatCommands["restart"] = adminCmds.CMD_Restart;
             // TODO: CMD_Reload
@@ -305,12 +318,12 @@ namespace DenizenBot
                 {
                     return Task.CompletedTask;
                 }
-                Console.WriteLine("Args: " + args.Length);
+                Console.WriteLine($"Args: {args.Length}");
                 if (args.Length > 0 && ulong.TryParse(args[0], out ulong argument1))
                 {
                     ISocketMessageChannel channelToNotify = Client.GetChannel(argument1) as ISocketMessageChannel;
-                    Console.WriteLine("Restarted as per request in channel: " + channelToNotify.Name);
-                    channelToNotify.SendMessageAsync(UserCommands.SUCCESS_PREFIX + "Connected and ready!").Wait();
+                    Console.WriteLine($"Restarted as per request in channel: {channelToNotify.Name}");
+                    channelToNotify.SendMessageAsync(embed: UserCommands.GetGenericPositiveMessageEmbed("Restarted", "Connected and ready!")).Wait();
                 }
                 BotMonitor.ConnectedOnce = true;
                 return Task.CompletedTask;
@@ -332,16 +345,16 @@ namespace DenizenBot
                 }
                 if (message.Channel.Name.StartsWith("@") || !(message.Channel is SocketGuildChannel sgc))
                 {
-                    Console.WriteLine("Refused message from (" + message.Author.Username + "): (Invalid Channel: " + message.Channel.Name + "): " + message.Content);
+                    Console.WriteLine($"Refused message from ({message.Author.Username}): (Invalid Channel: {message.Channel.Name}): {message.Content}");
                     return Task.CompletedTask;
                 }
                 if (ValidChannels.Count != 0 && !ValidChannels.Contains(message.Channel.Id))
                 {
-                    Console.WriteLine("Refused message from (" + message.Author.Username + "): (Non-whitelisted Channel: " + message.Channel.Name + "): " + message.Content);
+                    Console.WriteLine($"Refused message from ({message.Author.Username}): (Non-whitelisted Channel: {message.Channel.Name}): {message.Content}");
                     return Task.CompletedTask;
                 }
                 bool mentionedMe = message.MentionedUsers.Any((su) => su.Id == Client.CurrentUser.Id);
-                Console.WriteLine("Parsing message from (" + message.Author.Username + "), in channel: " + message.Channel.Name + ": " + message.Content);
+                Console.WriteLine($"Parsing message from ({message.Author.Username}), in channel: {message.Channel.Name}: {message.Content}");
                 if (mentionedMe)
                 {
                     try
@@ -354,7 +367,7 @@ namespace DenizenBot
                         {
                             throw;
                         }
-                        Console.WriteLine("Error handling command: " + ex.ToString());
+                        Console.WriteLine($"Error handling command: {ex.ToString()}");
                     }
                 }
                 return Task.CompletedTask;

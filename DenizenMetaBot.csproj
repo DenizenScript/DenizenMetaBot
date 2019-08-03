@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DenizenMetaBot</RootNamespace>
+    <RootNamespace>DenizenBot</RootNamespace>
     <AssemblyName>DenizenMetaBot</AssemblyName>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
