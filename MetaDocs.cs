@@ -69,6 +69,10 @@ namespace DenizenBot
             {
                 Download(src);
             }
+            foreach (string str in LoadErrors)
+            {
+                Console.WriteLine($"Load error: {str}");
+            }
         }
 
         /// <summary>
@@ -167,7 +171,8 @@ namespace DenizenBot
         {
             if (!MetaObjectGetters.TryGetValue(objectType.ToLowerFast(), out Func<MetaObject> getter))
             {
-                LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
+                // TODO: Only temporarily ignored (until more types supported)
+                // LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
                 return;
             }
             MetaObject obj = getter();

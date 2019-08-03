@@ -69,6 +69,12 @@ namespace DenizenBot.CommandHandlers
             docs.DownloadAll();
             Program.CurrentMeta = docs;
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Reload Complete").WithDescription("Documentation reloaded successfully.");
+            if (docs.LoadErrors.Count > 0)
+            {
+                List<string> errors = docs.LoadErrors.Count > 5 ? docs.LoadErrors.GetRange(0, 5) : docs.LoadErrors;
+                SendErrorMessageReply(message, "Error(s) While Reloading", string.Join("\n", errors));
+                embed.AddField("Errors", docs.LoadErrors.Count, true);
+            }
             embed.AddField("Commands", docs.Commands.Count, true);
             SendReply(message, embed.Build());
         }
