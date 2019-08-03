@@ -41,7 +41,7 @@ namespace DenizenBot.CommandHandlers
             string search = cmds[0].ToLowerFast();
             if (search == "all")
             {
-                SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}");
+                SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}{type.WebPath}/");
                 return;
             }
             if (!docs.TryGetValue(search, out T obj))
@@ -61,10 +61,11 @@ namespace DenizenBot.CommandHandlers
                 }
                 else if (matched.Count > 1)
                 {
+                    matched = matched.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat)).ToList();
                     string suffix = ".";
-                    if (matched.Count > 10)
+                    if (matched.Count > 20)
                     {
-                        matched = matched.GetRange(0, 10);
+                        matched = matched.GetRange(0, 20);
                         suffix = ", ...";
                     }
                     string listText = string.Join("`, `", matched);
