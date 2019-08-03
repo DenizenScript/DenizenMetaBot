@@ -30,6 +30,7 @@ To configure the bot:
         - `icon` set to a `.png` icon image URL.
     - `channel_details` set to a submapping of channels to details specific to the channel. Within each channel ID key is a submapping of the details, as follows:
         - `updates` set to what projects they correspond to (for the update command).
+		- `docs` set to whether meta docs are allowed in this channel.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -48,6 +49,7 @@ project_details:
 channel_details:
     315163488085475337:
         updates: denizen spigot
+		docs: true
 ```
 
 To start the bot up:

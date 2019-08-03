@@ -23,6 +23,22 @@ namespace DenizenBot.CommandHandlers
     public class MetaCommands : UserCommands
     {
         /// <summary>
+        /// Checks whether meta commands are denied in the relevant channel. If denied, will return 'true' and show a rejection message.
+        /// </summary>
+        /// <param name="message">The socket channel.</param>
+        /// <returns>True if they are denied.</returns>
+        public bool CheckMetaDenied(SocketMessage message)
+        {
+            if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || !details.Docs)
+            {
+                SendErrorMessageReply(message, "Command Not Allowed Here",
+                    "Meta documentation commands are not allowed in this channel. Please switch to a bot spam channel, or a Denizen channel.");
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Automatically processes a meta search command.
         /// </summary>
         /// <typeparam name="T">The meta object type.</typeparam>

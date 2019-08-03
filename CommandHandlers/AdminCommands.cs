@@ -77,6 +77,7 @@ namespace DenizenBot.CommandHandlers
                 embed.AddField("Errors", docs.LoadErrors.Count, true);
             }
             embed.AddField("Commands", docs.Commands.Count, true);
+            embed.AddField("Mechanisms", docs.Mechanisms.Count, true);
             SendReply(message, embed.Build());
         }
     }

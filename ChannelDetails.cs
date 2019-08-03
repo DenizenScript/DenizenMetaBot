@@ -27,8 +27,8 @@ namespace DenizenBot
 
 
         /// <summary>
-        /// GitHub repo URL.
+        /// Whether docs are allowed.
         /// </summary>
-        public string GitHub = "";
+        public bool Docs = false;
     }
 }

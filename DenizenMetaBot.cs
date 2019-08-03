@@ -273,12 +273,12 @@ namespace DenizenBot
                 FDSSection detailsSection = channelDetailsSection.GetSection(key);
                 ChannelDetails detail = new ChannelDetails();
                 List<ProjectDetails> projects = new List<ProjectDetails>();
-                foreach (string projName in detailsSection.GetString("updates", "").Split(' '))
+                foreach (string projName in detailsSection.GetString("updates", "").Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
                     projects.Add(ProjectToDetails[projName]);
                 }
                 detail.Updates = projects.ToArray();
-                detail.GitHub = detailsSection.GetString("github", "");
+                detail.Docs = detailsSection.GetBool("docs", false).Value;
                 ChannelToDetails.Add(ulong.Parse(key), detail);
             }
         }
