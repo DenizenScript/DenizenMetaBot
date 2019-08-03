@@ -170,6 +170,7 @@ namespace DenizenBot
             ChatCommands["ghissues"] = infoCmds.CMD_Issues;
             ChatCommands["githubissues"] = infoCmds.CMD_Issues;
             // ========= Meta Docs =========
+            // command
             ChatCommands["command"] = metaCmds.CMD_Command;
             ChatCommands["commands"] = metaCmds.CMD_Command;
             ChatCommands["cmd"] = metaCmds.CMD_Command;

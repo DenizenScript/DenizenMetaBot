@@ -44,17 +44,54 @@ namespace DenizenBot
         };
 
         /// <summary>
-        /// All known commands.
+        /// The "command" meta type.
         /// </summary>
-        public Dictionary<string, MetaCommand> Commands = new Dictionary<string, MetaCommand>(512);
+        public static MetaType META_TYPE_COMMAND = new MetaType() { Name = "Command", WebPath = "cmds" };
+
+        /// <summary>
+        /// The "mechanism" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_MECHANISM = new MetaType() { Name = "Mechanism", WebPath = "mecs" };
+
+        /// <summary>
+        /// The "event" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_EVENT = new MetaType() { Name = "Event", WebPath = "evts" };
+
+        /// <summary>
+        /// The "action" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_ACTION = new MetaType() { Name = "Action", WebPath = "acts" };
+
+        /// <summary>
+        /// The "language" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_LANGUAGE = new MetaType() { Name = "Language", WebPath = "lngs" };
+
+        /// <summary>
+        /// The "tag" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_TAG = new MetaType() { Name = "Tag", WebPath = "tags" };
+
+        /// <summary>
+        /// All meta types.
+        /// </summary>
+        public static MetaType[] META_TYPES = new MetaType[] { META_TYPE_COMMAND, META_TYPE_MECHANISM,
+            META_TYPE_EVENT, META_TYPE_ACTION, META_TYPE_LANGUAGE, META_TYPE_TAG };
 
         /// <summary>
         /// Getters for standard meta object types.
         /// </summary>
         public static Dictionary<string, Func<MetaObject>> MetaObjectGetters = new Dictionary<string, Func<MetaObject>>()
         {
-            { "command", () => new MetaCommand() }
+            { "command", () => new MetaCommand() },
+            // TODO: Action, Event, Language, Tag
         };
+
+        /// <summary>
+        /// All known commands.
+        /// </summary>
+        public Dictionary<string, MetaCommand> Commands = new Dictionary<string, MetaCommand>(512);
 
         /// <summary>
         /// Download all docs.

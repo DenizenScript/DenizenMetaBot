@@ -12,17 +12,12 @@ namespace DenizenBot.MetaObjects
     public abstract class MetaObject
     {
         /// <summary>
-        /// Get the name of the object meta type.
+        /// Get the meta type of the object.
         /// </summary>
-        public abstract string TypeName { get; }
+        public abstract MetaType Type { get; }
 
         /// <summary>
-        /// Get the webpath for this object meta type (eg "cmds").
-        /// </summary>
-        public abstract string WebPath { get; }
-
-        /// <summary>
-        /// Get the name of the object.
+        /// Get the name of the object. May have capitals.
         /// </summary>
         public abstract string Name { get; }
 
@@ -90,8 +85,8 @@ namespace DenizenBot.MetaObjects
         /// </summary>
         public virtual EmbedBuilder GetEmbed()
         {
-            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(TypeName + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + WebPath + "/" + Name.Replace(" ", "%20"));
+            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Name.Replace(" ", "%20"));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)

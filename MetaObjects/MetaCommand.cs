@@ -12,51 +12,49 @@ namespace DenizenBot.MetaObjects
     /// </summary>
     public class MetaCommand : MetaObject
     {
-        public override string TypeName => "Command";
+        public override MetaType Type => MetaDocs.META_TYPE_COMMAND;
 
-        public override string WebPath => "cmds";
-
-        public override string Name => CommandName.ToLowerFast();
+        public override string Name => CommandName;
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Commands.Add(Name, this);
+            docs.Commands.Add(Name.ToLowerFast(), this);
         }
 
         /// <summary>
-        /// The name of the command (capitalized).
+        /// The name of the command.
         /// </summary>
-        public string CommandName;
+        public string CommandName = "";
 
         /// <summary>
         /// How many arguments are required, minimum.
         /// </summary>
-        public int Required;
+        public int Required = 0;
 
         /// <summary>
         /// The syntax guide.
         /// </summary>
-        public string Syntax;
+        public string Syntax = "";
 
         /// <summary>
         /// The short description.
         /// </summary>
-        public string Short;
+        public string Short = "";
 
         /// <summary>
         /// The long-form description.
         /// </summary>
-        public string Description;
+        public string Description = "";
 
         /// <summary>
         /// Tags documented for this command. One tag per string.
         /// </summary>
-        public string[] Tags;
+        public string[] Tags = new string[0];
 
         /// <summary>
         /// An associated video link.
         /// </summary>
-        public string Video;
+        public string Video = "";
 
         /// <summary>
         /// Sample usages.
@@ -68,6 +66,7 @@ namespace DenizenBot.MetaObjects
             EmbedBuilder builder = base.GetEmbed();
             AutoField(builder, "Syntax", Syntax);
             AutoField(builder, "Short Description", Short);
+            AutoField(builder, "Related Video", Video);
             builder.Description = Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description;
             return builder;
         }
