@@ -18,8 +18,47 @@ namespace DenizenBot.MetaObjects
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Tags.Add(Name.ToLowerFast(), this);
+            docs.Tags.Add(CleanedName, this);
         }
+
+        /// <summary>
+        /// Cleans tag text for searchability.
+        /// </summary>
+        public static string CleanTag(string text)
+        {
+            text = text.ToLowerFast();
+            StringBuilder cleaned = new StringBuilder(text.Length);
+            bool skipping = false;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '<' || c == '>')
+                {
+                    continue;
+                }
+                if (c == '[')
+                {
+                    skipping = true;
+                    continue;
+                }
+                if (c == ']')
+                {
+                    skipping = false;
+                    continue;
+                }
+                if (skipping)
+                {
+                    continue;
+                }
+                cleaned.Append(c);
+            }
+            return cleaned.ToString();
+        }
+
+        /// <summary>
+        /// The cleaned (searchable) name.
+        /// </summary>
+        public string CleanedName;
 
         /// <summary>
         /// The full tag syntax text.
@@ -56,6 +95,7 @@ namespace DenizenBot.MetaObjects
             {
                 case "attribute":
                     TagFull = value;
+                    CleanedName = CleanTag(TagFull);
                     return true;
                 case "returns":
                     Returns = value;

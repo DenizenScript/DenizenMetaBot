@@ -46,7 +46,8 @@ namespace DenizenBot.CommandHandlers
         /// <param name="type">The meta type.</param>
         /// <param name="cmds">The command args.</param>
         /// <param name="message">The Discord message object.</param>
-        public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message) where T: MetaObject
+        /// <param name="secondarySearch">A secondary search string if the first fails.</param>
+        public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message, string secondarySearch = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
             {
@@ -121,7 +122,17 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Tag(string[] cmds, SocketMessage message)
         {
-            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message);
+            string secondarySearch = null;
+            if (cmds.Length > 0)
+            {
+                cmds[0] = MetaTag.CleanTag(cmds[0]);
+                int dotIndex = cmds[0].IndexOf('.');
+                if (dotIndex > 0)
+                {
+                    secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
+                }
+            }
+            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearch);
         }
     }
 }
