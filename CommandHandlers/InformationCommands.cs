@@ -45,6 +45,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public static string CmdsAdminHelp =
                 "`restart` restarts the bot, "
+                + "`reload` reloads the meta docs, "
                 + "...";
 
         /// <summary>

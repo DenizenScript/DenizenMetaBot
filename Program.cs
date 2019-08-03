@@ -12,6 +12,7 @@ using Discord.WebSocket;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
+using DenizenBot;
 
 namespace DenizenBot
 {
@@ -26,10 +27,17 @@ namespace DenizenBot
         public static DenizenMetaBot CurrentBot = null;
 
         /// <summary>
+        /// The current meta documentation (the instance which change if meta is reloaded).
+        /// </summary>
+        public static MetaDocs CurrentMeta = null;
+
+        /// <summary>
         /// Software entry point - starts the bot.
         /// </summary>
         static void Main(string[] args)
         {
+            CurrentMeta = new MetaDocs();
+            CurrentMeta.DownloadAll();
             CurrentBot = new DenizenMetaBot();
             LaunchBotThread(args);
             while (true)

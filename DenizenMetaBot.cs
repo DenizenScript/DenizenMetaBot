@@ -184,7 +184,7 @@ namespace DenizenBot
             // TODO: CMD_DScript
             // ========= Admin =========
             ChatCommands["restart"] = adminCmds.CMD_Restart;
-            // TODO: CMD_Reload
+            ChatCommands["reload"] = adminCmds.CMD_Reload;
         }
 
         /// <summary>

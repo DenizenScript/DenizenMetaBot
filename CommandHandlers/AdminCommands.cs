@@ -20,9 +20,8 @@ namespace DenizenBot.CommandHandlers
     /// </summary>
     public class AdminCommands : UserCommands
     {
-
         /// <summary>
-        /// Bot restart user command.
+        /// Bot restart admin command.
         /// </summary>
         public void CMD_Restart(string[] cmds, SocketMessage message)
         {
@@ -37,7 +36,7 @@ namespace DenizenBot.CommandHandlers
             {
                 SendErrorMessageReply(message, "Cannot Comply", "Nope! That's not valid for my current configuration! (`start.sh` missing).");
             }
-            SendGenericPositiveMessageReply(message, "Restarting...", "Yes, boss. Restarting now...");
+            SendGenericPositiveMessageReply(message, "Restarting", "Yes, boss. Restarting now...");
             Process.Start("bash", "./start.sh " + message.Channel.Id);
             Task.Factory.StartNew(() =>
             {
@@ -51,6 +50,27 @@ namespace DenizenBot.CommandHandlers
                 Environment.Exit(0);
             });
             Bot.Client.StopAsync().Wait();
+        }
+
+        /// <summary>
+        /// Bot meta reload admin command.
+        /// </summary>
+        public void CMD_Reload(string[] cmds, SocketMessage message)
+        {
+            // NOTE: This implies a one-guild bot. A multi-guild bot probably shouldn't have this "BotCommander" role-based verification.
+            // But under current scale, a true-admin confirmation isn't worth the bother.
+            if (!Bot.IsBotCommander(message.Author as SocketGuildUser))
+            {
+                SendErrorMessageReply(message, "Authorization Failure", "Nope! That's not for you!");
+                return;
+            }
+            SendGenericPositiveMessageReply(message, "Reloading", "Yes, boss. Reloading meta documentation now...");
+            MetaDocs docs = new MetaDocs();
+            docs.DownloadAll();
+            Program.CurrentMeta = docs;
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Reload Complete").WithDescription("Documentation reloaded successfully.");
+            embed.AddField("Commands", docs.Commands.Count, true);
+            SendReply(message, embed.Build());
         }
     }
 }
