@@ -161,6 +161,11 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// Generic reusable "information" icon.
+        /// </summary>
+        public const string INFO_ICON = "https://i.alexgoodwin.media/i/for_real_usage/911f66.png";
+
+        /// <summary>
         /// User command to get some predefined informational output.
         /// </summary>
         public void CMD_Info(string[] cmds, SocketMessage message)
@@ -174,11 +179,11 @@ namespace DenizenBot.CommandHandlers
             if (commandSearch == "list")
             {
                 string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
-                SendGenericPositiveMessageReply(message, "Available Info Names", "Available info names: " + fullList);
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
             }
             else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
             {
-                SendGenericPositiveMessageReply(message, "Info: " + commandSearch, infoOutput);
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
             }
             else
             {
