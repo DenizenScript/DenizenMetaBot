@@ -25,7 +25,8 @@ namespace DenizenBot
         public static readonly string[] DENIZEN_SOURCES = new string[]
         {
             "https://github.com/DenizenScript/Denizen-For-Bukkit/archive/dev.zip",
-            "https://github.com/DenizenScript/Denizen-Core/archive/master.zip"
+            "https://github.com/DenizenScript/Denizen-Core/archive/master.zip",
+            "https://github.com/DenizenScript/Depenizen/archive/master.zip"
         };
 
         public static readonly string[] DENIZEN_ADDON_SOURCES = new string[]
@@ -34,10 +35,6 @@ namespace DenizenBot
             "https://github.com/DenizenScript/Webizen/archive/master.zip",
             "https://github.com/DenizenScript/dIRCBot/archive/master.zip"
         };
-
-        public static readonly string DEPENIZEN_SPECIAL_LIMITED_SOURCE = "https://github.com/DenizenScript/Depenizen/archive/master.zip";
-
-        public static readonly string DEPENIZEN_FOLDER_LIMIT = "bukkit";
 
         public void DownloadAll()
         {
@@ -49,7 +46,6 @@ namespace DenizenBot
             {
                 Download(src);
             }
-            Download(DEPENIZEN_SPECIAL_LIMITED_SOURCE, DEPENIZEN_FOLDER_LIMIT);
         }
 
         public static ZipArchive DownloadZip(string url)
