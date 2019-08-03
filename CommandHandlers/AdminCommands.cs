@@ -49,6 +49,7 @@ namespace DenizenBot.CommandHandlers
                 Console.WriteLine("Shutdown!");
                 Environment.Exit(0);
             });
+            Bot.BotMonitor.StopAllLogic = true;
             Bot.Client.StopAsync().Wait();
         }
 

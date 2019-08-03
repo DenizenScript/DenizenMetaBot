@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Discord;
+using FreneticUtilities.FreneticExtensions;
 
 namespace DenizenBot.MetaObjects
 {
@@ -15,15 +16,15 @@ namespace DenizenBot.MetaObjects
 
         public override string WebPath => "cmds";
 
-        public override string Name => CommandName;
+        public override string Name => CommandName.ToLowerFast();
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Commands.Add(CommandName, this);
+            docs.Commands.Add(Name, this);
         }
 
         /// <summary>
-        /// The name of the command.
+        /// The name of the command (capitalized).
         /// </summary>
         public string CommandName;
 
