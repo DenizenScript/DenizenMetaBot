@@ -13,7 +13,7 @@ using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 
-namespace DenizenBot
+namespace DenizenBot.CommandHandlers
 {
     /// <summary>
     /// Commands to administrate the bot.
@@ -30,14 +30,14 @@ namespace DenizenBot
             // But under current scale, a true-admin confirmation isn't worth the bother.
             if (!Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Nope! That's not for you!").Wait();
+                SendErrorMessageReply(message, "Authorization Failure", "Nope! That's not for you!");
                 return;
             }
             if (!File.Exists("./start.sh"))
             {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Nope! That's not valid for my current configuration!").Wait();
+                SendErrorMessageReply(message, "Cannot Comply", "Nope! That's not valid for my current configuration! (`start.sh` missing).");
             }
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Yes, boss. Restarting now...").Wait();
+            SendGenericPositiveMessageReply(message, "Restarting...", "Yes, boss. Restarting now...");
             Process.Start("bash", "./start.sh " + message.Channel.Id);
             Task.Factory.StartNew(() =>
             {

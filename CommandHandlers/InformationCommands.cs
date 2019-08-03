@@ -14,7 +14,7 @@ using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 using FreneticUtilities.FreneticToolkit;
 
-namespace DenizenBot
+namespace DenizenBot.CommandHandlers
 {
     /// <summary>
     /// Commands that give basic information to the user.
@@ -29,6 +29,15 @@ namespace DenizenBot
                 + "`hello` shows a source code link, "
                 + "`info <name>` shows a prewritten informational notice reply, "
                 + "`update [project ...]` shows an update link for the named project(s), "
+                + "`github [project ...]` shows a GitHub link for the named project(s), "
+                + "`issues [project ...]` shows an issue posting link for the named project(s), "
+                + "...";
+
+        /// <summary>
+        /// Simple output string for meta commands.
+        /// </summary>
+        public static string CmdsMeta =
+                "`command [name]` to search commands, "
                 + "...";
 
         /// <summary>
@@ -44,11 +53,12 @@ namespace DenizenBot
         public void CMD_Help(string[] cmds, SocketMessage message)
         {
             string outputMessage = "Available Commands: " + CmdsHelp;
+            outputMessage += "\nAvailable Meta Docs Commands: " + CmdsMeta;
             if (Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
                 outputMessage += "\nAvailable admin commands: " + CmdsAdminHelp;
             }
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + outputMessage).Wait();
+            SendGenericPositiveMessageReply(message, "Bot Command Help", outputMessage);
         }
 
         /// <summary>
@@ -56,7 +66,7 @@ namespace DenizenBot
         /// </summary>
         public void CMD_Hello(string[] cmds, SocketMessage message)
         {
-            message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot").Wait();
+            SendGenericPositiveMessageReply(message, "Hello", "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot");
         }
 
         /// <summary>
@@ -68,12 +78,12 @@ namespace DenizenBot
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Update command", "Please specify which project(s) you want the update link for.")).Wait();
+                    SendErrorMessageReply(message, "Unknown input for Update command", "Please specify which project(s) you want the update link for.");
                     return;
                 }
                 foreach (ProjectDetails proj in details.Updates)
                 {
-                    message.Channel.SendMessageAsync(embed: proj.GetUpdateEmbed()).Wait();
+                    SendReply(message, proj.GetUpdateEmbed());
                 }
                 return;
             }
@@ -82,11 +92,11 @@ namespace DenizenBot
                 string projectNameLower = projectName.ToLowerFast();
                 if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    message.Channel.SendMessageAsync(embed: detail.GetUpdateEmbed()).Wait();
+                    SendReply(message, detail.GetUpdateEmbed());
                 }
                 else
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for Update command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                    SendErrorMessageReply(message, "Unknown project name for Update command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.");
                 }
             }
         }
@@ -100,10 +110,10 @@ namespace DenizenBot
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for GitHub command", "Please specify which project(s) you want the GitHub link for.")).Wait();
+                    SendErrorMessageReply(message, "Unknown input for GitHub command", "Please specify which project(s) you want the GitHub link for.");
                     return;
                 }
-                message.Channel.SendMessageAsync(embed: details.Updates[0].GetGithubEmbed()).Wait();
+                SendReply(message, details.Updates[0].GetGithubEmbed());
                 return;
             }
             foreach (string projectName in cmds)
@@ -111,11 +121,11 @@ namespace DenizenBot
                 string projectNameLower = projectName.ToLowerFast();
                 if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    message.Channel.SendMessageAsync(embed: detail.GetGithubEmbed()).Wait();
+                    SendReply(message, detail.GetGithubEmbed());
                 }
                 else
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for GitHub command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                    SendErrorMessageReply(message, "Unknown project name for GitHub command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.");
                 }
             }
         }
@@ -129,10 +139,10 @@ namespace DenizenBot
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Issues command", "Please specify which project(s) you want the Issues link for.")).Wait();
+                    SendErrorMessageReply(message, "Unknown input for Issues command", "Please specify which project(s) you want the Issues link for.");
                     return;
                 }
-                message.Channel.SendMessageAsync(embed: details.Updates[0].GetIssuesEmbed()).Wait();
+                SendReply(message, details.Updates[0].GetIssuesEmbed());
                 return;
             }
             foreach (string projectName in cmds)
@@ -140,11 +150,11 @@ namespace DenizenBot
                 string projectNameLower = projectName.ToLowerFast();
                 if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    message.Channel.SendMessageAsync(embed: detail.GetIssuesEmbed()).Wait();
+                    SendReply(message, detail.GetIssuesEmbed());
                 }
                 else
                 {
-                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for Issues command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                    SendErrorMessageReply(message, "Unknown project name for Issues command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.");
                 }
             }
         }
@@ -154,37 +164,25 @@ namespace DenizenBot
         /// </summary>
         public void CMD_Info(string[] cmds, SocketMessage message)
         {
-            if (cmds.Length == 1)
+            if (cmds.Length != 1)
             {
-                string commandSearch = cmds[0].ToLowerFast().Trim();
-                if (commandSearch == "list")
-                {
-                    string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
-                    message.Channel.SendMessageAsync(SUCCESS_PREFIX + "Available info names: " + fullList).Wait();
-                }
-                else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
-                {
-                    message.Channel.SendMessageAsync(SUCCESS_PREFIX + infoOutput).Wait();
-                }
-                else
-                {
-                    int lowestDistance = 20;
-                    string lowestName = null;
-                    foreach (string option in Bot.InformationalData.Keys)
-                    {
-                        int currentDistance = StringConversionHelper.GetLevenshteinDistance(commandSearch, option);
-                        if (currentDistance < lowestDistance)
-                        {
-                            lowestDistance = currentDistance;
-                            lowestName = option;
-                        }
-                    }
-                    message.Channel.SendMessageAsync(REFUSAL_PREFIX + "Unknown info name. " + (lowestName == null ? "" : "Did you mean `" + lowestName + "`?")).Wait();
-                }
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "!info <info item or 'list'>");
+                return;
+            }
+            string commandSearch = cmds[0].ToLowerFast().Trim();
+            if (commandSearch == "list")
+            {
+                string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
+                SendGenericPositiveMessageReply(message, "Available Info Names", "Available info names: " + fullList);
+            }
+            else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+            {
+                SendGenericPositiveMessageReply(message, "Info: " + commandSearch, infoOutput);
             }
             else
             {
-                message.Channel.SendMessageAsync(REFUSAL_PREFIX + "!info <info item or 'list'>").Wait();
+                string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, commandSearch, 20);
+                SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
             }
         }
     }
