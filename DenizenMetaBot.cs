@@ -249,6 +249,7 @@ namespace DenizenBot
                 detail.Icon = detailsSection.GetString("icon", "");
                 detail.GitHub = detailsSection.GetString("github", "");
                 detail.UpdateMessage = detailsSection.GetString("update", "");
+                ProjectToDetails.Add(key.ToLowerFast(), detail);
             }
             FDSSection channelDetailsSection = ConfigFile.GetSection("channel_details");
             foreach (string key in channelDetailsSection.GetRootKeys())
