@@ -125,7 +125,8 @@ namespace DenizenBot
         {
             AdminCommands adminCmds = new AdminCommands() { Bot = this };
             InformationCommands infoCmds = new InformationCommands() { Bot = this };
-            // Various
+            // ========= Various =========
+            // help
             ChatCommands["help"] = infoCmds.CMD_Help;
             ChatCommands["halp"] = infoCmds.CMD_Help;
             ChatCommands["helps"] = infoCmds.CMD_Help;
@@ -133,6 +134,7 @@ namespace DenizenBot
             ChatCommands["hel"] = infoCmds.CMD_Help;
             ChatCommands["hal"] = infoCmds.CMD_Help;
             ChatCommands["h"] = infoCmds.CMD_Help;
+            // hello
             ChatCommands["hello"] = infoCmds.CMD_Hello;
             ChatCommands["hi"] = infoCmds.CMD_Hello;
             ChatCommands["hey"] = infoCmds.CMD_Hello;
@@ -141,9 +143,11 @@ namespace DenizenBot
             ChatCommands["github"] = infoCmds.CMD_Hello;
             ChatCommands["git"] = infoCmds.CMD_Hello;
             ChatCommands["hub"] = infoCmds.CMD_Hello;
+            // info
             ChatCommands["info"] = infoCmds.CMD_Info;
             ChatCommands["notice"] = infoCmds.CMD_Info;
             ChatCommands["alert"] = infoCmds.CMD_Info;
+            // update
             ChatCommands["update"] = infoCmds.CMD_Update;
             ChatCommands["latest"] = infoCmds.CMD_Update;
             ChatCommands["current"] = infoCmds.CMD_Update;
@@ -151,9 +155,21 @@ namespace DenizenBot
             ChatCommands["builds"] = infoCmds.CMD_Update;
             ChatCommands["download"] = infoCmds.CMD_Update;
             ChatCommands["version"] = infoCmds.CMD_Update;
+            // github
+            ChatCommands["github"] = infoCmds.CMD_GitHub;
+            ChatCommands["readme"] = infoCmds.CMD_GitHub;
+            ChatCommands["gh"] = infoCmds.CMD_GitHub;
+            ChatCommands["read"] = infoCmds.CMD_GitHub;
+            ChatCommands["link"] = infoCmds.CMD_GitHub;
+            // issues
+            ChatCommands["issues"] = infoCmds.CMD_Issues;
+            ChatCommands["issue"] = infoCmds.CMD_Issues;
+            ChatCommands["error"] = infoCmds.CMD_Issues;
+            ChatCommands["ghissues"] = infoCmds.CMD_Issues;
+            ChatCommands["githubissues"] = infoCmds.CMD_Issues;
             // TODO: CMD_DScript
             // TODO: CMD_Command/Tag/Event/Mechanism/Language/Tutorial/Action
-            // Admin
+            // ========= Admin =========
             ChatCommands["restart"] = adminCmds.CMD_Restart;
             // TODO: CMD_Reload
         }

@@ -92,6 +92,70 @@ namespace DenizenBot
         }
 
         /// <summary>
+        /// User command to see a link to the GitHub.
+        /// </summary>
+        public void CMD_GitHub(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for GitHub command", "Please specify which project(s) you want the GitHub link for.")).Wait();
+                    return;
+                }
+                foreach (ProjectDetails proj in details.Updates)
+                {
+                    message.Channel.SendMessageAsync(embed: proj.GetGithubEmbed()).Wait();
+                }
+                return;
+            }
+            foreach (string projectName in cmds)
+            {
+                string projectNameLower = projectName.ToLowerFast();
+                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
+                {
+                    message.Channel.SendMessageAsync(embed: detail.GetGithubEmbed()).Wait();
+                }
+                else
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for GitHub command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                }
+            }
+        }
+
+        /// <summary>
+        /// User command to see a link to the GitHub.
+        /// </summary>
+        public void CMD_Issues(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Issues command", "Please specify which project(s) you want the Issues link for.")).Wait();
+                    return;
+                }
+                foreach (ProjectDetails proj in details.Updates)
+                {
+                    message.Channel.SendMessageAsync(embed: proj.GetIssuesEmbed()).Wait();
+                }
+                return;
+            }
+            foreach (string projectName in cmds)
+            {
+                string projectNameLower = projectName.ToLowerFast();
+                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
+                {
+                    message.Channel.SendMessageAsync(embed: detail.GetIssuesEmbed()).Wait();
+                }
+                else
+                {
+                    message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown project name for Issues command", "Unknown project name `" + projectName.Replace('`', '\'') + "`.")).Wait();
+                }
+            }
+        }
+
+        /// <summary>
         /// User command to get some predefined informational output.
         /// </summary>
         public void CMD_Info(string[] cmds, SocketMessage message)
