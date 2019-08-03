@@ -36,11 +36,6 @@ namespace DenizenBot.CommandHandlers
         public DenizenMetaBot Bot;
 
         /// <summary>
-        /// A warning emoji image URL.
-        /// </summary>
-        public const string WARNING_EMOJI = "https://i.alexgoodwin.media/i/for_real_usage/13993d.png";
-
-        /// <summary>
         /// Sends a reply to a message in the same channel.
         /// </summary>
         /// <param name="message">The message to reply to.</param>
@@ -79,7 +74,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public static Embed GetErrorMessageEmbed(string title, string description)
         {
-            return new EmbedBuilder().WithTitle(title).WithColor(255, 64, 32).WithThumbnailUrl(WARNING_EMOJI).WithDescription(description).Build();
+            return new EmbedBuilder().WithTitle(title).WithColor(255, 64, 32).WithThumbnailUrl(Constants.WARNING_ICON).WithDescription(description).Build();
         }
     }
 }

@@ -53,13 +53,14 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Help(string[] cmds, SocketMessage message)
         {
-            string outputMessage = "Available Commands: " + CmdsHelp;
-            outputMessage += "\nAvailable Meta Docs Commands: " + CmdsMeta;
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
+            embed.AddField("**Available Commands:**", CmdsHelp, true);
+            embed.AddField("**Available Meta Docs Commands:**", CmdsMeta, true);
             if (Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
-                outputMessage += "\nAvailable admin commands: " + CmdsAdminHelp;
+                embed.AddField("**Available Admin Commands:**", CmdsAdminHelp, true);
             }
-            SendGenericPositiveMessageReply(message, "Bot Command Help", outputMessage);
+            SendReply(message, embed.Build());
         }
 
         /// <summary>
@@ -67,7 +68,8 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Hello(string[] cmds, SocketMessage message)
         {
-            SendGenericPositiveMessageReply(message, "Hello", "Hi! I'm a bot! Find my source code at https://github.com/DenizenScript/DenizenMetaBot");
+            SendReply(message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(Constants.DENIZEN_LOGO).WithUrl(Constants.SOURCE_CODE_URL)
+                .WithDescription($"Hi! I'm a bot! Find my source code at {Constants.SOURCE_CODE_URL}").Build());
         }
 
         /// <summary>
@@ -161,29 +163,24 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
-        /// Generic reusable "information" icon.
-        /// </summary>
-        public const string INFO_ICON = "https://i.alexgoodwin.media/i/for_real_usage/911f66.png";
-
-        /// <summary>
         /// User command to get some predefined informational output.
         /// </summary>
         public void CMD_Info(string[] cmds, SocketMessage message)
         {
             if (cmds.Length != 1)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "!info <info item or 'list'>");
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!info <info item or 'list'>`");
                 return;
             }
             string commandSearch = cmds[0].ToLowerFast().Trim();
             if (commandSearch == "list")
             {
                 string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
-                SendReply(message, new EmbedBuilder().WithThumbnailUrl(INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
             }
             else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
             {
-                SendReply(message, new EmbedBuilder().WithThumbnailUrl(INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
             }
             else
             {

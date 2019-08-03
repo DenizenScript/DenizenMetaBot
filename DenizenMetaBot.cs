@@ -37,11 +37,6 @@ namespace DenizenBot
         public const string CONFIG_FILE = CONFIG_FOLDER + "config.fds";
 
         /// <summary>
-        /// The base for the meta docs URL.
-        /// </summary>
-        public const string URL_BASE = "https://one.denizenscript.com/denizen/";
-
-        /// <summary>
         /// Bot token, read from config data.
         /// </summary>
         public static readonly string TOKEN = File.ReadAllText(TOKEN_FILE).Replace('\n', ' ').Replace('\r', ' ').Replace('\t', ' ').Replace(" ", "");
