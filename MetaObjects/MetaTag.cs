@@ -110,7 +110,6 @@ namespace DenizenBot.MetaObjects
                     return true;
                 default:
                     return base.ApplyValue(key, value);
-
             }
         }
     }

@@ -40,14 +40,15 @@ namespace DenizenBot.CommandHandlers
                 + "`mechanism [name]` to search mechanisms\n"
                 + "`tag [name]` to search tags\n"
                 + "`event [name]` to search world script events\n"
-                + "`action [name]` to search NPC assignment actions\n";
+                + "`action [name]` to search NPC assignment actions\n"
+                + "`language [name]` to search language docs";
 
         /// <summary>
         /// Simple output string for admin commands.
         /// </summary>
         public static string CmdsAdminHelp =
                 "`restart` restarts the bot\n"
-                + "`reload` reloads the meta docs\n";
+                + "`reload` reloads the meta docs";
 
         /// <summary>
         /// User command to get help (shows a list of valid bot commands).

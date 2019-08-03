@@ -200,7 +200,12 @@ namespace DenizenBot
             ChatCommands["act"] = metaCmds.CMD_Action;
             ChatCommands["acts"] = metaCmds.CMD_Action;
             ChatCommands["a"] = metaCmds.CMD_Action;
-            // TODO: CMD_Language
+            // language
+            ChatCommands["language"] = metaCmds.CMD_Language;
+            ChatCommands["languages"] = metaCmds.CMD_Language;
+            ChatCommands["lang"] = metaCmds.CMD_Language;
+            ChatCommands["langs"] = metaCmds.CMD_Language;
+            ChatCommands["l"] = metaCmds.CMD_Language;
             // ========= Utility =========
             // TODO: CMD_DScript
             // ========= Admin =========

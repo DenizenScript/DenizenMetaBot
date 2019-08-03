@@ -184,5 +184,18 @@ namespace DenizenBot.CommandHandlers
             }
             AutoMetaCommand(Program.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, message);
         }
+
+        /// <summary>
+        /// Language meta docs user command.
+        /// </summary>
+        public void CMD_Language(string[] cmds, SocketMessage message)
+        {
+            string secondarySearch = string.Join(" ", cmds).ToLowerFast();
+            if (cmds.Length > 0)
+            {
+                cmds[0] = secondarySearch;
+            }
+            AutoMetaCommand(Program.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, message);
+        }
     }
 }

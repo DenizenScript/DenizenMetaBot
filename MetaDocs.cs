@@ -88,8 +88,8 @@ namespace DenizenBot
             { "mechanism", () => new MetaMechanism() },
             { "tag", () => new MetaTag() },
             { "event", () => new MetaEvent() },
-            { "action", () => new MetaAction() }
-            // TODO: Action, Language
+            { "action", () => new MetaAction() },
+            { "language", () => new MetaLanguage() }
         };
 
         /// <summary>
@@ -116,6 +116,11 @@ namespace DenizenBot
         /// All known actions.
         /// </summary>
         public Dictionary<string, MetaAction> Actions = new Dictionary<string, MetaAction>(512);
+
+        /// <summary>
+        /// All known languages.
+        /// </summary>
+        public Dictionary<string, MetaLanguage> Languages = new Dictionary<string, MetaLanguage>(512);
 
         /// <summary>
         /// Download all docs.
@@ -264,8 +269,7 @@ namespace DenizenBot
             {
                 if (!MetaObjectGetters.TryGetValue(objectType.ToLowerFast(), out Func<MetaObject> getter))
                 {
-                    // TODO: Only temporarily ignored (until more types supported)
-                    // LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
+                    LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
                     return;
                 }
                 MetaObject obj = getter();
