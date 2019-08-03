@@ -47,7 +47,9 @@ namespace DenizenBot.CommandHandlers
         /// <param name="cmds">The command args.</param>
         /// <param name="message">The Discord message object.</param>
         /// <param name="secondarySearch">A secondary search string if the first fails.</param>
-        public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message, string secondarySearch = null) where T: MetaObject
+        /// <param name="secondaryMatcher">A secondary matching function if needed.</param>
+        public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
+            string secondarySearch = null, Func<T, bool> secondaryMatcher = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
             {
@@ -68,12 +70,21 @@ namespace DenizenBot.CommandHandlers
             if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
             {
                 List<string> matched = new List<string>();
+                List<string> strongMatched = new List<string>();
                 foreach (string cmd in docs.Keys)
                 {
                     if (cmd.Contains(search) || (secondarySearch != null && cmd.Contains(secondarySearch)))
                     {
                         matched.Add(cmd);
                     }
+                    if (secondaryMatcher != null && secondaryMatcher(docs[cmd]))
+                    {
+                        strongMatched.Add(cmd);
+                    }
+                }
+                if (strongMatched.Count > 0)
+                {
+                    matched = strongMatched;
                 }
                 if (matched.Count == 0)
                 {
@@ -149,7 +160,9 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Event(string[] cmds, SocketMessage message)
         {
-            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message);
+            string secondarySearch = string.Join(" ", cmds);
+            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondarySearch,
+                (e) => e.RegexMatcher.IsMatch(secondarySearch));
         }
     }
 }
