@@ -248,48 +248,56 @@ namespace DenizenBot
         /// </summary>
         public void LoadInObject(string objectType, string file, string[] objectData)
         {
-            if (!MetaObjectGetters.TryGetValue(objectType.ToLowerFast(), out Func<MetaObject> getter))
+            try
             {
-                // TODO: Only temporarily ignored (until more types supported)
-                // LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
-                return;
+                if (!MetaObjectGetters.TryGetValue(objectType.ToLowerFast(), out Func<MetaObject> getter))
+                {
+                    // TODO: Only temporarily ignored (until more types supported)
+                    // LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
+                    return;
+                }
+                MetaObject obj = getter();
+                string curKey = null;
+                string curValue = null;
+                foreach (string line in objectData)
+                {
+                    if (line.StartsWith("@"))
+                    {
+                        if (curKey != null && curValue != null)
+                        {
+                            if (!obj.ApplyValue(curKey.ToLowerFast(), curValue))
+                            {
+                                LoadErrors.Add("While processing " + file + " in object type '" + objectType + "' for '"
+                                    + obj.Name + "' could not apply key '" + curKey + "' with value '" + curValue + "'.");
+                            }
+                            curKey = null;
+                            curValue = null;
+                        }
+                        int space = line.IndexOf(' ');
+                        if (space == -1)
+                        {
+                            curKey = line.Substring(1);
+                            if (curKey == "end_meta")
+                            {
+                                break;
+                            }
+                            continue;
+                        }
+                        curKey = line.Substring(1, space - 1);
+                        curValue = line.Substring(space + 1);
+                    }
+                    else
+                    {
+                        curValue += "\n" + line;
+                    }
+                }
+                obj.AddTo(this);
             }
-            MetaObject obj = getter();
-            string curKey = null;
-            string curValue = null;
-            foreach (string line in objectData)
+            catch (Exception ex)
             {
-                if (line.StartsWith("@"))
-                {
-                    if (curKey != null && curValue != null)
-                    {
-                        if (!obj.ApplyValue(curKey.ToLowerFast(), curValue))
-                        {
-                            LoadErrors.Add("While processing " + file + " in object type '" + objectType + "' for '"
-                                + obj.Name + "' could not apply key '" + curKey + "' with value '" + curValue + "'.");
-                        }
-                        curKey = null;
-                        curValue = null;
-                    }
-                    int space = line.IndexOf(' ');
-                    if (space == -1)
-                    {
-                        curKey = line.Substring(1);
-                        if (curKey == "end_meta")
-                        {
-                            break;
-                        }
-                        continue;
-                    }
-                    curKey = line.Substring(1, space - 1);
-                    curValue = line.Substring(space + 1);
-                }
-                else
-                {
-                    curValue += "\n" + line;
-                }
+                Console.WriteLine($"Error in file {file} for object type {objectType}: {ex}");
+                LoadErrors.Add($"Error in file {file} for object type {objectType}: {ex.GetType().Name}: {ex.Message} ... see console for details.");
             }
-            obj.AddTo(this);
         }
 
         /// <summary>
