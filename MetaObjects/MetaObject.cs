@@ -68,7 +68,6 @@ namespace DenizenBot.MetaObjects
                     return true;
                 default:
                     return false;
-
             }
         }
 
@@ -92,7 +91,7 @@ namespace DenizenBot.MetaObjects
         public virtual EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + CleanName.Replace(" ", "%20"));
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + CleanName.Replace(" ", "%20").Replace("<", "%3C").Replace(">", "%3E"));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
