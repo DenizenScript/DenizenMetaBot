@@ -81,7 +81,7 @@ namespace DenizenBot.MetaObjects
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                builder.AddField(key, value, true);
+                builder.AddField(key, value.Replace("<", "\\<").Replace(">", "\\>"), true);
             }
         }
 
