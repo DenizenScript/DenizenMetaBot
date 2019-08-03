@@ -196,22 +196,12 @@ namespace DenizenBot
         /// <summary>
         /// A mapping from channel IDs to project names for the update command.
         /// </summary>
-        public Dictionary<ulong, string[]> ChannelToProject = new Dictionary<ulong, string[]>(512);
+        public Dictionary<ulong, ChannelDetails> ChannelToDetails = new Dictionary<ulong, ChannelDetails>(512);
 
         /// <summary>
-        /// A map of project names to the relevant update messages.
+        /// A map of project names to the project's details.
         /// </summary>
-        public Dictionary<string, string> UpdateMessages = new Dictionary<string, string>(512);
-
-        /// <summary>
-        /// A map of project names (all lower) to their properly cased names.
-        /// </summary>
-        public Dictionary<string, string> ProjectNames = new Dictionary<string, string>(512);
-
-        /// <summary>
-        /// A map of project names to image URLs.
-        /// </summary>
-        public Dictionary<string, string> ProjectImageUrls = new Dictionary<string, string>(512);
+        public Dictionary<string, ProjectDetails> ProjectToDetails = new Dictionary<string, ProjectDetails>(512);
 
         /// <summary>
         /// Fills fields with data from the config file.
@@ -234,24 +224,29 @@ namespace DenizenBot
                     InformationalData[name.Trim()] = infoValue;
                 }
             }
-            FDSSection channelUpdatesSection = ConfigFile.GetSection("channel_updates");
-            foreach (string key in channelUpdatesSection.GetRootKeys())
+            FDSSection projectDetailsSection = ConfigFile.GetSection("project_details");
+            foreach (string key in projectDetailsSection.GetRootKeys())
             {
-                ChannelToProject.Add(ulong.Parse(key), channelUpdatesSection.GetString(key).Split(' '));
+                FDSSection detailsSection = projectDetailsSection.GetSection(key);
+                ProjectDetails detail = new ProjectDetails();
+                detail.Name = key;
+                detail.Icon = detailsSection.GetString("icon", "");
+                detail.GitHub = detailsSection.GetString("github", "");
+                detail.UpdateMessage = detailsSection.GetString("update", "");
             }
-            FDSSection updateProjectsSection = ConfigFile.GetSection("update_projects");
-            foreach (string key in updateProjectsSection.GetRootKeys())
+            FDSSection channelDetailsSection = ConfigFile.GetSection("channel_details");
+            foreach (string key in channelDetailsSection.GetRootKeys())
             {
-                UpdateMessages.Add(key, updateProjectsSection.GetString(key));
-            }
-            foreach (string project in ConfigFile.GetStringList("project_names"))
-            {
-                ProjectNames.Add(project.ToLowerFast(), project);
-            }
-            FDSSection projectIconsSection = ConfigFile.GetSection("project_icons");
-            foreach (string key in projectIconsSection.GetRootKeys())
-            {
-                ProjectImageUrls.Add(key, projectIconsSection.GetString(key));
+                FDSSection detailsSection = channelDetailsSection.GetSection(key);
+                ChannelDetails detail = new ChannelDetails();
+                List<ProjectDetails> projects = new List<ProjectDetails>();
+                foreach (string projName in detailsSection.GetString("updates", "").Split(' '))
+                {
+                    projects.Add(ProjectToDetails[projName]);
+                }
+                detail.Updates = projects.ToArray();
+                detail.GitHub = detailsSection.GetString("github", "");
+                ChannelToDetails.Add(ulong.Parse(key), detail);
             }
         }
 

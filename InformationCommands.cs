@@ -66,21 +66,23 @@ namespace DenizenBot
         {
             if (cmds.Length == 0)
             {
-                if (!Bot.ChannelToProject.TryGetValue(message.Channel.Id, out cmds))
+                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Update command", "Please specify which project(s) you want the update link for.")).Wait();
                     return;
                 }
+                foreach (ProjectDetails proj in details.Updates)
+                {
+                    message.Channel.SendMessageAsync(embed: proj.GetUpdateEmbed()).Wait();
+                }
+                return;
             }
-            StringBuilder toOutput = new StringBuilder();
             foreach (string projectName in cmds)
             {
                 string projectNameLower = projectName.ToLowerFast();
-                if (Bot.UpdateMessages.TryGetValue(projectNameLower, out string updateMessage))
+                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    Embed embed = new EmbedBuilder().WithTitle("Update " + Bot.ProjectNames[projectNameLower]).WithColor(0, 255, 255)
-                        .WithThumbnailUrl(Bot.ProjectImageUrls[projectNameLower]).WithDescription(updateMessage).Build();
-                    message.Channel.SendMessageAsync(embed: embed).Wait();
+                    message.Channel.SendMessageAsync(embed: detail.GetUpdateEmbed()).Wait();
                 }
                 else
                 {
