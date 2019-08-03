@@ -115,5 +115,13 @@ namespace DenizenBot.CommandHandlers
         {
             AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message);
         }
+
+        /// <summary>
+        /// Tag meta docs user command.
+        /// </summary>
+        public void CMD_Tag(string[] cmds, SocketMessage message)
+        {
+            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message);
+        }
     }
 }
