@@ -104,13 +104,43 @@ namespace DenizenBot
         /// </summary>
         public void DownloadAll()
         {
-            foreach (string src in DENIZEN_SOURCES)
+            ConcurrentBag<ZipArchive> zips = new ConcurrentBag<ZipArchive>();
+            List<ManualResetEvent> resets = new List<ManualResetEvent>();
+            foreach (string src in DENIZEN_SOURCES.Union(DENIZEN_ADDON_SOURCES))
             {
-                Download(src);
+                ManualResetEvent evt = new ManualResetEvent(false);
+                resets.Add(evt);
+                Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        ZipArchive zip = DownloadZip(src);
+                        zips.Add(zip);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Zip download exception {ex}");
+                        LoadErrors.Add($"Zip download error: {ex.GetType().Name}: {ex.Message}");
+                    }
+                    evt.Set();
+                });
             }
-            foreach (string src in DENIZEN_ADDON_SOURCES)
+            foreach (ManualResetEvent evt in resets)
             {
-                Download(src);
+                evt.WaitOne();
+            }
+            foreach (ZipArchive zip in zips)
+            {
+                try
+                {
+                    string[] fullLines = ReadLines(zip);
+                    LoadDataFromLines(fullLines);
+                }
+                catch (Exception ex)
+                {
+                    LoadErrors.Add("Internal exception - " + ex.GetType().FullName + " ... see bot console for details.");
+                    Console.WriteLine("Error: " + ex.ToString());
+                }
             }
             foreach (string str in LoadErrors)
             {
@@ -254,24 +284,6 @@ namespace DenizenBot
                 }
             }
             obj.AddTo(this);
-        }
-
-        /// <summary>
-        /// Download and load a source.
-        /// </summary>
-        public void Download(string source, string folderLimit = null)
-        {
-            try
-            {
-                ZipArchive zip = DownloadZip(source);
-                string[] fullLines = ReadLines(zip, folderLimit);
-                LoadDataFromLines(fullLines);
-            }
-            catch (Exception ex)
-            {
-                LoadErrors.Add("Internal exception - " + ex.GetType().FullName + " ... see bot console for details.");
-                Console.WriteLine("Error: " + ex.ToString());
-            }
         }
 
         /// <summary>
