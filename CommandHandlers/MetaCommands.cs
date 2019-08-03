@@ -143,5 +143,13 @@ namespace DenizenBot.CommandHandlers
             }
             AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearch);
         }
+
+        /// <summary>
+        /// Event meta docs user command.
+        /// </summary>
+        public void CMD_Event(string[] cmds, SocketMessage message)
+        {
+            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message);
+        }
     }
 }

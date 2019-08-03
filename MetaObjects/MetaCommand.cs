@@ -90,7 +90,7 @@ namespace DenizenBot.MetaObjects
                     Description = value;
                     return true;
                 case "tags":
-                    Tags = value.Split('\n');
+                    Tags = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     return true;
                 case "usage":
                     Usages.Add(value);
