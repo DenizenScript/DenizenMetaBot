@@ -161,7 +161,7 @@ namespace DenizenBot.CommandHandlers
         public void CMD_Event(string[] cmds, SocketMessage message)
         {
             string onSearch = string.Join(" ", cmds).ToLowerFast();
-            string secondarySearch = onSearch.StartsWith("on ") ? onSearch : onSearch.Substring("on ".Length);
+            string secondarySearch = onSearch.StartsWith("on ") ? onSearch.Substring("on ".Length) : onSearch;
             onSearch = "on " + secondarySearch;
             if (cmds.Length > 0)
             {
