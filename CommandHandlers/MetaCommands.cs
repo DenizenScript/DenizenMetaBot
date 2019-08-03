@@ -114,7 +114,16 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Mechanism(string[] cmds, SocketMessage message)
         {
-            AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message);
+            string secondarySearch = null;
+            if (cmds.Length > 0)
+            {
+                int dotIndex = cmds[0].IndexOf('.');
+                if (dotIndex > 0)
+                {
+                    secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
+                }
+            }
+            AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearch);
         }
 
         /// <summary>
