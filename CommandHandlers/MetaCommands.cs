@@ -160,13 +160,15 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Event(string[] cmds, SocketMessage message)
         {
-            string secondarySearch = string.Join(" ", cmds).ToLowerFast();
+            string onSearch = string.Join(" ", cmds).ToLowerFast();
+            string secondarySearch = onSearch.StartsWith("on ") ? onSearch : onSearch.Substring("on ".Length);
+            onSearch = "on " + secondarySearch;
             if (cmds.Length > 0)
             {
                 cmds[0] = secondarySearch;
             }
             AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, null,
-            (e) => e.RegexMatcher.IsMatch(secondarySearch));
+            (e) => e.RegexMatcher.IsMatch(onSearch));
         }
     }
 }

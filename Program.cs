@@ -77,7 +77,14 @@ namespace DenizenBot
             {
                 Console.WriteLine("Discord crash: " + ex.ToString());
                 Thread.Sleep(10 * 1000);
-                Thread.CurrentThread.Name = "discordbotthread_dead" + new Random().Next(5000);
+                try
+                {
+                    Thread.CurrentThread.Name = "discordbotthread_dead" + new Random().Next(5000);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Ignore
+                }
                 LaunchBotThread(new string[0]);
             }
         }
