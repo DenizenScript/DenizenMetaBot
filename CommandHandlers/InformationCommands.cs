@@ -25,28 +25,25 @@ namespace DenizenBot.CommandHandlers
         /// Simple output string for general public commands.
         /// </summary>
         public static string CmdsHelp =
-                "`help` shows help output, "
-                + "`hello` shows a source code link, "
-                + "`info <name>` shows a prewritten informational notice reply, "
-                + "`update [project ...]` shows an update link for the named project(s), "
-                + "`github [project ...]` shows a GitHub link for the named project(s), "
-                + "`issues [project ...]` shows an issue posting link for the named project(s), "
-                + "...";
+                "`help` shows help output\n"
+                + "`hello` shows a source code link\n"
+                + "`info <name>` shows a prewritten informational notice reply\n"
+                + "`update [project ...]` shows an update link for the named project(s)\n"
+                + "`github [project ...]` shows a GitHub link for the named project(s)\n"
+                + "`issues [project ...]` shows an issue posting link for the named project(s)";
 
         /// <summary>
         /// Simple output string for meta commands.
         /// </summary>
         public static string CmdsMeta =
-                "`command [name]` to search commands, "
-                + "...";
+                "`command [name]` to search commands\n";
 
         /// <summary>
         /// Simple output string for admin commands.
         /// </summary>
         public static string CmdsAdminHelp =
-                "`restart` restarts the bot, "
-                + "`reload` reloads the meta docs, "
-                + "...";
+                "`restart` restarts the bot\n"
+                + "`reload` reloads the meta docs\n";
 
         /// <summary>
         /// User command to get help (shows a list of valid bot commands).
