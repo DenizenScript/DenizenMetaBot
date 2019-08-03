@@ -52,7 +52,10 @@ namespace DenizenBot.CommandHandlers
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
             embed.AddField("**Available Commands:**", CmdsHelp, true);
-            embed.AddField("**Available Meta Docs Commands:**", CmdsMeta, true);
+            if (Bot.MetaCommandsAllowed(message.Channel))
+            {
+                embed.AddField("**Available Meta Docs Commands:**", CmdsMeta, true);
+            }
             if (Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
                 embed.AddField("**Available Admin Commands:**", CmdsAdminHelp, true);

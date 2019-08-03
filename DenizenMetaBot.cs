@@ -201,6 +201,16 @@ namespace DenizenBot
         }
 
         /// <summary>
+        /// Returns whether meta commands are allowed in a given channel.
+        /// </summary>
+        /// <param name="channel">The channel to check.</param>
+        /// <returns>True if allowed, false otherwise.</returns>
+        public bool MetaCommandsAllowed(ISocketMessageChannel channel)
+        {
+            return ChannelToDetails.TryGetValue(channel.Id, out ChannelDetails details) && details.Docs;
+        }
+
+        /// <summary>
         /// Signaled when the bot is stopped.
         /// </summary>
         public ManualResetEvent StoppedEvent = new ManualResetEvent(false);
