@@ -170,5 +170,19 @@ namespace DenizenBot.CommandHandlers
             AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, null,
             (e) => e.RegexMatcher.IsMatch(onSearch));
         }
+
+        /// <summary>
+        /// Action meta docs user command.
+        /// </summary>
+        public void CMD_Action(string[] cmds, SocketMessage message)
+        {
+            string secondarySearch = string.Join(" ", cmds).ToLowerFast();
+            secondarySearch = secondarySearch.StartsWith("on ") ? secondarySearch.Substring("on ".Length) : secondarySearch;
+            if (cmds.Length > 0)
+            {
+                cmds[0] = secondarySearch;
+            }
+            AutoMetaCommand(Program.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, message);
+        }
     }
 }

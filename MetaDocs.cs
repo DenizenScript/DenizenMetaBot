@@ -87,7 +87,8 @@ namespace DenizenBot
             { "command", () => new MetaCommand() },
             { "mechanism", () => new MetaMechanism() },
             { "tag", () => new MetaTag() },
-            { "event", () => new MetaEvent() }
+            { "event", () => new MetaEvent() },
+            { "action", () => new MetaAction() }
             // TODO: Action, Language
         };
 
@@ -110,6 +111,11 @@ namespace DenizenBot
         /// All known events.
         /// </summary>
         public Dictionary<string, MetaEvent> Events = new Dictionary<string, MetaEvent>(1024);
+
+        /// <summary>
+        /// All known actions.
+        /// </summary>
+        public Dictionary<string, MetaAction> Actions = new Dictionary<string, MetaAction>(512);
 
         /// <summary>
         /// Download all docs.

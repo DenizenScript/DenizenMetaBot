@@ -9,33 +9,23 @@ using FreneticUtilities.FreneticExtensions;
 namespace DenizenBot.MetaObjects
 {
     /// <summary>
-    /// A documented event.
+    /// A documented action.
     /// </summary>
-    public class MetaEvent : MetaObject
+    public class MetaAction : MetaObject
     {
-        public override MetaType Type => MetaDocs.META_TYPE_EVENT;
+        public override MetaType Type => MetaDocs.META_TYPE_ACTION;
 
-        public override string Name => Events[0];
+        public override string Name => Actions[0];
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Events.Add(Name.ToLowerFast(), this);
+            docs.Actions.Add(Name.ToLowerFast(), this);
         }
 
         /// <summary>
-        /// The names of the event.
+        /// The names of the action.
         /// </summary>
-        public string[] Events = new string[0];
-
-        /// <summary>
-        /// Switches available to the event.
-        /// </summary>
-        public List<string> Switches = new List<string>();
-
-        /// <summary>
-        /// The regex matcher.
-        /// </summary>
-        public Regex RegexMatcher = null;
+        public string[] Actions = new string[0];
 
         /// <summary>
         /// The trigger reason.
@@ -52,23 +42,13 @@ namespace DenizenBot.MetaObjects
         /// </summary>
         public string[] Determinations = new string[0];
 
-        /// <summary>
-        /// Whether the event is cancellable.
-        /// </summary>
-        public bool Cancellable = false;
-
         public override EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = base.GetEmbed();
-            AutoField(builder, "Other Event Lines", string.Join("\n", Events.Skip(1)));
-            AutoField(builder, "Switches", string.Join("\n", Switches));
+            AutoField(builder, "Other Action Lines", string.Join("\n", Actions.Skip(1)));
             AutoField(builder, "Triggers", Triggers);
             AutoField(builder, "Context", string.Join("\n", Context));
             AutoField(builder, "Determine", string.Join("\n", Determinations));
-            if (Cancellable)
-            {
-                AutoField(builder, "Cancellable", "True - this adds `<context.cancelled>` and determines `cancelled` + `cancelled:false`.");
-            }
             return builder;
         }
 
@@ -76,26 +56,17 @@ namespace DenizenBot.MetaObjects
         {
             switch (key)
             {
-                case "events":
-                    Events = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                case "actions":
+                    Actions = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     return true;
                 case "triggers":
                     Triggers = value;
-                    return true;
-                case "regex":
-                    RegexMatcher = new Regex(value, RegexOptions.Compiled);
-                    return true;
-                case "switch":
-                    Switches.Add(value);
                     return true;
                 case "context":
                     Context = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     return true;
                 case "determine":
                     Determinations = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                    return true;
-                case "cancellable":
-                    Cancellable = value.Trim().ToLowerFast() == "true";
                     return true;
                 default:
                     return base.ApplyValue(key, value);

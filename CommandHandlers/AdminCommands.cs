@@ -80,6 +80,7 @@ namespace DenizenBot.CommandHandlers
             embed.AddField("Mechanisms", docs.Mechanisms.Count, true);
             embed.AddField("Tags", docs.Tags.Count, true);
             embed.AddField("Events", docs.Events.Count, true);
+            embed.AddField("Actions", docs.Actions.Count, true);
             SendReply(message, embed.Build());
         }
     }
