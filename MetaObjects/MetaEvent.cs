@@ -53,6 +53,16 @@ namespace DenizenBot.MetaObjects
         public string[] Determinations = new string[0];
 
         /// <summary>
+        /// Whether there's a player attached to the event.
+        /// </summary>
+        public string Player = "";
+
+        /// <summary>
+        /// Whether there's an NPC attached to the event.
+        /// </summary>
+        public string NPC = "";
+
+        /// <summary>
         /// Whether the event is cancellable.
         /// </summary>
         public bool Cancellable = false;
@@ -63,6 +73,8 @@ namespace DenizenBot.MetaObjects
             AutoField(builder, "Other Event Lines", string.Join("\n", Events.Skip(1)));
             AutoField(builder, "Switches", string.Join("\n", Switches));
             AutoField(builder, "Triggers", Triggers);
+            AutoField(builder, "Has Player", Player);
+            AutoField(builder, "Has NPC", NPC);
             AutoField(builder, "Context", string.Join("\n", Context));
             AutoField(builder, "Determine", string.Join("\n", Determinations));
             if (Cancellable)
@@ -81,6 +93,12 @@ namespace DenizenBot.MetaObjects
                     return true;
                 case "triggers":
                     Triggers = value;
+                    return true;
+                case "player":
+                    Player = value;
+                    return true;
+                case "npc":
+                    NPC = value;
                     return true;
                 case "regex":
                     RegexMatcher = new Regex(value, RegexOptions.Compiled);
