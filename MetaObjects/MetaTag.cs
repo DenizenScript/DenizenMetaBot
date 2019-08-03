@@ -16,6 +16,8 @@ namespace DenizenBot.MetaObjects
 
         public override string Name => TagFull;
 
+        public override string CleanName => CleanedName;
+
         public override void AddTo(MetaDocs docs)
         {
             docs.Tags.Add(CleanedName, this);

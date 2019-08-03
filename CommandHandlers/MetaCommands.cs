@@ -65,12 +65,12 @@ namespace DenizenBot.CommandHandlers
                 SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}{type.WebPath}/");
                 return;
             }
-            if (!docs.TryGetValue(search, out T obj))
+            if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
             {
                 List<string> matched = new List<string>();
                 foreach (string cmd in docs.Keys)
                 {
-                    if (cmd.Contains(search))
+                    if (cmd.Contains(search) || (secondarySearch != null && cmd.Contains(secondarySearch)))
                     {
                         matched.Add(cmd);
                     }

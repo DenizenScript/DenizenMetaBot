@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Discord;
 using DenizenBot;
+using FreneticUtilities.FreneticExtensions;
 
 namespace DenizenBot.MetaObjects
 {
@@ -20,6 +21,11 @@ namespace DenizenBot.MetaObjects
         /// Get the name of the object. May have capitals.
         /// </summary>
         public abstract string Name { get; }
+
+        /// <summary>
+        /// Get the clean lowercase name of the object.
+        /// </summary>
+        public virtual string CleanName => Name.ToLowerFast();
 
         /// <summary>
         /// What categorization group the object is in.
@@ -86,7 +92,7 @@ namespace DenizenBot.MetaObjects
         public virtual EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Name.Replace(" ", "%20"));
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + CleanName.Replace(" ", "%20"));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
