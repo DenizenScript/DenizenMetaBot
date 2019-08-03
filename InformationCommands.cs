@@ -103,10 +103,7 @@ namespace DenizenBot
                     message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for GitHub command", "Please specify which project(s) you want the GitHub link for.")).Wait();
                     return;
                 }
-                foreach (ProjectDetails proj in details.Updates)
-                {
-                    message.Channel.SendMessageAsync(embed: proj.GetGithubEmbed()).Wait();
-                }
+                message.Channel.SendMessageAsync(embed: details.Updates[0].GetGithubEmbed()).Wait();
                 return;
             }
             foreach (string projectName in cmds)
@@ -135,10 +132,7 @@ namespace DenizenBot
                     message.Channel.SendMessageAsync(embed: GetErrorMessageEmbed("Unknown input for Issues command", "Please specify which project(s) you want the Issues link for.")).Wait();
                     return;
                 }
-                foreach (ProjectDetails proj in details.Updates)
-                {
-                    message.Channel.SendMessageAsync(embed: proj.GetIssuesEmbed()).Wait();
-                }
+                message.Channel.SendMessageAsync(embed: details.Updates[0].GetIssuesEmbed()).Wait();
                 return;
             }
             foreach (string projectName in cmds)
