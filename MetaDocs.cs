@@ -85,6 +85,7 @@ namespace DenizenBot
         public static Dictionary<string, Func<MetaObject>> MetaObjectGetters = new Dictionary<string, Func<MetaObject>>()
         {
             { "command", () => new MetaCommand() },
+            { "mechanism", () => new MetaMechanism() }
             // TODO: Action, Event, Language, Tag
         };
 
@@ -92,6 +93,11 @@ namespace DenizenBot
         /// All known commands.
         /// </summary>
         public Dictionary<string, MetaCommand> Commands = new Dictionary<string, MetaCommand>(512);
+
+        /// <summary>
+        /// All known mechanisms.
+        /// </summary>
+        public Dictionary<string, MetaMechanism> Mechanisms = new Dictionary<string, MetaMechanism>(1024);
 
         /// <summary>
         /// Download all docs.

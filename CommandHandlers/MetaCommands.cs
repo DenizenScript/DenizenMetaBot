@@ -84,7 +84,15 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Command(string[] cmds, SocketMessage message)
         {
-            AutoMetaCommand(Program.CurrentMeta.Commands, "Command", cmds, message);
+            AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message);
+        }
+
+        /// <summary>
+        /// Mechanism meta docs user command.
+        /// </summary>
+        public void CMD_Mechanism(string[] cmds, SocketMessage message)
+        {
+            AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message);
         }
     }
 }
