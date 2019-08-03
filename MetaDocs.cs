@@ -179,7 +179,7 @@ namespace DenizenBot
                 {
                     if (curKey != null && curValue != null)
                     {
-                        if (!obj.ApplyValue(curKey, curValue))
+                        if (!obj.ApplyValue(curKey.ToLowerFast(), curValue))
                         {
                             LoadErrors.Add("While processing " + file + " in object type '" + objectType + "' for '"
                                 + obj.Name + "' could not apply key '" + curKey + "' with value '" + curValue + "'.");

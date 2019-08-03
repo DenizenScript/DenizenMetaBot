@@ -53,6 +53,11 @@ namespace DenizenBot.MetaObjects
         public string[] Tags;
 
         /// <summary>
+        /// An associated video link.
+        /// </summary>
+        public string Video;
+
+        /// <summary>
         /// Sample usages.
         /// </summary>
         public List<string> Usages = new List<string>();
@@ -89,6 +94,9 @@ namespace DenizenBot.MetaObjects
                     return true;
                 case "usage":
                     Usages.Add(value);
+                    return true;
+                case "video":
+                    Video = Constants.DOCS_URL_BASE + value.Substring("/denizen/".Length);
                     return true;
                 default:
                     return base.ApplyValue(key, value);
