@@ -188,7 +188,7 @@ namespace DenizenBot.CommandHandlers
                 infoOutput = infoOutput.Trim();
                 if (infoOutput.StartsWith("NO_BOX:"))
                 {
-                    infoOutput = infoOutput.Substring("N_BOX:".Length).Trim();
+                    infoOutput = infoOutput.Substring("NO_BOX:".Length).Trim();
                     message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
                 }
                 else
