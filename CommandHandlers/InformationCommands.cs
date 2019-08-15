@@ -185,7 +185,16 @@ namespace DenizenBot.CommandHandlers
             }
             else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
             {
-                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                infoOutput = infoOutput.Trim();
+                if (infoOutput.StartsWith("NO_BOX:"))
+                {
+                    infoOutput = infoOutput.Substring("N_BOX:".Length).Trim();
+                    message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
+                }
+                else
+                {
+                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                }
             }
             else
             {
