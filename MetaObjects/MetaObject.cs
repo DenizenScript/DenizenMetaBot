@@ -72,6 +72,35 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Escapes some text for safe Discord output.
+        /// </summary>
+        /// <param name="input">The input text (unescaped).</param>
+        /// <returns>The output text (escaped).</returns>
+        public static string EscapeForDiscord(string input)
+        {
+            if (input.Contains("```"))
+            {
+                return input;
+            }
+            StringBuilder output = new StringBuilder(input.Length * 2);
+            bool inCodeBlock = false;
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                if (c == '`')
+                {
+                    inCodeBlock = !inCodeBlock;
+                }
+                else if (c == '<' || c == '>')
+                {
+                    output.Append("\\");
+                }
+                output.Append(c);
+            }
+            return output.ToString();
+        }
+
+        /// <summary>
         /// Checks the value as not null or whitespace, then adds it to the embed as an inline field.
         /// </summary>
         /// <param name="builder">The embed builder.</param>
@@ -81,7 +110,7 @@ namespace DenizenBot.MetaObjects
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                builder.AddField(key, value.Replace("<", "\\<").Replace(">", "\\>"), true);
+                builder.AddField(key, EscapeForDiscord(value), true);
             }
         }
 
@@ -91,7 +120,7 @@ namespace DenizenBot.MetaObjects
         public virtual EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + CleanName.Replace(" ", "%20").Replace("<", "%3C").Replace(">", "%3E"));
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Uri.EscapeUriString(CleanName));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
