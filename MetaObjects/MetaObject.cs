@@ -120,7 +120,7 @@ namespace DenizenBot.MetaObjects
         public virtual EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Uri.EscapeDataString(CleanName));
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Uri.EscapeDataString(CleanName).Replace("[", "%5B").Replace("]", "%5D"));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
