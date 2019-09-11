@@ -115,12 +115,22 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Escapes a URL input string.
+        /// </summary>
+        /// <param name="input">The unescaped input.</param>
+        /// <returns>The escaped output.</returns>
+        public static string UrlEscape(string input)
+        {
+            return input.Replace(" ", "%20").Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D");
+        }
+
+        /// <summary>
         /// Get an embed object for this meta object.
         /// </summary>
         public virtual EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
-                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + Uri.EscapeDataString(CleanName).Replace("[", "%5B").Replace("]", "%5D"));
+                .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + UrlEscape(CleanName));
             AutoField(builder, "Required Plugin(s)", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
