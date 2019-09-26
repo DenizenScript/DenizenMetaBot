@@ -169,6 +169,9 @@ namespace DenizenBot
             ChatCommands["error"] = infoCmds.CMD_Issues;
             ChatCommands["ghissues"] = infoCmds.CMD_Issues;
             ChatCommands["githubissues"] = infoCmds.CMD_Issues;
+            // rule
+            ChatCommands["rule"] = infoCmds.CMD_Rule;
+            ChatCommands["rules"] = infoCmds.CMD_Rule;
             // ========= Meta Docs =========
             // command
             ChatCommands["command"] = metaCmds.CMD_Command;
@@ -269,6 +272,11 @@ namespace DenizenBot
         public Dictionary<string, ProjectDetails> ProjectToDetails = new Dictionary<string, ProjectDetails>(512);
 
         /// <summary>
+        /// A map of rule IDs to their text.
+        /// </summary>
+        public Dictionary<string, string> Rules = new Dictionary<string, string>(128);
+
+        /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
         public void PopulateFromConfig()
@@ -314,6 +322,11 @@ namespace DenizenBot
                 detail.Updates = projects.ToArray();
                 detail.Docs = detailsSection.GetBool("docs", false).Value;
                 ChannelToDetails.Add(ulong.Parse(key), detail);
+            }
+            FDSSection rulesSection = ConfigFile.GetSection("rules");
+            foreach (string rule in rulesSection.GetRootKeys())
+            {
+                Rules.Add(rule, rulesSection.GetString(rule));
             }
         }
 

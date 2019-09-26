@@ -27,10 +27,11 @@ namespace DenizenBot.CommandHandlers
         public static string CmdsHelp =
                 "`help` shows help output\n"
                 + "`hello` shows a source code link\n"
-                + "`info <name>` shows a prewritten informational notice reply\n"
+                + "`info <name ...>` shows a prewritten informational notice reply\n"
                 + "`update [project ...]` shows an update link for the named project(s)\n"
                 + "`github [project ...]` shows a GitHub link for the named project(s)\n"
-                + "`issues [project ...]` shows an issue posting link for the named project(s)";
+                + "`issues [project ...]` shows an issue posting link for the named project(s)\n"
+                + "`rule [rule ...]` shows the identified rule";
 
         /// <summary>
         /// Simple output string for meta commands.
@@ -207,6 +208,35 @@ namespace DenizenBot.CommandHandlers
                 {
                     string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, commandSearch, 20);
                     SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// User command to display a rule.
+        /// </summary>
+        public void CMD_Rule(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                cmds = new string[] { "all" };
+            }
+            if (cmds.Length > 5)
+            {
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "Please request no more than 5 rules at a time.");
+                return;
+            }
+            foreach (string searchRaw in cmds)
+            {
+                string ruleSearch = searchRaw.ToLowerFast().Trim();
+                if (Bot.Rules.TryGetValue(ruleSearch, out string ruleText))
+                {
+                    ruleText = ruleText.Trim();
+                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithDescription(ruleText).Build());
+                }
+                else
+                {
+                    SendErrorMessageReply(message, "Cannot Display Rule", "Unknown rule ID.");
                 }
             }
         }

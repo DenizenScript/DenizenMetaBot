@@ -32,6 +32,7 @@ To configure the bot:
         - `updates` set to what projects they correspond to (for the update command).
 		- `docs` set to whether meta docs are allowed in this channel.
     - `url_base` set to the base URL of the meta website.
+    - `rules` set to a submapping of rule IDs to their text.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -52,6 +53,9 @@ channel_details:
     315163488085475337:
         updates: denizen spigot
 		docs: true
+rules:
+    all: Here's all the rules though!
+    1: This is an important rule!
 ```
 
 To start the bot up:
