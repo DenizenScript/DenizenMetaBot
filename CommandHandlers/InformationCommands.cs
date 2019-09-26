@@ -172,34 +172,42 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Info(string[] cmds, SocketMessage message)
         {
-            if (cmds.Length != 1)
+            if (cmds.Length == 0)
             {
                 SendErrorMessageReply(message, "Command Syntax Incorrect", "`!info <info item or 'list'>`");
                 return;
             }
-            string commandSearch = cmds[0].ToLowerFast().Trim();
-            if (commandSearch == "list")
+            if (cmds.Length > 5)
             {
-                string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
-                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
+                return;
             }
-            else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+            foreach (string searchRaw in cmds)
             {
-                infoOutput = infoOutput.Trim();
-                if (infoOutput.StartsWith("NO_BOX:"))
+                string commandSearch = searchRaw.ToLowerFast().Trim();
+                if (commandSearch == "list")
                 {
-                    infoOutput = infoOutput.Substring("NO_BOX:".Length).Trim();
-                    message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
+                    string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
+                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
+                }
+                else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+                {
+                    infoOutput = infoOutput.Trim();
+                    if (infoOutput.StartsWith("NO_BOX:"))
+                    {
+                        infoOutput = infoOutput.Substring("NO_BOX:".Length).Trim();
+                        message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
+                    }
+                    else
+                    {
+                        SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                    }
                 }
                 else
                 {
-                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                    string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, commandSearch, 20);
+                    SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
-            }
-            else
-            {
-                string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, commandSearch, 20);
-                SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
             }
         }
     }
