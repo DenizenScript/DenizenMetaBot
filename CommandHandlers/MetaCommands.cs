@@ -48,24 +48,25 @@ namespace DenizenBot.CommandHandlers
         /// <param name="message">The Discord message object.</param>
         /// <param name="secondarySearch">A secondary search string if the first fails.</param>
         /// <param name="secondaryMatcher">A secondary matching function if needed.</param>
-        public void AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
+        /// <returns>How close of an answer was gotten (0 = perfect, -1 = no match needed, 1000 = none).</returns>
+        public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
             string secondarySearch = null, Func<T, bool> secondaryMatcher = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
             {
-                return;
+                return -1;
             }
             if (cmds.Length == 0)
             {
                 SendErrorMessageReply(message, $"Need input for '{type.Name}' command",
                     $"Please specify a {type.Name} to search, like `!{type.Name} Some{type.Name}Here`. Or, use `!{type.Name} all` to view all documented {type.Name.ToLowerFast()}s.");
-                return;
+                return -1;
             }
             string search = cmds[0].ToLowerFast();
             if (search == "all")
             {
                 SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}{type.WebPath}/");
-                return;
+                return -1;
             }
             if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
             {
@@ -90,6 +91,7 @@ namespace DenizenBot.CommandHandlers
                 {
                     string closeName = StringConversionHelper.FindClosestString(docs.Keys, search, 20);
                     SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                    return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
                 }
                 else if (matched.Count > 1)
                 {
@@ -102,14 +104,16 @@ namespace DenizenBot.CommandHandlers
                     }
                     string listText = string.Join("`, `", matched);
                     SendErrorMessageReply(message, $"Cannot Specify Searched {type.Name}", $"Multiple possible {type.Name.ToLowerFast()}s: `{listText}`{suffix}");
+                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
                 }
                 else // Count == 1
                 {
                     SendReply(message, docs[matched[0]].GetEmbed().Build());
+                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
                 }
-                return;
             }
             SendReply(message, obj.GetEmbed().Build());
+            return 0;
         }
 
         /// <summary>
@@ -117,7 +121,15 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Command(string[] cmds, SocketMessage message)
         {
-            AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message);
+            int closeness = AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message);
+            if (closeness > 0)
+            {
+                string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys, cmds[0].ToLowerFast(), 10);
+                if (closeMech != null)
+                {
+                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?");
+                }
+            }
         }
 
         /// <summary>
@@ -134,7 +146,15 @@ namespace DenizenBot.CommandHandlers
                     secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
                 }
             }
-            AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearch);
+            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearch);
+            if (closeness > 0)
+            {
+                string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
+                if (closeCmd != null)
+                {
+                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?");
+                }
+            }
         }
 
         /// <summary>
