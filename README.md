@@ -31,6 +31,7 @@ To configure the bot:
     - `channel_details` set to a submapping of channels to details specific to the channel. Within each channel ID key is a submapping of the details, as follows:
         - `updates` set to what projects they correspond to (for the update command).
 		- `docs` set to whether meta docs are allowed in this channel.
+    - `url_base` set to the base URL of the meta website.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -41,6 +42,7 @@ valid_channels:
 - 315616018846318593
 info_replies:
     new,newb,noob,newbie: Welcome new user! Please read the rules at the bottom of the #info channel, and feel free after that to ask for help in the most relevant channel!
+url_base: https://one.denizenscript.com/denizen/
 project_details:
     Denizen:
         update: Latest **Denizen** dev builds are at <https://ci.citizensnpcs.co/job/Denizen_Developmental/>.\nLatest Denizen stable release builds are at <https://ci.citizensnpcs.co/job/Denizen/>.\nSpigot release of Denizen are at <https://www.spigotmc.org/resources/denizen.21039/>.

@@ -274,6 +274,7 @@ namespace DenizenBot
         public void PopulateFromConfig()
         {
             ValidChannels.Clear();
+            Constants.DOCS_URL_BASE = ConfigFile.GetString("url_base");
             foreach (string channel in ConfigFile.GetStringList("valid_channels"))
             {
                 ValidChannels.Add(ulong.Parse(channel.Trim()));

@@ -12,7 +12,7 @@ namespace DenizenBot
         /// <summary>
         /// The base for the meta docs URL.
         /// </summary>
-        public const string DOCS_URL_BASE = "https://one.denizenscript.com/denizen/";
+        public static string DOCS_URL_BASE = "https://one.denizenscript.com/denizen/";
 
         /// <summary>
         /// Link to the GitHub repo for this bot.
