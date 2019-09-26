@@ -124,7 +124,7 @@ namespace DenizenBot.CommandHandlers
             int closeness = AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message);
             if (closeness > 0)
             {
-                string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys, cmds[0].ToLowerFast(), 10);
+                string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
                 if (closeMech != null)
                 {
                     SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?");
