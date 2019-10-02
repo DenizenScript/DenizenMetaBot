@@ -76,11 +76,11 @@ namespace DenizenBot.CommandHandlers
                 {
                     if (name.Contains(search) || (secondarySearch != null && name.Contains(secondarySearch)))
                     {
-                        matched.Add(name);
+                        strongMatched.Add(name);
                     }
                     if (secondaryMatcher != null && secondaryMatcher(docs[name]))
                     {
-                        strongMatched.Add(name);
+                        matched.Add(name);
                     }
                 }
                 if (strongMatched.Count > 0)
