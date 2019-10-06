@@ -48,9 +48,10 @@ namespace DenizenBot.CommandHandlers
         /// <param name="message">The Discord message object.</param>
         /// <param name="secondarySearch">A secondary search string if the first fails.</param>
         /// <param name="secondaryMatcher">A secondary matching function if needed.</param>
+        /// <param name="altSingleOutput">An alternate method of processing the single-item-result.</param>
         /// <returns>How close of an answer was gotten (0 = perfect, -1 = no match needed, 1000 = none).</returns>
         public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
-            string secondarySearch = null, Func<T, bool> secondaryMatcher = null) where T: MetaObject
+            string secondarySearch = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
             {
@@ -67,6 +68,10 @@ namespace DenizenBot.CommandHandlers
             {
                 SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}{type.WebPath}/");
                 return -1;
+            }
+            if (altSingleOutput == null)
+            {
+                altSingleOutput = (singleObj) => SendReply(message, singleObj.GetEmbed().Build());
             }
             if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
             {
@@ -108,11 +113,11 @@ namespace DenizenBot.CommandHandlers
                 }
                 else // Count == 1
                 {
-                    SendReply(message, docs[matched[0]].GetEmbed().Build());
+                    altSingleOutput(docs[matched[0]]);
                     return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
                 }
             }
-            SendReply(message, obj.GetEmbed().Build());
+            altSingleOutput(obj);
             return 0;
         }
 
@@ -121,7 +126,30 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Command(string[] cmds, SocketMessage message)
         {
-            int closeness = AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message);
+            void singleReply(MetaCommand cmd)
+            {
+                if (cmds.Length >= 2)
+                {
+                    string outputType = cmds[1].ToLowerFast();
+                    if (outputType.StartsWith("u"))
+                    {
+                        SendReply(message, cmd.GetUsagesEmbed().Build());
+                    }
+                    else if (outputType.StartsWith("t"))
+                    {
+                        SendReply(message, cmd.GetTagsEmbed().Build());
+                    }
+                    else
+                    {
+                        SendErrorMessageReply(message, "Bad Command Syntax", "Second argument is unknown.\n\nUsage: `command [name] [usage/tags]`.");
+                    }
+                }
+                else
+                {
+                    SendReply(message, cmd.GetEmbed().Build());
+                }
+            }
+            int closeness = AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message, altSingleOutput: singleReply);
             if (closeness > 0)
             {
                 string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);

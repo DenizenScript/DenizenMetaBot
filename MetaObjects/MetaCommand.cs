@@ -71,6 +71,76 @@ namespace DenizenBot.MetaObjects
             return builder;
         }
 
+        /// <summary>
+        /// Gets a version of the output embed, that showcases related tags.
+        /// </summary>
+        public EmbedBuilder GetTagsEmbed()
+        {
+            EmbedBuilder builder = GetEmbed();
+            builder.Description = "";
+            int limitLengthRemaining = 1000;
+            foreach (string tag in Tags)
+            {
+                string tagOut = tag;
+                if (tagOut.EndsWith(">"))
+                {
+                    MetaTag realTag = Program.CurrentMeta.FindTag(tagOut);
+                    if (realTag == null)
+                    {
+                        tagOut += " (Invalid tag)";
+                    }
+                    else
+                    {
+                        tagOut += realTag.Description.Replace("\n", " ");
+                    }
+                }
+                if (tagOut.Length > 128)
+                {
+                    tagOut = tagOut.Substring(0, 100) + "...";
+                }
+                limitLengthRemaining -= tagOut.Length;
+                AutoField(builder, "Related Tag", tagOut);
+                if (limitLengthRemaining <= 0)
+                {
+                    break;
+                }
+            }
+            return builder;
+        }
+
+        /// <summary>
+        /// Gets a version of the output embed, that showcases sample usages.
+        /// </summary>
+        public EmbedBuilder GetUsagesEmbed()
+        {
+            EmbedBuilder builder = GetEmbed();
+            builder.Description = "";
+            int limitLengthRemaining = 1000;
+            foreach (string usage in Usages)
+            {
+                string usageOut = usage;
+                string nameBar = "Sample Usage";
+                int firstNewline = usageOut.IndexOf('\n');
+                if (firstNewline > 0)
+                {
+                    nameBar = usageOut.Substring(0, firstNewline);
+                    limitLengthRemaining -= nameBar.Length;
+                    usageOut = usageOut.Substring(firstNewline + 1);
+                }
+                if (usageOut.Length > 512)
+                {
+                    usageOut = usageOut.Substring(0, 500) + "...";
+                }
+                limitLengthRemaining -= usageOut.Length;
+                AutoField(builder, nameBar, usageOut);
+                if (limitLengthRemaining <= 0)
+                {
+                    break;
+                }
+            }
+            return builder;
+        }
+
         public override bool ApplyValue(string key, string value)
         {
             switch (key)

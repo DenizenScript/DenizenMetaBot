@@ -37,7 +37,7 @@ namespace DenizenBot.CommandHandlers
         /// Simple output string for meta commands.
         /// </summary>
         public static string CmdsMeta =
-                "`command [name]` to search commands\n"
+                "`command [name] [usage/tags]` to search commands\n"
                 + "`mechanism [name]` to search mechanisms\n"
                 + "`tag [name]` to search tags\n"
                 + "`event [name]` to search world script events\n"
