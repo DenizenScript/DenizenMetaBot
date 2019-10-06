@@ -93,6 +93,10 @@ namespace DenizenBot
             {
                 message.Channel.SendMessageAsync(embed: UserCommands.GetErrorMessageEmbed("Unknown Command", "Unknown command. Consider the __**help**__ command?")).Wait();
             }
+            else if (cmds.Count == 0 && InformationalData.ContainsKey(commandNameLowered))
+            {
+                InfoCmds.CMD_Info(new string[] { commandNameLowered }, message);
+            }
         }
 
         /// <summary>
@@ -125,12 +129,18 @@ namespace DenizenBot
         public static Object ConfigSaveLock = new Object();
 
         /// <summary>
+        /// The informational commands provider.
+        /// </summary>
+        public InformationCommands InfoCmds = new InformationCommands();
+
+        /// <summary>
         /// Generates default command name->method pairs.
         /// </summary>
         void DefaultCommands()
         {
+            InfoCmds.Bot = this;
             AdminCommands adminCmds = new AdminCommands() { Bot = this };
-            InformationCommands infoCmds = new InformationCommands() { Bot = this };
+            InformationCommands infoCmds = InfoCmds;
             MetaCommands metaCmds = new MetaCommands() { Bot = this };
             // ========= Informational =========
             // help

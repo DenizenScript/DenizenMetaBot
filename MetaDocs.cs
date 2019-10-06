@@ -196,7 +196,9 @@ namespace DenizenBot
         {
             ConcurrentBag<ZipArchive> zips = new ConcurrentBag<ZipArchive>();
             List<ManualResetEvent> resets = new List<ManualResetEvent>();
-            foreach (string src in DENIZEN_SOURCES.Union(DENIZEN_ADDON_SOURCES))
+            List<string> sources = new List<string>(DENIZEN_SOURCES);
+            sources.AddRange(DENIZEN_ADDON_SOURCES);
+            foreach (string src in sources)
             {
                 ManualResetEvent evt = new ManualResetEvent(false);
                 resets.Add(evt);
