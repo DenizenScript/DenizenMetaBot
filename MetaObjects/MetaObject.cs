@@ -213,5 +213,13 @@ namespace DenizenBot.MetaObjects
         /// </summary>
         /// <param name="docs">The docs set.</param>
         public abstract void AddTo(MetaDocs docs);
+
+        /// <summary>
+        /// Checks the object for validity, after all loading is done.
+        /// </summary>
+        /// <param name="docs">The relevant docs object.</param>
+        public virtual void PostCheck(MetaDocs docs)
+        {
+        }
     }
 }

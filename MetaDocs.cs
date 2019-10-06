@@ -123,6 +123,38 @@ namespace DenizenBot
         public Dictionary<string, MetaLanguage> Languages = new Dictionary<string, MetaLanguage>(512);
 
         /// <summary>
+        /// Returns an enumerable of all objects in the meta documentation.
+        /// </summary>
+        /// <returns>All objects.</returns>
+        public IEnumerable<MetaObject> AllMetaObjects()
+        {
+            foreach (MetaCommand command in Commands.Values)
+            {
+                yield return command;
+            }
+            foreach (MetaMechanism mechanism in Mechanisms.Values)
+            {
+                yield return mechanism;
+            }
+            foreach (MetaTag tag in Tags.Values)
+            {
+                yield return tag;
+            }
+            foreach (MetaEvent evt in Events.Values)
+            {
+                yield return evt;
+            }
+            foreach (MetaAction action in Actions.Values)
+            {
+                yield return action;
+            }
+            foreach (MetaLanguage language in Languages.Values)
+            {
+                yield return language;
+            }
+        }
+
+        /// <summary>
         /// Finds the tag for the input text.
         /// </summary>
         /// <param name="tagText">The input text to search for.</param>
@@ -192,6 +224,10 @@ namespace DenizenBot
                     Console.WriteLine("Error: " + ex.ToString());
                 }
             }
+            foreach (MetaObject obj in AllMetaObjects())
+            {
+                obj.PostCheck(this);
+            }
             foreach (string str in LoadErrors)
             {
                 Console.WriteLine($"Load error: {str}");
@@ -203,8 +239,10 @@ namespace DenizenBot
         /// </summary>
         public static ZipArchive DownloadZip(string url)
         {
-            HttpClient client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 2, 0);
+            HttpClient client = new HttpClient
+            {
+                Timeout = new TimeSpan(0, 2, 0)
+            };
             byte[] zipDataBytes = client.GetByteArrayAsync(url).Result;
             MemoryStream zipDataStream = new MemoryStream(zipDataBytes);
             return new ZipArchive(zipDataStream);

@@ -102,5 +102,20 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+
+        public override void PostCheck(MetaDocs docs)
+        {
+            foreach (string tag in Tags)
+            {
+                if (tag.EndsWith(">"))
+                {
+                    MetaTag realTag = Program.CurrentMeta.FindTag(tag);
+                    if (realTag == null)
+                    {
+                        docs.LoadErrors.Add($"Command '{Name}' references tag '{tag}', which doesn't exist.");
+                    }
+                }
+            }
+        }
     }
 }
