@@ -177,7 +177,14 @@ namespace DenizenBot.MetaObjects
                 }
                 int startOfMetaCommand = nextLinkIndex + "<@link ".Length;
                 string metaCommand = linkedtext.Substring(startOfMetaCommand, endIndex - startOfMetaCommand);
-                output.Append($"`!{metaCommand}`");
+                if (metaCommand.StartsWith("!url"))
+                {
+                    output.Append(metaCommand.Substring("!url ".Length));
+                }
+                else
+                {
+                    output.Append($"`!{metaCommand}`");
+                }
                 lastStartIndex = endIndex + 1;
                 nextLinkIndex = linkedtext.IndexOf("<@link", lastStartIndex);
             }
