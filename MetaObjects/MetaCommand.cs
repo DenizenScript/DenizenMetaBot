@@ -91,7 +91,7 @@ namespace DenizenBot.MetaObjects
                     }
                     else
                     {
-                        tagOut += realTag.Description.Replace("\n", " ");
+                        tagOut += " " + realTag.Description.Replace("\n", " ");
                     }
                 }
                 if (tagOut.Length > 128)
