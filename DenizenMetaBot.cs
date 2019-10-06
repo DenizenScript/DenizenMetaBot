@@ -61,7 +61,7 @@ namespace DenizenBot
             List<string> cmds = new List<string>();
             for (int i = 0; i < messageDataSplit.Length; i++)
             {
-                if (messageDataSplit[i].Contains("<") && messageDataSplit[i].Contains(">"))
+                if (messageDataSplit[i].Contains("<@") && messageDataSplit[i].Contains(">"))
                 {
                     continue;
                 }
@@ -302,11 +302,13 @@ namespace DenizenBot
             foreach (string key in projectDetailsSection.GetRootKeys())
             {
                 FDSSection detailsSection = projectDetailsSection.GetSection(key);
-                ProjectDetails detail = new ProjectDetails();
-                detail.Name = key;
-                detail.Icon = detailsSection.GetString("icon", "");
-                detail.GitHub = detailsSection.GetString("github", "");
-                detail.UpdateMessage = detailsSection.GetString("update", "");
+                ProjectDetails detail = new ProjectDetails
+                {
+                    Name = key,
+                    Icon = detailsSection.GetString("icon", ""),
+                    GitHub = detailsSection.GetString("github", ""),
+                    UpdateMessage = detailsSection.GetString("update", "")
+                };
                 ProjectToDetails.Add(key.ToLowerFast(), detail);
             }
             FDSSection channelDetailsSection = ConfigFile.GetSection("channel_details");
@@ -347,8 +349,10 @@ namespace DenizenBot
             PopulateFromConfig();
             DefaultCommands();
             Console.WriteLine("Loading Discord...");
-            DiscordSocketConfig config = new DiscordSocketConfig();
-            config.MessageCacheSize = 256;
+            DiscordSocketConfig config = new DiscordSocketConfig
+            {
+                MessageCacheSize = 256
+            };
             //config.LogLevel = LogSeverity.Debug;
             Client = new DiscordSocketClient(config);
             /*Client.Log += (m) =>
