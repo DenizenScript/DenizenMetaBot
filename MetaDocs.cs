@@ -123,6 +123,33 @@ namespace DenizenBot
         public Dictionary<string, MetaLanguage> Languages = new Dictionary<string, MetaLanguage>(512);
 
         /// <summary>
+        /// Finds the tag for the input text.
+        /// </summary>
+        /// <param name="tagText">The input text to search for.</param>
+        /// <returns>The matching tag, or null if not found.</returns>
+        public MetaTag FindTag(string tagText)
+        {
+            string cleaned = MetaTag.CleanTag(tagText);
+            if (Tags.TryGetValue(tagText, out MetaTag result))
+            {
+                return result;
+            }
+            // TODO: Chain searching
+            int dotIndex = cleaned.IndexOf('.');
+            if (dotIndex > 0)
+            {
+                string tagBase = cleaned.Substring(0, dotIndex);
+                if (tagBase.EndsWith("tag"))
+                {
+                    return null;
+                }
+                string secondarySearch = tagBase + "tag" + cleaned.Substring(dotIndex);
+                return FindTag(secondarySearch);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Download all docs.
         /// </summary>
         public void DownloadAll()
