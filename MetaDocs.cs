@@ -162,7 +162,7 @@ namespace DenizenBot
         public MetaTag FindTag(string tagText)
         {
             string cleaned = MetaTag.CleanTag(tagText);
-            if (Tags.TryGetValue(tagText, out MetaTag result))
+            if (Tags.TryGetValue(cleaned, out MetaTag result))
             {
                 return result;
             }
