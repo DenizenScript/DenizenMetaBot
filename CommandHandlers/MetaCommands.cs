@@ -113,10 +113,13 @@ namespace DenizenBot.CommandHandlers
                 }
                 else // Count == 1
                 {
-                    altSingleOutput(docs[matched[0]]);
+                    obj = docs[matched[0]];
+                    Console.WriteLine($"Meta-Command for '{type.Name}' found imperfect single match for search '{search}': '{obj.CleanName}'");
+                    altSingleOutput(obj);
                     return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
                 }
             }
+            Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
             altSingleOutput(obj);
             return 0;
         }
