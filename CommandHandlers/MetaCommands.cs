@@ -279,11 +279,6 @@ namespace DenizenBot.CommandHandlers
                     strongMatch.Add(obj);
                     continue;
                 }
-                if (fullSearch.Contains(obj.CleanName))
-                {
-                    partialStrongMatch.Add(obj);
-                    continue;
-                }
                 foreach (string word in cmds)
                 {
                     if (obj.CleanName.Contains(word))
@@ -295,6 +290,11 @@ namespace DenizenBot.CommandHandlers
                 if (obj.Searchable.Contains(fullSearch))
                 {
                     weakMatch.Add(obj);
+                    continue;
+                }
+                if (fullSearch.Contains(obj.CleanName))
+                {
+                    partialWeakMatch.Add(obj);
                     continue;
                 }
                 foreach (string word in cmds)
