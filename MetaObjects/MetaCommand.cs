@@ -127,6 +127,7 @@ namespace DenizenBot.MetaObjects
                     limitLengthRemaining -= nameBar.Length;
                     usageOut = usageOut.Substring(firstNewline + 1);
                 }
+                usageOut = $"```yml\n{usageOut}\n```";
                 if (usageOut.Length > 512)
                 {
                     usageOut = usageOut.Substring(0, 500) + "...";
