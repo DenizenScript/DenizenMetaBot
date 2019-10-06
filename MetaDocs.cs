@@ -171,11 +171,19 @@ namespace DenizenBot
             if (dotIndex > 0)
             {
                 string tagBase = cleaned.Substring(0, dotIndex);
-                if (tagBase.EndsWith("tag"))
+                string secondarySearch;
+                if (tagBase == "playertag" || tagBase == "npctag")
+                { // TODO: Object meta, to inform of down-typing like this?
+                    secondarySearch = "entitytag" + cleaned.Substring(dotIndex);
+                }
+                else if (!tagBase.EndsWith("tag"))
+                {
+                    secondarySearch = tagBase + "tag" + cleaned.Substring(dotIndex);
+                }
+                else
                 {
                     return null;
                 }
-                string secondarySearch = tagBase + "tag" + cleaned.Substring(dotIndex);
                 return FindTag(secondarySearch);
             }
             return null;
