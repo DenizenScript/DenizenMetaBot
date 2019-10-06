@@ -34,7 +34,7 @@ namespace DenizenBot.MetaObjects
         public override EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = base.GetEmbed();
-            builder.Description = Description.Length > 900 ? Description.Substring(0, 800) + "..." : Description;
+            builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 900 ? Description.Substring(0, 800) + "..." : Description));
             return builder;
         }
 

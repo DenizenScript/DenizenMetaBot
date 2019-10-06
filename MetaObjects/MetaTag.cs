@@ -87,7 +87,7 @@ namespace DenizenBot.MetaObjects
             EmbedBuilder builder = base.GetEmbed();
             AutoField(builder, "Returns", Returns);
             AutoField(builder, "Mechanism", Mechanism);
-            builder.Description = Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description;
+            builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description));
             return builder;
         }
 

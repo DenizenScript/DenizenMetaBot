@@ -110,7 +110,7 @@ namespace DenizenBot.MetaObjects
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                builder.AddField(key, EscapeForDiscord(value), true);
+                builder.AddField(key, EscapeForDiscord(ProcessMetaLinksForDiscord(value)), true);
             }
         }
 
@@ -122,6 +122,67 @@ namespace DenizenBot.MetaObjects
         public static string UrlEscape(string input)
         {
             return input.Replace(" ", "%20").Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D");
+        }
+
+        /// <summary>
+        /// Finds the closing tag mark, compensating for layered tags.
+        /// </summary>
+        /// <param name="text">The raw text.</param>
+        /// <param name="startIndex">The index to start searching at.</param>
+        /// <returns>The closing symbol index, or -1 if not found.</returns>
+        public static int FindClosingTagMark(string text, int startIndex)
+        {
+            int depth = 0;
+            for (int i = startIndex; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '<')
+                {
+                    depth++;
+                }
+                if (c == '>')
+                {
+                    if (depth == 0)
+                    {
+                        return i;
+                    }
+                    depth--;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Processes meta "@link"s for Discord output.
+        /// </summary>
+        /// <param name="linkedtext">The text which may contain links.</param>
+        /// <returns>The text, with links processed.</returns>
+        public static string ProcessMetaLinksForDiscord(string linkedtext)
+        {
+            int nextLinkIndex = linkedtext.IndexOf("<@link");
+            if (nextLinkIndex < 0)
+            {
+                return linkedtext;
+            }
+            int lastStartIndex = 0;
+            StringBuilder output = new StringBuilder(linkedtext.Length);
+            while (nextLinkIndex >= 0)
+            {
+                output.Append(linkedtext.Substring(lastStartIndex, nextLinkIndex - lastStartIndex));
+                int endIndex = FindClosingTagMark(linkedtext, nextLinkIndex + 1);
+                if (endIndex < 0)
+                {
+                    lastStartIndex = nextLinkIndex;
+                    break;
+                }
+                int startOfMetaCommand = nextLinkIndex + "<@link ".Length;
+                string metaCommand = linkedtext.Substring(startOfMetaCommand, endIndex - startOfMetaCommand);
+                output.Append($"`!{metaCommand}`");
+                lastStartIndex = endIndex + 1;
+                nextLinkIndex = linkedtext.IndexOf("<@link", lastStartIndex);
+            }
+            output.Append(linkedtext.Substring(lastStartIndex));
+            return output.ToString();
         }
 
         /// <summary>

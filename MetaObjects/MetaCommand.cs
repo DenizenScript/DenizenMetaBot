@@ -67,7 +67,7 @@ namespace DenizenBot.MetaObjects
             AutoField(builder, "Syntax", Syntax);
             AutoField(builder, "Short Description", Short);
             AutoField(builder, "Related Video", Video);
-            builder.Description = Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description;
+            builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description));
             return builder;
         }
 

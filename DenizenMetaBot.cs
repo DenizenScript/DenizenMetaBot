@@ -216,6 +216,7 @@ namespace DenizenBot
             ChatCommands["l"] = metaCmds.CMD_Language;
             // ========= Utility =========
             // TODO: CMD_DScript
+            // TODO: CMD_LogCheck
             // ========= Admin =========
             ChatCommands["restart"] = adminCmds.CMD_Restart;
             ChatCommands["reload"] = adminCmds.CMD_Reload;
