@@ -214,6 +214,26 @@ namespace DenizenBot
             ChatCommands["lang"] = metaCmds.CMD_Language;
             ChatCommands["langs"] = metaCmds.CMD_Language;
             ChatCommands["l"] = metaCmds.CMD_Language;
+            // search
+            ChatCommands["search"] = metaCmds.CMD_Search;
+            ChatCommands["s"] = metaCmds.CMD_Search;
+            ChatCommands["find"] = metaCmds.CMD_Search;
+            ChatCommands["f"] = metaCmds.CMD_Search;
+            ChatCommands["get"] = metaCmds.CMD_Search;
+            ChatCommands["g"] = metaCmds.CMD_Search;
+            ChatCommands["locate"] = metaCmds.CMD_Search;
+            ChatCommands["what"] = metaCmds.CMD_Search;
+            ChatCommands["where"] = metaCmds.CMD_Search;
+            ChatCommands["how"] = metaCmds.CMD_Search;
+            ChatCommands["w"] = metaCmds.CMD_Search;
+            ChatCommands["meta"] = metaCmds.CMD_Search;
+            ChatCommands["metainfo"] = metaCmds.CMD_Search;
+            ChatCommands["docs"] = metaCmds.CMD_Search;
+            ChatCommands["doc"] = metaCmds.CMD_Search;
+            ChatCommands["documentation"] = metaCmds.CMD_Search;
+            ChatCommands["documentations"] = metaCmds.CMD_Search;
+            ChatCommands["document"] = metaCmds.CMD_Search;
+            ChatCommands["documents"] = metaCmds.CMD_Search;
             // ========= Utility =========
             // TODO: CMD_DScript
             // TODO: CMD_LogCheck

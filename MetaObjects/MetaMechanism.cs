@@ -78,5 +78,12 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+
+        public override string GetAllSearchableText()
+        {
+            string baseText = base.GetAllSearchableText();
+            string allTags = string.Join('\n', Tags);
+            return $"{baseText}\n{allTags}\n{Input}\n{Description}\n{MechObject}\n{MechName}";
+        }
     }
 }

@@ -235,6 +235,7 @@ namespace DenizenBot
             foreach (MetaObject obj in AllMetaObjects())
             {
                 obj.PostCheck(this);
+                obj.Searchable = obj.GetAllSearchableText().ToLowerFast();
             }
             foreach (string str in LoadErrors)
             {

@@ -112,5 +112,11 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+
+        public override string GetAllSearchableText()
+        {
+            string baseText = base.GetAllSearchableText();
+            return $"{baseText}\n{TagFull}\n{Returns}\n{Description}\n{Mechanism}";
+        }
     }
 }

@@ -119,5 +119,15 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+
+        public override string GetAllSearchableText()
+        {
+            string baseText = base.GetAllSearchableText();
+            string allEvents = string.Join('\n', Events);
+            string allContexts = string.Join('\n', Context);
+            string allDeterminations = string.Join('\n', Determinations);
+            string regex = RegexMatcher.ToString();
+            return $"{baseText}\n{allEvents}\n{Triggers}\n{Player}\n{NPC}\n{regex}\n{allContexts}\n{allDeterminations}";
+        }
     }
 }

@@ -248,5 +248,108 @@ namespace DenizenBot.CommandHandlers
             }
             AutoMetaCommand(Program.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, message);
         }
+
+        /// <summary>
+        /// Meta docs total search command.
+        /// </summary>
+        public void CMD_Search(string[] cmds, SocketMessage message)
+        {
+            if (CheckMetaDenied(message))
+            {
+                return;
+            }
+            if (cmds.Length == 0)
+            {
+                SendErrorMessageReply(message, "Need input for Search command", "Please specify some text to search, like `!search someobjecthere`.");
+                return;
+            }
+            for (int i = 0; i < cmds.Length; i++)
+            {
+                cmds[i] = cmds[i].ToLowerFast();
+            }
+            string fullSearch = string.Join(' ', cmds);
+            List<MetaObject> strongMatch = new List<MetaObject>();
+            List<MetaObject> partialStrongMatch = new List<MetaObject>();
+            List<MetaObject> weakMatch = new List<MetaObject>();
+            List<MetaObject> partialWeakMatch = new List<MetaObject>();
+            foreach (MetaObject obj in Program.CurrentMeta.AllMetaObjects())
+            {
+                if (obj.CleanName.Contains(fullSearch))
+                {
+                    strongMatch.Add(obj);
+                    continue;
+                }
+                if (fullSearch.Contains(obj.CleanName))
+                {
+                    partialStrongMatch.Add(obj);
+                    continue;
+                }
+                foreach (string word in cmds)
+                {
+                    if (obj.CleanName.Contains(word))
+                    {
+                        partialStrongMatch.Add(obj);
+                        goto fullContinue;
+                    }
+                }
+                if (obj.Searchable.Contains(fullSearch))
+                {
+                    weakMatch.Add(obj);
+                    continue;
+                }
+                foreach (string word in cmds)
+                {
+                    if (obj.Searchable.Contains(word))
+                    {
+                        partialWeakMatch.Add(obj);
+                        goto fullContinue;
+                    }
+                }
+            fullContinue:
+                continue;
+            }
+            if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
+            {
+                SendErrorMessageReply(message, "Search Command Has No Results", "Input search text could not be found.");
+                return;
+            }
+            string suffix = ".";
+            void listWrangle(string typeShort, string typeLong, List<MetaObject> objs)
+            {
+                objs = objs.OrderBy((obj) => StringConversionHelper.GetLevenshteinDistance(fullSearch, obj.CleanName)).ToList();
+                suffix = ".";
+                if (objs.Count > 20)
+                {
+                    objs = objs.GetRange(0, 20);
+                    suffix = ", ...";
+                }
+                string listText = string.Join("`, `", objs.Select((obj) => $"!{obj.Type.Name} {obj.CleanName}"));
+                SendGenericPositiveMessageReply(message, $"{typeShort} Search Results", $"{typeShort} ({typeLong}) search results: `{listText}`{suffix}");
+            }
+            if (strongMatch.Any())
+            {
+                listWrangle("Best", "very close", strongMatch);
+            }
+            if (partialStrongMatch.Any())
+            {
+                listWrangle("Probable", "close but imperfect", partialStrongMatch);
+                if (strongMatch.Any())
+                {
+                    return;
+                }
+            }
+            if (weakMatch.Any())
+            {
+                listWrangle("Possible", "might be related", weakMatch);
+                if (strongMatch.Any() || partialStrongMatch.Any())
+                {
+                    return;
+                }
+            }
+            if (partialWeakMatch.Any())
+            {
+                listWrangle("Weak", "if nothing else, some chance of being related", partialWeakMatch);
+            }
+        }
     }
 }

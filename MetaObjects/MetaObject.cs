@@ -48,6 +48,11 @@ namespace DenizenBot.MetaObjects
         public string SourceFile;
 
         /// <summary>
+        /// The searchable text pile.
+        /// </summary>
+        public string Searchable;
+
+        /// <summary>
         /// Apply a setting value to this meta object.
         /// </summary>
         /// <param name="key">The setting key.</param>
@@ -220,6 +225,15 @@ namespace DenizenBot.MetaObjects
         /// <param name="docs">The relevant docs object.</param>
         public virtual void PostCheck(MetaDocs docs)
         {
+        }
+
+        /// <summary>
+        /// Get all text for related to this object that may be useful for searches.
+        /// </summary>
+        public virtual string GetAllSearchableText()
+        {
+            string warningFlat = string.Join('\n', Warnings);
+            return $"{Name}\n{CleanName}\n{Group}\n{warningFlat}\n{Plugin}\n{SourceFile}";
         }
     }
 }

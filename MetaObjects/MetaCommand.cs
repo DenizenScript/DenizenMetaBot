@@ -188,5 +188,13 @@ namespace DenizenBot.MetaObjects
                 }
             }
         }
+
+        public override string GetAllSearchableText()
+        {
+            string baseText = base.GetAllSearchableText();
+            string allUsages = string.Join('\n', Usages);
+            string allTags = string.Join('\n', Tags);
+            return $"{baseText}\n{allTags}\n{allUsages}\n{Syntax}\n{Short}\n{Description}\n{Video}";
+        }
     }
 }

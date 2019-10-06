@@ -72,5 +72,14 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+
+        public override string GetAllSearchableText()
+        {
+            string baseText = base.GetAllSearchableText();
+            string allActions = string.Join('\n', Actions);
+            string allContexts = string.Join('\n', Context);
+            string allDeterminations = string.Join('\n', Determinations);
+            return $"{baseText}\n{allActions}\n{Triggers}\n{allContexts}\n{allDeterminations}";
+        }
     }
 }
