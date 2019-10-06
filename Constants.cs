@@ -6,6 +6,7 @@ namespace DenizenBot
 {
     /// <summary>
     /// Constants (links, image urls, etc).
+    /// Either absolute constants, or config-loaded pseudo-constants.
     /// </summary>
     public static class Constants
     {
@@ -13,6 +14,11 @@ namespace DenizenBot
         /// The base for the meta docs URL.
         /// </summary>
         public static string DOCS_URL_BASE = "https://one.denizenscript.com/denizen/";
+
+        /// <summary>
+        /// The prefix for non-ping-based command usage.
+        /// </summary>
+        public static string COMMAND_PREFIX = "!";
 
         /// <summary>
         /// Link to the GitHub repo for this bot.

@@ -33,6 +33,7 @@ To configure the bot:
 		- `docs` set to whether meta docs are allowed in this channel.
     - `url_base` set to the base URL of the meta website.
     - `rules` set to a submapping of rule IDs to their text.
+    - `command_prefix` set to the command prefix (for non-ping-based usages of the bot).
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -44,6 +45,7 @@ valid_channels:
 info_replies:
     new,newb,noob,newbie: Welcome new user! Please read the rules at the bottom of the #info channel, and feel free after that to ask for help in the most relevant channel!
 url_base: https://one.denizenscript.com/denizen/
+command_prefix: !
 project_details:
     Denizen:
         update: Latest **Denizen** dev builds are at <https://ci.citizensnpcs.co/job/Denizen_Developmental/>.\nLatest Denizen stable release builds are at <https://ci.citizensnpcs.co/job/Denizen/>.\nSpigot release of Denizen are at <https://www.spigotmc.org/resources/denizen.21039/>.

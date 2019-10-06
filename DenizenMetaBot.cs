@@ -54,10 +54,15 @@ namespace DenizenBot
         /// <summary>
         /// Bot command response handler.
         /// </summary>
-        public void Respond(SocketMessage message)
+        public void Respond(SocketMessage message, bool outputUnknowns)
         {
-            string[] messageDataSplit = message.Content.Split(' ');
-            StringBuilder resultBuilder = new StringBuilder(message.Content.Length);
+            string messageText = message.Content;
+            if (messageText.StartsWith(Constants.COMMAND_PREFIX))
+            {
+                messageText = messageText.Substring(Constants.COMMAND_PREFIX.Length);
+            }
+            string[] messageDataSplit = messageText.Split(' ');
+            StringBuilder resultBuilder = new StringBuilder(messageText.Length);
             List<string> cmds = new List<string>();
             for (int i = 0; i < messageDataSplit.Length; i++)
             {
@@ -84,7 +89,7 @@ namespace DenizenBot
             {
                 acto.Invoke(cmds.ToArray(), message);
             }
-            else
+            else if (outputUnknowns)
             {
                 message.Channel.SendMessageAsync(embed: UserCommands.GetErrorMessageEmbed("Unknown Command", "Unknown command. Consider the __**help**__ command?")).Wait();
             }
@@ -283,6 +288,7 @@ namespace DenizenBot
         {
             ValidChannels.Clear();
             Constants.DOCS_URL_BASE = ConfigFile.GetString("url_base");
+            Constants.COMMAND_PREFIX = ConfigFile.GetString("command_prefix");
             foreach (string channel in ConfigFile.GetStringList("valid_channels"))
             {
                 ValidChannels.Add(ulong.Parse(channel.Trim()));
@@ -409,11 +415,11 @@ namespace DenizenBot
                 }
                 bool mentionedMe = message.MentionedUsers.Any((su) => su.Id == Client.CurrentUser.Id);
                 Console.WriteLine($"Parsing message from ({message.Author.Username}), in channel: {message.Channel.Name}: {message.Content}");
-                if (mentionedMe)
+                if (mentionedMe || message.Content.StartsWith(Constants.COMMAND_PREFIX))
                 {
                     try
                     {
-                        Respond(message);
+                        Respond(message, mentionedMe);
                     }
                     catch (Exception ex)
                     {
