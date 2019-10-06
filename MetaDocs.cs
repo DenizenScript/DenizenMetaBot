@@ -346,7 +346,7 @@ namespace DenizenBot
                     {
                         if (curKey != null && curValue != null)
                         {
-                            if (!obj.ApplyValue(curKey.ToLowerFast(), curValue))
+                            if (!obj.ApplyValue(curKey.ToLowerFast(), curValue.Trim(' ', '\t', '\n', '\r')))
                             {
                                 LoadErrors.Add("While processing " + file + " in object type '" + objectType + "' for '"
                                     + obj.Name + "' could not apply key '" + curKey + "' with value '" + curValue + "'.");
