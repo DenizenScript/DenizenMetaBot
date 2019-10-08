@@ -52,9 +52,9 @@ namespace DenizenBot.MetaObjects
         public string[] Tags = new string[0];
 
         /// <summary>
-        /// An associated video link.
+        /// An associated beginner's guide link.
         /// </summary>
-        public string Video = "";
+        public string Guide = "";
 
         /// <summary>
         /// Sample usages.
@@ -66,7 +66,7 @@ namespace DenizenBot.MetaObjects
             EmbedBuilder builder = base.GetEmbed();
             AutoField(builder, "Syntax", Syntax);
             AutoField(builder, "Short Description", Short);
-            AutoField(builder, "Related Video", Video);
+            AutoField(builder, "Related Guide Page", Guide);
             builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description));
             return builder;
         }
@@ -166,8 +166,8 @@ namespace DenizenBot.MetaObjects
                 case "usage":
                     Usages.Add(value);
                     return true;
-                case "video":
-                    Video = Constants.DOCS_URL_BASE + value.Substring("/denizen/".Length);
+                case "guide":
+                    Guide = value;
                     return true;
                 default:
                     return base.ApplyValue(key, value);
@@ -194,7 +194,7 @@ namespace DenizenBot.MetaObjects
             string baseText = base.GetAllSearchableText();
             string allUsages = string.Join('\n', Usages);
             string allTags = string.Join('\n', Tags);
-            return $"{baseText}\n{allTags}\n{allUsages}\n{Syntax}\n{Short}\n{Description}\n{Video}";
+            return $"{baseText}\n{allTags}\n{allUsages}\n{Syntax}\n{Short}\n{Description}\n{Guide}";
         }
     }
 }
