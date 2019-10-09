@@ -49,9 +49,11 @@ namespace DenizenBot.CommandHandlers
         /// <param name="secondarySearch">A secondary search string if the first fails.</param>
         /// <param name="secondaryMatcher">A secondary matching function if needed.</param>
         /// <param name="altSingleOutput">An alternate method of processing the single-item-result.</param>
+        /// <param name="altFindClosest">Alternate method to find the closest result.</param>
         /// <returns>How close of an answer was gotten (0 = perfect, -1 = no match needed, 1000 = none).</returns>
         public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
-            string secondarySearch = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null) where T: MetaObject
+            string secondarySearch = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null,
+            Func<string> altFindClosest = null, Func<List<T>, List<T>> altMatchOrderer = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
             {
@@ -73,19 +75,27 @@ namespace DenizenBot.CommandHandlers
             {
                 altSingleOutput = (singleObj) => SendReply(message, singleObj.GetEmbed().Build());
             }
+            if (altFindClosest == null)
+            {
+                altFindClosest = () => StringConversionHelper.FindClosestString(docs.Keys, search, 20);
+            }
+            if (altMatchOrderer == null)
+            {
+                altMatchOrderer = (list) => list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
+            }
             if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
             {
-                List<string> matched = new List<string>();
-                List<string> strongMatched = new List<string>();
-                foreach (string name in docs.Keys)
+                List<T> matched = new List<T>();
+                List<T> strongMatched = new List<T>();
+                foreach (KeyValuePair<string, T> objPair in docs)
                 {
-                    if (name.Contains(search) || (secondarySearch != null && name.Contains(secondarySearch)))
+                    if (objPair.Key.Contains(search) || (secondarySearch != null && objPair.Key.Contains(secondarySearch)))
                     {
-                        strongMatched.Add(name);
+                        strongMatched.Add(objPair.Value);
                     }
-                    if (secondaryMatcher != null && secondaryMatcher(docs[name]))
+                    if (secondaryMatcher != null && secondaryMatcher(objPair.Value))
                     {
-                        matched.Add(name);
+                        matched.Add(objPair.Value);
                     }
                 }
                 if (strongMatched.Count > 0)
@@ -94,13 +104,13 @@ namespace DenizenBot.CommandHandlers
                 }
                 if (matched.Count == 0)
                 {
-                    string closeName = StringConversionHelper.FindClosestString(docs.Keys, search, 20);
+                    string closeName = altFindClosest();
                     SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                     return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
                 }
                 else if (matched.Count > 1)
                 {
-                    matched = matched.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat)).ToList();
+                    matched = altMatchOrderer(matched);
                     string suffix = ".";
                     if (matched.Count > 20)
                     {
@@ -109,14 +119,14 @@ namespace DenizenBot.CommandHandlers
                     }
                     string listText = string.Join("`, `", matched);
                     SendErrorMessageReply(message, $"Cannot Specify Searched {type.Name}", $"Multiple possible {type.Name.ToLowerFast()}s: `{listText}`{suffix}");
-                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
+                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
                 }
                 else // Count == 1
                 {
-                    obj = docs[matched[0]];
+                    obj = matched[0];
                     Console.WriteLine($"Meta-Command for '{type.Name}' found imperfect single match for search '{search}': '{obj.CleanName}'");
                     altSingleOutput(obj);
-                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0]);
+                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
                 }
             }
             Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
@@ -203,7 +213,30 @@ namespace DenizenBot.CommandHandlers
                     secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
                 }
             }
-            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearch);
+            int getDistanceTo(MetaTag tag)
+            {
+                int dist1 = StringConversionHelper.GetLevenshteinDistance(cmds[0], tag.CleanedName);
+                int dist2 = StringConversionHelper.GetLevenshteinDistance(cmds[0], tag.AfterDotCleaned);
+                int dist3 = secondarySearch == null ? int.MaxValue : StringConversionHelper.GetLevenshteinDistance(secondarySearch, tag.CleanedName);
+                return Math.Min(Math.Min(dist1, dist2), dist3);
+            }
+            string findClosestTag()
+            {
+                int lowestDistance = 20;
+                string lowestStr = null;
+                foreach (MetaTag tag in Program.CurrentMeta.Tags.Values)
+                {
+                    int currentDistance = getDistanceTo(tag);
+                    if (currentDistance < lowestDistance)
+                    {
+                        lowestDistance = currentDistance;
+                        lowestStr = tag.CleanedName;
+                    }
+                }
+                return lowestStr;
+            }
+            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearch, altFindClosest: findClosestTag,
+                altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
         }
 
         /// <summary>

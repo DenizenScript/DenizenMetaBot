@@ -20,7 +20,7 @@ namespace DenizenBot.MetaObjects
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Tags.Add(CleanedName, this);
+            docs.Tags.Add(CleanName, this);
         }
 
         /// <summary>
@@ -63,6 +63,11 @@ namespace DenizenBot.MetaObjects
         public string CleanedName;
 
         /// <summary>
+        /// The text after the first dot (with tag cleaning applied).
+        /// </summary>
+        public string AfterDotCleaned;
+
+        /// <summary>
         /// The full tag syntax text.
         /// </summary>
         public string TagFull;
@@ -98,6 +103,7 @@ namespace DenizenBot.MetaObjects
                 case "attribute":
                     TagFull = value;
                     CleanedName = CleanTag(TagFull);
+                    AfterDotCleaned = CleanedName.After('.');
                     return true;
                 case "returns":
                     Returns = value;

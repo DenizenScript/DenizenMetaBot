@@ -18,7 +18,7 @@ namespace DenizenBot.MetaObjects
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Languages.Add(Name.ToLowerFast(), this);
+            docs.Languages.Add(CleanName, this);
         }
 
         /// <summary>

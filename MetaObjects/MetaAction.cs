@@ -19,7 +19,7 @@ namespace DenizenBot.MetaObjects
 
         public override void AddTo(MetaDocs docs)
         {
-            docs.Actions.Add(Name.ToLowerFast(), this);
+            docs.Actions.Add(CleanName, this);
         }
 
         /// <summary>
