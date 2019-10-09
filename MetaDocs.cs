@@ -230,8 +230,8 @@ namespace DenizenBot
                 }
                 catch (Exception ex)
                 {
-                    LoadErrors.Add("Internal exception - " + ex.GetType().FullName + " ... see bot console for details.");
-                    Console.WriteLine("Error: " + ex.ToString());
+                    LoadErrors.Add($"Internal exception - {ex.GetType().FullName} ... see bot console for details.");
+                    Console.WriteLine($"Error: {ex.ToString()}");
                 }
             }
             foreach (MetaObject obj in AllMetaObjects())
@@ -310,7 +310,7 @@ namespace DenizenBot
                 }
                 else if (line.StartsWith("<--[") && line.EndsWith("]"))
                 {
-                    string objectType = line.Substring("<--[".Length, lines[i].Length - "<--[]".Length);
+                    string objectType = line.Substring("<--[".Length, line.Length - "<--[]".Length);
                     List<string> objectData = new List<string>();
                     for (i++; i < lines.Length; i++)
                     {
@@ -318,9 +318,14 @@ namespace DenizenBot
                         {
                             break;
                         }
+                        else if (lines[i].StartsWith("<--["))
+                        {
+                            LoadErrors.Add($"While processing {file} at line {i + 1} found the start of a meta block, while still processing the previous meta block.");
+                            break;
+                        }
                         else if (lines[i] == END_OF_FILE_MARK || lines[i].StartsWith(START_OF_FILE_PREFIX))
                         {
-                            LoadErrors.Add("While processing " + file + " was not able to find the end of an object's documentation!");
+                            LoadErrors.Add($"While processing {file} was not able to find the end of an object's documentation!");
                             objectData = null;
                             break;
                         }
@@ -345,7 +350,7 @@ namespace DenizenBot
             {
                 if (!MetaObjectGetters.TryGetValue(objectType.ToLowerFast(), out Func<MetaObject> getter))
                 {
-                    LoadErrors.Add("While processing " + file + " found unknown meta type '" + objectType + "'.");
+                    LoadErrors.Add($"While processing {file} found unknown meta type '{objectType}'.");
                     return;
                 }
                 MetaObject obj = getter();
@@ -359,8 +364,7 @@ namespace DenizenBot
                         {
                             if (!obj.ApplyValue(curKey.ToLowerFast(), curValue.Trim(' ', '\t', '\n', '\r')))
                             {
-                                LoadErrors.Add("While processing " + file + " in object type '" + objectType + "' for '"
-                                    + obj.Name + "' could not apply key '" + curKey + "' with value '" + curValue + "'.");
+                                LoadErrors.Add($"While processing {file} in object type '{objectType}' for '{obj.Name}' could not apply key '{curKey}' with value '{curValue}'.");
                             }
                             curKey = null;
                             curValue = null;
