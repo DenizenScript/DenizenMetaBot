@@ -96,7 +96,7 @@ namespace DenizenBot.MetaObjects
                 {
                     inCodeBlock = !inCodeBlock;
                 }
-                else if (!inCodeBlock && (c == '<' || c == '>'))
+                else if (!inCodeBlock && (c == '<' || c == '>' || c == ':'))
                 {
                     output.Append("\\");
                 }
