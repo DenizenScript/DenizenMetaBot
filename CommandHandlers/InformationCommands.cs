@@ -22,9 +22,9 @@ namespace DenizenBot.CommandHandlers
     public class InformationCommands : UserCommands
     {
         /// <summary>
-        /// Simple output string for general public commands.
+        /// Simple output string for basic info commands.
         /// </summary>
-        public static string CmdsHelp =
+        public static string CmdsInfo =
                 "`help` shows help output\n"
                 + "`hello` shows a source code link\n"
                 + "`info <name ...>` shows a prewritten informational notice reply\n"
@@ -45,9 +45,15 @@ namespace DenizenBot.CommandHandlers
                 + "`language [name]` to search language docs";
 
         /// <summary>
+        /// Simple output string for utility commands.
+        /// </summary>
+        public static string CmdsUtility =
+                "`logcheck <link>` gathers information from a server log paste";
+
+        /// <summary>
         /// Simple output string for admin commands.
         /// </summary>
-        public static string CmdsAdminHelp =
+        public static string CmdsAdmin =
                 "`restart` restarts the bot\n"
                 + "`reload` reloads the meta docs";
 
@@ -57,14 +63,15 @@ namespace DenizenBot.CommandHandlers
         public void CMD_Help(string[] cmds, SocketMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
-            embed.AddField("**Available Commands:**", CmdsHelp, true);
+            embed.AddField("**Available Informational Commands:**", CmdsInfo, true);
+            embed.AddField("**Available Utility Commands:**", CmdsUtility, true);
             if (Bot.MetaCommandsAllowed(message.Channel))
             {
                 embed.AddField("**Available Meta Docs Commands:**", CmdsMeta, true);
             }
             if (Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
-                embed.AddField("**Available Admin Commands:**", CmdsAdminHelp, true);
+                embed.AddField("**Available Admin Commands:**", CmdsAdmin, true);
             }
             SendReply(message, embed.Build());
         }

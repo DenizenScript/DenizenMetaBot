@@ -151,16 +151,16 @@ namespace DenizenBot
         {
             InfoCmds.Bot = this;
             AdminCommands adminCmds = new AdminCommands() { Bot = this };
-            InformationCommands infoCmds = InfoCmds;
             MetaCommands metaCmds = new MetaCommands() { Bot = this };
+            UtilityCommands utilCmds = new UtilityCommands() { Bot = this };
             // Informational
-            RegisterCommand(infoCmds.CMD_Help, "help", "halp", "helps", "halps", "hel", "hal", "h");
-            RegisterCommand(infoCmds.CMD_Hello, "hello", "hi", "hey", "source", "src");
-            RegisterCommand(infoCmds.CMD_Info, "info", "notice", "alert");
-            RegisterCommand(infoCmds.CMD_Update, "update", "latest", "current", "build", "builds", "download", "version");
-            RegisterCommand(infoCmds.CMD_GitHub, "github", "git", "gh", "readme", "read", "link");
-            RegisterCommand(infoCmds.CMD_Issues, "issues", "issue", "error", "ghissues", "githubissues");
-            RegisterCommand(infoCmds.CMD_Rule, "rule", "rules");
+            RegisterCommand(InfoCmds.CMD_Help, "help", "halp", "helps", "halps", "hel", "hal", "h");
+            RegisterCommand(InfoCmds.CMD_Hello, "hello", "hi", "hey", "source", "src");
+            RegisterCommand(InfoCmds.CMD_Info, "info", "notice", "alert");
+            RegisterCommand(InfoCmds.CMD_Update, "update", "latest", "current", "build", "builds", "download", "version");
+            RegisterCommand(InfoCmds.CMD_GitHub, "github", "git", "gh", "readme", "read", "link");
+            RegisterCommand(InfoCmds.CMD_Issues, "issues", "issue", "error", "ghissues", "githubissues");
+            RegisterCommand(InfoCmds.CMD_Rule, "rule", "rules");
             // Meta Docs
             RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
             RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m");
@@ -171,8 +171,8 @@ namespace DenizenBot
             RegisterCommand(metaCmds.CMD_Search, "search", "s", "find", "f", "get", "g", "locate", "what", "where", "how",
                 "w", "meta", "metainfo", "docs", "doc", "documentation", "documentations", "document", "documents");
             // Utility
-            // TODO: CMD_DScript
-            // TODO: CMD_LogCheck
+            // TODO: CMD_DScriptCheck
+            RegisterCommand(utilCmds.CMD_LogCheck, "logcheck", "checklog", "logscheck", "checklogs");
             // Admin
             RegisterCommand(adminCmds.CMD_Restart, "restart");
             RegisterCommand(adminCmds.CMD_Reload, "reload");
