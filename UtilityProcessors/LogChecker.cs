@@ -286,12 +286,8 @@ namespace DenizenBot.UtilityProcessors
                 int signIndex = FullLogTextLower.IndexOf(sign);
                 if (signIndex >= 0)
                 {
-                    int lineStart = FullLogText.LastIndexOf('\n', signIndex);
+                    int lineStart = FullLogText.LastIndexOf('\n', signIndex) + 1;
                     int lineEnd = FullLogText.IndexOf('\n', signIndex);
-                    if (lineStart == -1)
-                    {
-                        lineStart = 0;
-                    }
                     if (lineEnd == -1)
                     {
                         lineEnd = FullLogText.Length;
