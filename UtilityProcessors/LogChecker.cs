@@ -19,7 +19,12 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Plugins that go into the <see cref="DangerousPlugins"/> list.
         /// </summary>
-        public static string[] BAD_PLUGINS = new string[] { "SkinsRestorer", "AuthMe", "PlugMan" };
+        public static string[] BAD_PLUGINS = new string[] { "SkinsRestorer", "AuthMe", "PlugMan", "CMI" };
+
+        /// <summary>
+        /// Plugins that go into the <see cref="IffyPlugins"/> list.
+        /// </summary>
+        public static string[] IFFY_PLUGINS = new string[] { "FeatherBoard" };
 
         /// <summary>
         /// Plugins that should show version output.
@@ -131,6 +136,11 @@ namespace DenizenBot.UtilityProcessors
         /// Any potentially problematic plugins found in the log.
         /// </summary>
         public List<string> DangerousPlugins = new List<string>();
+
+        /// <summary>
+        /// Any sometimes-conflictive plugins found in the log.
+        /// </summary>
+        public List<string> IffyPlugins = new List<string>();
 
         /// <summary>
         /// Plugins whose versions will be listed.
@@ -255,6 +265,15 @@ namespace DenizenBot.UtilityProcessors
                     DangerousPlugins.Add(pluginLoadText);
                 }
             }
+            foreach (string plugin in IFFY_PLUGINS)
+            {
+                string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
+                if (pluginLoadText.Length != 0)
+                {
+                    Console.WriteLine($"Iffy Plugin: {pluginLoadText}");
+                    IffyPlugins.Add(pluginLoadText);
+                }
+            }
         }
 
         /// <summary>
@@ -301,7 +320,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public Embed GetResult()
         {
-            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0);
+            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Count > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
             AutoField(embed, "Server Version", ServerVersion);
             if (IsOffline)
@@ -315,6 +334,7 @@ namespace DenizenBot.UtilityProcessors
             }
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions));
             AutoField(embed, "Bad Plugin(s)", string.Join('\n', DangerousPlugins));
+            AutoField(embed, "Iffy Plugin(s)", string.Join('\n', IffyPlugins));
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines));
             return embed.Build();
         }
