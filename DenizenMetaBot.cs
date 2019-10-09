@@ -129,6 +129,17 @@ namespace DenizenBot
         public static Object ConfigSaveLock = new Object();
 
         /// <summary>
+        /// Registers a command to a name and any number of aliases.
+        /// </summary>
+        public void RegisterCommand(Action<string[], SocketMessage> command, params string[] names)
+        {
+            foreach (string name in names)
+            {
+                ChatCommands.Add(name, command);
+            }
+        }
+
+        /// <summary>
         /// The informational commands provider.
         /// </summary>
         public InformationCommands InfoCmds = new InformationCommands();
@@ -142,114 +153,29 @@ namespace DenizenBot
             AdminCommands adminCmds = new AdminCommands() { Bot = this };
             InformationCommands infoCmds = InfoCmds;
             MetaCommands metaCmds = new MetaCommands() { Bot = this };
-            // ========= Informational =========
-            // help
-            ChatCommands["help"] = infoCmds.CMD_Help;
-            ChatCommands["halp"] = infoCmds.CMD_Help;
-            ChatCommands["helps"] = infoCmds.CMD_Help;
-            ChatCommands["halps"] = infoCmds.CMD_Help;
-            ChatCommands["hel"] = infoCmds.CMD_Help;
-            ChatCommands["hal"] = infoCmds.CMD_Help;
-            ChatCommands["h"] = infoCmds.CMD_Help;
-            // hello
-            ChatCommands["hello"] = infoCmds.CMD_Hello;
-            ChatCommands["hi"] = infoCmds.CMD_Hello;
-            ChatCommands["hey"] = infoCmds.CMD_Hello;
-            ChatCommands["source"] = infoCmds.CMD_Hello;
-            ChatCommands["src"] = infoCmds.CMD_Hello;
-            ChatCommands["github"] = infoCmds.CMD_Hello;
-            ChatCommands["git"] = infoCmds.CMD_Hello;
-            ChatCommands["hub"] = infoCmds.CMD_Hello;
-            // info
-            ChatCommands["info"] = infoCmds.CMD_Info;
-            ChatCommands["notice"] = infoCmds.CMD_Info;
-            ChatCommands["alert"] = infoCmds.CMD_Info;
-            // update
-            ChatCommands["update"] = infoCmds.CMD_Update;
-            ChatCommands["latest"] = infoCmds.CMD_Update;
-            ChatCommands["current"] = infoCmds.CMD_Update;
-            ChatCommands["build"] = infoCmds.CMD_Update;
-            ChatCommands["builds"] = infoCmds.CMD_Update;
-            ChatCommands["download"] = infoCmds.CMD_Update;
-            ChatCommands["version"] = infoCmds.CMD_Update;
-            // github
-            ChatCommands["github"] = infoCmds.CMD_GitHub;
-            ChatCommands["readme"] = infoCmds.CMD_GitHub;
-            ChatCommands["gh"] = infoCmds.CMD_GitHub;
-            ChatCommands["read"] = infoCmds.CMD_GitHub;
-            ChatCommands["link"] = infoCmds.CMD_GitHub;
-            // issues
-            ChatCommands["issues"] = infoCmds.CMD_Issues;
-            ChatCommands["issue"] = infoCmds.CMD_Issues;
-            ChatCommands["error"] = infoCmds.CMD_Issues;
-            ChatCommands["ghissues"] = infoCmds.CMD_Issues;
-            ChatCommands["githubissues"] = infoCmds.CMD_Issues;
-            // rule
-            ChatCommands["rule"] = infoCmds.CMD_Rule;
-            ChatCommands["rules"] = infoCmds.CMD_Rule;
-            // ========= Meta Docs =========
-            // command
-            ChatCommands["command"] = metaCmds.CMD_Command;
-            ChatCommands["commands"] = metaCmds.CMD_Command;
-            ChatCommands["cmd"] = metaCmds.CMD_Command;
-            ChatCommands["cmds"] = metaCmds.CMD_Command;
-            ChatCommands["c"] = metaCmds.CMD_Command;
-            // mechanism
-            ChatCommands["mechanism"] = metaCmds.CMD_Mechanism;
-            ChatCommands["mechanisms"] = metaCmds.CMD_Mechanism;
-            ChatCommands["mech"] = metaCmds.CMD_Mechanism;
-            ChatCommands["mechs"] = metaCmds.CMD_Mechanism;
-            ChatCommands["mec"] = metaCmds.CMD_Mechanism;
-            ChatCommands["mecs"] = metaCmds.CMD_Mechanism;
-            ChatCommands["m"] = metaCmds.CMD_Mechanism;
-            // tag
-            ChatCommands["tag"] = metaCmds.CMD_Tag;
-            ChatCommands["tags"] = metaCmds.CMD_Tag;
-            ChatCommands["t"] = metaCmds.CMD_Tag;
-            // event
-            ChatCommands["event"] = metaCmds.CMD_Event;
-            ChatCommands["events"] = metaCmds.CMD_Event;
-            ChatCommands["evt"] = metaCmds.CMD_Event;
-            ChatCommands["evts"] = metaCmds.CMD_Event;
-            ChatCommands["e"] = metaCmds.CMD_Event;
-            // action
-            ChatCommands["action"] = metaCmds.CMD_Action;
-            ChatCommands["actions"] = metaCmds.CMD_Action;
-            ChatCommands["act"] = metaCmds.CMD_Action;
-            ChatCommands["acts"] = metaCmds.CMD_Action;
-            ChatCommands["a"] = metaCmds.CMD_Action;
-            // language
-            ChatCommands["language"] = metaCmds.CMD_Language;
-            ChatCommands["languages"] = metaCmds.CMD_Language;
-            ChatCommands["lang"] = metaCmds.CMD_Language;
-            ChatCommands["langs"] = metaCmds.CMD_Language;
-            ChatCommands["l"] = metaCmds.CMD_Language;
-            // search
-            ChatCommands["search"] = metaCmds.CMD_Search;
-            ChatCommands["s"] = metaCmds.CMD_Search;
-            ChatCommands["find"] = metaCmds.CMD_Search;
-            ChatCommands["f"] = metaCmds.CMD_Search;
-            ChatCommands["get"] = metaCmds.CMD_Search;
-            ChatCommands["g"] = metaCmds.CMD_Search;
-            ChatCommands["locate"] = metaCmds.CMD_Search;
-            ChatCommands["what"] = metaCmds.CMD_Search;
-            ChatCommands["where"] = metaCmds.CMD_Search;
-            ChatCommands["how"] = metaCmds.CMD_Search;
-            ChatCommands["w"] = metaCmds.CMD_Search;
-            ChatCommands["meta"] = metaCmds.CMD_Search;
-            ChatCommands["metainfo"] = metaCmds.CMD_Search;
-            ChatCommands["docs"] = metaCmds.CMD_Search;
-            ChatCommands["doc"] = metaCmds.CMD_Search;
-            ChatCommands["documentation"] = metaCmds.CMD_Search;
-            ChatCommands["documentations"] = metaCmds.CMD_Search;
-            ChatCommands["document"] = metaCmds.CMD_Search;
-            ChatCommands["documents"] = metaCmds.CMD_Search;
-            // ========= Utility =========
+            // Informational
+            RegisterCommand(infoCmds.CMD_Help, "help", "halp", "helps", "halps", "hel", "hal", "h");
+            RegisterCommand(infoCmds.CMD_Hello, "hello", "hi", "hey", "source", "src");
+            RegisterCommand(infoCmds.CMD_Info, "info", "notice", "alert");
+            RegisterCommand(infoCmds.CMD_Update, "update", "latest", "current", "build", "builds", "download", "version");
+            RegisterCommand(infoCmds.CMD_GitHub, "github", "git", "gh", "readme", "read", "link");
+            RegisterCommand(infoCmds.CMD_Issues, "issues", "issue", "error", "ghissues", "githubissues");
+            RegisterCommand(infoCmds.CMD_Rule, "rule", "rules");
+            // Meta Docs
+            RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
+            RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m");
+            RegisterCommand(metaCmds.CMD_Tag, "tag", "tags", "t");
+            RegisterCommand(metaCmds.CMD_Event, "event", "events", "evt", "evts", "e");
+            RegisterCommand(metaCmds.CMD_Action, "action", "actions", "act", "acts", "a");
+            RegisterCommand(metaCmds.CMD_Language, "language", "languages", "lang", "langs", "l");
+            RegisterCommand(metaCmds.CMD_Search, "search", "s", "find", "f", "get", "g", "locate", "what", "where", "how",
+                "w", "meta", "metainfo", "docs", "doc", "documentation", "documentations", "document", "documents");
+            // Utility
             // TODO: CMD_DScript
             // TODO: CMD_LogCheck
-            // ========= Admin =========
-            ChatCommands["restart"] = adminCmds.CMD_Restart;
-            ChatCommands["reload"] = adminCmds.CMD_Reload;
+            // Admin
+            RegisterCommand(adminCmds.CMD_Restart, "restart");
+            RegisterCommand(adminCmds.CMD_Reload, "reload");
         }
 
         /// <summary>
