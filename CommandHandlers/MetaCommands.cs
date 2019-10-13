@@ -126,7 +126,7 @@ namespace DenizenBot.CommandHandlers
                     obj = matched[0];
                     Console.WriteLine($"Meta-Command for '{type.Name}' found imperfect single match for search '{search}': '{obj.CleanName}'");
                     altSingleOutput(obj);
-                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
+                    return 0;
                 }
             }
             Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
