@@ -34,7 +34,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Lowercase text that usually is a bad sign.
         /// </summary>
-        public static string[] DANGER_TEXT = new string[] { "cracked by", "blackspigot" };
+        public static string[] DANGER_TEXT = new string[] { "cracked by", "blackspigot", "issued server command: /reload" };
 
         /// <summary>
         /// The text that comes before the server version report.
