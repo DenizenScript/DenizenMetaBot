@@ -66,7 +66,10 @@ namespace DenizenBot.MetaObjects
             EmbedBuilder builder = base.GetEmbed();
             AutoField(builder, "Syntax", Syntax);
             AutoField(builder, "Short Description", Short);
-            AutoField(builder, "Related Guide Page", Guide);
+            if (!string.IsNullOrWhiteSpace(Guide))
+            {
+                AutoField(builder, "Related Guide Page", $"[{Guide}]({Guide})");
+            }
             builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description));
             return builder;
         }
