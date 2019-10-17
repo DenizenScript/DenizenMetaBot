@@ -253,7 +253,7 @@ namespace DenizenBot
             FDSSection infoSection = ConfigFile.GetSection("info_replies");
             foreach (string key in infoSection.GetRootKeys())
             {
-                string infoValue = infoSection.GetString(key);
+                string infoValue = infoSection.GetRootData(key).AsString;
                 string[] keysSplit = key.SplitFast(',');
                 InformationalDataNames.Add(keysSplit[0]);
                 foreach (string name in keysSplit)
