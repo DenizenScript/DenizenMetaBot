@@ -50,7 +50,7 @@ namespace DenizenBot.CommandHandlers
                 Environment.Exit(0);
             });
             Bot.BotMonitor.StopAllLogic = true;
-            Bot.Client.StopAsync().Wait();
+            Bot.Shutdown();
         }
 
         /// <summary>

@@ -82,7 +82,7 @@ namespace DenizenBot
             }
             Task.Factory.StartNew(() =>
             {
-                DiscordBot.Client.StopAsync().Wait();
+                DiscordBot.Shutdown();
             });
             Program.CurrentBot = new DenizenMetaBot();
             Program.LaunchBotThread(new String[0]);

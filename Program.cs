@@ -40,18 +40,6 @@ namespace DenizenBot
             CurrentMeta.DownloadAll();
             CurrentBot = new DenizenMetaBot();
             LaunchBotThread(args);
-            while (true)
-            {
-                string read = Console.ReadLine();
-                string[] commandDataSplit = read.Split(new char[] { ' ' }, 2);
-                string commandName = commandDataSplit[0].ToLowerInvariant();
-                if (commandName == "quit" || commandName == "stop" || commandName == "exit")
-                {
-                    CurrentBot.Shutdown();
-                    Environment.Exit(0);
-                }
-                // Could have more commands and/or a more advanced console command handler here.
-            }
         }
 
         /// <summary>
