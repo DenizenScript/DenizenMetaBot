@@ -112,7 +112,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for Update command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
@@ -143,7 +143,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for GitHub command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
@@ -174,7 +174,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for Issues command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
