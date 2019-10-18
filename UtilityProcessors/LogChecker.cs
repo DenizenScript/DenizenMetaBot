@@ -39,7 +39,8 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// The text that comes before the server version report.
         /// </summary>
-        public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version";
+        public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version",
+            SERVER_VERSION_PREFIX_BACKUP = "This server is running ";
 
         /// <summary>
         /// The text that comes before a player UUID post.
@@ -213,6 +214,10 @@ namespace DenizenBot.UtilityProcessors
             IsOffline = FullLogText.Contains(OFFLINE_NOTICE);
             Console.WriteLine($"Offline={IsOffline}, Bungee={IsBungee}");
             ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX);
+            if (string.IsNullOrWhiteSpace(ServerVersion))
+            {
+                ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
+            }
             Console.WriteLine($"ServerVersion={ServerVersion}");
         }
 
