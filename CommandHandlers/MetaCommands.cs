@@ -201,16 +201,16 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Mechanism(string[] cmds, SocketMessage message)
         {
-            string secondarySearch = null;
+            List<string> secondarySearches = new List<string>();
             if (cmds.Length > 0)
             {
                 int dotIndex = cmds[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
+                    secondarySearches.Add(cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex));
                 }
             }
-            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, new List<string>() { secondarySearch });
+            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearches);
             if (closeness > 0)
             {
                 string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
