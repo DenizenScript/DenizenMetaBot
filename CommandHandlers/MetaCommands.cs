@@ -46,13 +46,13 @@ namespace DenizenBot.CommandHandlers
         /// <param name="type">The meta type.</param>
         /// <param name="cmds">The command args.</param>
         /// <param name="message">The Discord message object.</param>
-        /// <param name="secondarySearch">A secondary search string if the first fails.</param>
+        /// <param name="secondarySearches">A list of secondary search strings if the first fails.</param>
         /// <param name="secondaryMatcher">A secondary matching function if needed.</param>
         /// <param name="altSingleOutput">An alternate method of processing the single-item-result.</param>
         /// <param name="altFindClosest">Alternate method to find the closest result.</param>
         /// <returns>How close of an answer was gotten (0 = perfect, -1 = no match needed, 1000 = none).</returns>
         public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
-            string secondarySearch = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null,
+            List<string> secondarySearches = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null,
             Func<string> altFindClosest = null, Func<List<T>, List<T>> altMatchOrderer = null) where T: MetaObject
         {
             if (CheckMetaDenied(message))
@@ -83,55 +83,78 @@ namespace DenizenBot.CommandHandlers
             {
                 altMatchOrderer = (list) => list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
             }
-            if (!docs.TryGetValue(search, out T obj) && (secondarySearch == null || !docs.TryGetValue(secondarySearch, out obj)))
+            if (docs.TryGetValue(search, out T obj))
             {
-                List<T> matched = new List<T>();
-                List<T> strongMatched = new List<T>();
-                foreach (KeyValuePair<string, T> objPair in docs)
+                Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
+                altSingleOutput(obj);
+                return 0;
+            }
+            if (secondarySearches != null)
+            {
+                foreach (string secondSearch in secondarySearches)
                 {
-                    if (objPair.Key.Contains(search) || (secondarySearch != null && objPair.Key.Contains(secondarySearch)))
+                    if (docs.TryGetValue(secondSearch, out obj))
                     {
-                        strongMatched.Add(objPair.Value);
+                        Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for secondary search '{secondSearch}': '{obj.CleanName}'");
+                        altSingleOutput(obj);
+                        return 0;
                     }
-                    if (secondaryMatcher != null && secondaryMatcher(objPair.Value))
-                    {
-                        matched.Add(objPair.Value);
-                    }
-                }
-                if (strongMatched.Count > 0)
-                {
-                    matched = strongMatched;
-                }
-                if (matched.Count == 0)
-                {
-                    string closeName = altFindClosest();
-                    SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
-                    return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
-                }
-                else if (matched.Count > 1)
-                {
-                    matched = altMatchOrderer(matched);
-                    string suffix = ".";
-                    if (matched.Count > 20)
-                    {
-                        matched = matched.GetRange(0, 20);
-                        suffix = ", ...";
-                    }
-                    string listText = string.Join("`, `", matched.Select((m) => m.Name));
-                    SendErrorMessageReply(message, $"Cannot Specify Searched {type.Name}", $"Multiple possible {type.Name.ToLowerFast()}s: `{listText}`{suffix}");
-                    return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
-                }
-                else // Count == 1
-                {
-                    obj = matched[0];
-                    Console.WriteLine($"Meta-Command for '{type.Name}' found imperfect single match for search '{search}': '{obj.CleanName}'");
-                    altSingleOutput(obj);
-                    return 0;
                 }
             }
-            Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
-            altSingleOutput(obj);
-            return 0;
+            List<T> matched = new List<T>();
+            List<T> strongMatched = new List<T>();
+            foreach (KeyValuePair<string, T> objPair in docs)
+            {
+                if (objPair.Key.Contains(search))
+                {
+                    strongMatched.Add(objPair.Value);
+                }
+                else if (secondarySearches != null)
+                {
+                    foreach (string secondSearch in secondarySearches)
+                    {
+                        if (objPair.Key.Contains(secondSearch))
+                        {
+                            strongMatched.Add(objPair.Value);
+                            break;
+                        }
+                    }
+                }
+                if (secondaryMatcher != null && secondaryMatcher(objPair.Value))
+                {
+                    matched.Add(objPair.Value);
+                }
+            }
+            if (strongMatched.Count > 0)
+            {
+                matched = strongMatched;
+            }
+            if (matched.Count == 0)
+            {
+                string closeName = altFindClosest();
+                SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
+            }
+            else if (matched.Count > 1)
+            {
+                matched = altMatchOrderer(matched);
+                string suffix = ".";
+                if (matched.Count > 20)
+                {
+                    matched = matched.GetRange(0, 20);
+                    suffix = ", ...";
+                }
+                string listText = string.Join("`, `", matched.Select((m) => m.Name));
+                SendErrorMessageReply(message, $"Cannot Specify Searched {type.Name}", $"Multiple possible {type.Name.ToLowerFast()}s: `{listText}`{suffix}");
+                return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
+            }
+            else // Count == 1
+            {
+                obj = matched[0];
+                Console.WriteLine($"Meta-Command for '{type.Name}' found imperfect single match for search '{search}': '{obj.CleanName}'");
+                altSingleOutput(obj);
+                return 0;
+            }
         }
 
         /// <summary>
@@ -187,7 +210,7 @@ namespace DenizenBot.CommandHandlers
                     secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
                 }
             }
-            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearch);
+            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, new List<string>() { secondarySearch });
             if (closeness > 0)
             {
                 string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
@@ -203,22 +226,38 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Tag(string[] cmds, SocketMessage message)
         {
-            string secondarySearch = null;
+            List<string> secondarySearches = new List<string>();
             if (cmds.Length > 0)
             {
                 cmds[0] = MetaTag.CleanTag(cmds[0]);
                 int dotIndex = cmds[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    secondarySearch = cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex);
+                    string tagBase = cmds[0].Substring(0, dotIndex);
+                    string tagSuffix = cmds[0].Substring(dotIndex);
+                    if (!tagBase.EndsWith("tag"))
+                    {
+                        secondarySearches.Add(tagBase + "tag" + tagSuffix);
+                    }
+                    string tagBaseLow = tagBase.ToLowerFast();
+                    if (tagBaseLow == "player" || tagBaseLow == "npc" || tagBaseLow == "playertag" || tagBaseLow == "npctag")
+                    {
+                        secondarySearches.Add("entitytag" + tagSuffix);
+                    }
+                    secondarySearches.Add("elementtag" + tagSuffix);
                 }
             }
             int getDistanceTo(MetaTag tag)
             {
                 int dist1 = StringConversionHelper.GetLevenshteinDistance(cmds[0], tag.CleanedName);
                 int dist2 = StringConversionHelper.GetLevenshteinDistance(cmds[0], tag.AfterDotCleaned);
-                int dist3 = secondarySearch == null ? int.MaxValue : StringConversionHelper.GetLevenshteinDistance(secondarySearch, tag.CleanedName);
-                return Math.Min(Math.Min(dist1, dist2), dist3);
+                int dist = Math.Min(dist1, dist2);
+                foreach (string secondSearch in secondarySearches)
+                {
+                    int dist3 = StringConversionHelper.GetLevenshteinDistance(secondSearch, tag.CleanedName);
+                    dist = Math.Min(dist, dist3);
+                }
+                return dist;
             }
             string findClosestTag()
             {
@@ -235,7 +274,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 return lowestStr;
             }
-            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearch, altFindClosest: findClosestTag,
+            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearches, altFindClosest: findClosestTag,
                 altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
         }
 
@@ -251,8 +290,7 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, null,
-            (e) => e.RegexMatcher.IsMatch(onSearch));
+            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
         }
 
         /// <summary>

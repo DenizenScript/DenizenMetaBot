@@ -155,7 +155,8 @@ namespace DenizenBot
         }
 
         /// <summary>
-        /// Finds the tag for the input text.
+        /// Finds the exact tag for the input text.
+        /// Does not perform partial matching or chain parsing.
         /// </summary>
         /// <param name="tagText">The input text to search for.</param>
         /// <returns>The matching tag, or null if not found.</returns>
@@ -173,7 +174,8 @@ namespace DenizenBot
                 string tagBase = cleaned.Substring(0, dotIndex);
                 string secondarySearch;
                 if (tagBase == "playertag" || tagBase == "npctag")
-                { // TODO: Object meta, to inform of down-typing like this?
+                {
+                    // TODO: Object meta, to inform of down-typing like this?
                     secondarySearch = "entitytag" + cleaned.Substring(dotIndex);
                 }
                 else if (!tagBase.EndsWith("tag"))
