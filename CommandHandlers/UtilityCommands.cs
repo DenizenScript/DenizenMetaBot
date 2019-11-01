@@ -156,7 +156,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    SendGenericNegativeMessageReply(message, "Build Outdated", $"That version an outdated {build.Name} build.\nThe current {build.Name} build is {build.Value}.\nYou are behind by {behindBy} builds.");
+                    SendGenericNegativeMessageReply(message, "Build Outdated", $"That version is an outdated {build.Name} build.\nThe current {build.Name} build is {build.Value}.\nYou are behind by {behindBy} builds.");
                 }
                 return;
             }
