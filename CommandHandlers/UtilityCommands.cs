@@ -160,7 +160,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 return;
             }
-            SendErrorMessageReply(message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project.");
+            SendErrorMessageReply(message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project (or the version text is formatted incorrectly).");
             return;
         }
     }

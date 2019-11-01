@@ -111,9 +111,13 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public static void AutoField(EmbedBuilder builder, string key, string value)
         {
+            if (builder.Length > 1500)
+            {
+                return;
+            }
             if (!string.IsNullOrWhiteSpace(value))
             {
-                value = LimitStringLength(value.Replace('`', '\''), 256, 240);
+                value = LimitStringLength(value.Replace('`', '\''), 450, 400);
                 builder.AddField(key, $"`{value}`", true);
             }
         }
@@ -257,7 +261,8 @@ namespace DenizenBot.UtilityProcessors
                 string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
                 if (pluginLoadText.Length != 0)
                 {
-                    string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText.After("Loading "), out string versionText);
+                    pluginLoadText = pluginLoadText.After("Loading ");
+                    string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText, out string versionText);
                     if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
                     {
                         if (build.IsCurrent(buildNum, out int behindBy))
