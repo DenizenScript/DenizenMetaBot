@@ -48,7 +48,8 @@ namespace DenizenBot.CommandHandlers
         /// Simple output string for utility commands.
         /// </summary>
         public static string CmdsUtility =
-                "`logcheck <link>` gathers information from a server log paste";
+                "`logcheck <link>` gathers information from a server log paste\n"
+                + "`versioncheck <version text>` checks whether a project version is current\n";
 
         /// <summary>
         /// Simple output string for admin commands.

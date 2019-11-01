@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 using Discord.Net;
 using Discord;
 using Discord.WebSocket;
@@ -32,6 +33,11 @@ namespace DenizenBot
         public static MetaDocs CurrentMeta = null;
 
         /// <summary>
+        /// Reusable HTTP(S) web client.
+        /// </summary>
+        public static HttpClient ReusableWebClient = new HttpClient();
+
+        /// <summary>
         /// Software entry point - starts the bot.
         /// </summary>
         static void Main(string[] args)
@@ -47,8 +53,7 @@ namespace DenizenBot
         /// </summary>
         public static void LaunchBotThread(string[] args)
         {
-            Thread thr = new Thread(new ParameterizedThreadStart(BotThread));
-            thr.Name = "denizendiscordbot";
+            Thread thr = new Thread(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
             thr.Start(args);
         }
 

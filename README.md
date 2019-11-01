@@ -34,6 +34,10 @@ To configure the bot:
     - `url_base` set to the base URL of the meta website.
     - `rules` set to a submapping of rule IDs to their text.
     - `command_prefix` set to the command prefix (for non-ping-based usages of the bot).
+    - `build_numbers` set to a submapping of project names to build number tracker details.
+        - `name` set to the human-friendly name.
+        - `jenkins_job` set to the Jenkins job name.
+        `- regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -58,6 +62,11 @@ channel_details:
 rules:
     all: Here's all the rules though!
     1: This is an important rule!
+build_numbers:
+    denizen_release:
+        name: Denizen Release
+        jenkins_job: Denizen
+        regex: [\d.]+(?:-SNAPSHOT)? \(build (\d+)-REL\)
 ```
 
 To start the bot up:

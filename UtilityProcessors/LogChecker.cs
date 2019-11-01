@@ -257,6 +257,18 @@ namespace DenizenBot.UtilityProcessors
                 string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
                 if (pluginLoadText.Length != 0)
                 {
+                    string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText.After("Loading "), out string versionText);
+                    if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
+                    {
+                        if (build.IsCurrent(buildNum, out int behindBy))
+                        {
+                            pluginLoadText += " -- (Current build)";
+                        }
+                        else
+                        {
+                            pluginLoadText += $" -- (Outdated build, behind by {behindBy})";
+                        }
+                    }
                     Console.WriteLine($"Plugin Version: {pluginLoadText}");
                     PluginVersions.Add(pluginLoadText);
                 }

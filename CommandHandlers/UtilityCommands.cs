@@ -40,11 +40,6 @@ namespace DenizenBot.CommandHandlers
         public static AsciiMatcher HASTE_CODE_VALIDATOR = new AsciiMatcher((c) => c >= '0' && c <= '9');
 
         /// <summary>
-        /// Reusable HTTP(S) web client.
-        /// </summary>
-        public static HttpClient ReusableWebClient = new HttpClient();
-
-        /// <summary>
         /// The max wait time for a web-link download in a command.
         /// </summary>
         public static TimeSpan WebLinkDownloadTimeout = new TimeSpan(hours: 0, minutes: 0, seconds: 15);
@@ -82,8 +77,13 @@ namespace DenizenBot.CommandHandlers
             }
             try
             {
-                Task<string> downloadTask = ReusableWebClient.GetStringAsync(rawUrl);
+                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(rawUrl);
                 downloadTask.Wait(WebLinkDownloadTimeout);
+                if (!downloadTask.IsCompleted)
+                {
+                    SendErrorMessageReply(message, "Error", "Download did not complete in time.");
+                    return null;
+                }
                 return downloadTask.Result;
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace DenizenBot.CommandHandlers
                 Console.WriteLine(ex.ToString());
                 if (ex is HttpRequestException)
                 {
-                    SendErrorMessageReply(message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: {ex.Message}");
+                    SendErrorMessageReply(message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
                 }
                 else
                 {
@@ -119,6 +119,49 @@ namespace DenizenBot.CommandHandlers
             LogChecker checker = new LogChecker(data);
             checker.Run();
             SendReply(message, checker.GetResult());
+        }
+
+        /// <summary>
+        /// Command to check the updatedness of a version string.
+        /// </summary>
+        public void CMD_VersionCheck(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!versioncheck <version text>`");
+                return;
+            }
+            string combined = string.Join(" ", cmds).Trim();
+            if (combined.ToLowerFast().StartsWith("loading "))
+            {
+                combined = combined.Substring("loading ".Length).Trim();
+            }
+            if (combined.IsEmpty())
+            {
+                SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (blank input?).");
+                return;
+            }
+            string projectName = BuildNumberTracker.SplitToNameAndVersion(combined, out string versionText).Replace(":", "").Trim();
+            versionText = versionText.Trim();
+            if (projectName.IsEmpty() || versionText.IsEmpty())
+            {
+                SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (single word input?).");
+                return;
+            }
+            if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
+            {
+                if (build.IsCurrent(buildNum, out int behindBy))
+                {
+                    SendGenericPositiveMessageReply(message, "Running Current Build", $"That version is the current {build.Name} build.");
+                }
+                else
+                {
+                    SendGenericNegativeMessageReply(message, "Build Outdated", $"That version an outdated {build.Name} build.\nThe current {build.Name} build is {build.Value}.\nYou are behind by {behindBy} builds.");
+                }
+                return;
+            }
+            SendErrorMessageReply(message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project.");
+            return;
         }
     }
 }

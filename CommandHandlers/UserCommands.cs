@@ -54,6 +54,14 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// Sends a generic negative reply to a message in the same channel.
+        /// </summary>
+        public static void SendGenericNegativeMessageReply(SocketMessage message, string title, string description)
+        {
+            SendReply(message, GetGenericNegativeMessageEmbed(title, description));
+        }
+
+        /// <summary>
         /// Sends an error message reply to a message in the same channel.
         /// </summary>
         public static void SendErrorMessageReply(SocketMessage message, string title, string description)
@@ -70,11 +78,29 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// Creates an Embed object for a generic negative message.
+        /// </summary>
+        public static Embed GetGenericNegativeMessageEmbed(string title, string description)
+        {
+            return new EmbedBuilder().WithTitle(title).WithColor(255, 128, 0).WithDescription(description).Build();
+        }
+
+        /// <summary>
         /// Creates an Embed object for an error message.
         /// </summary>
         public static Embed GetErrorMessageEmbed(string title, string description)
         {
             return new EmbedBuilder().WithTitle(title).WithColor(255, 64, 32).WithThumbnailUrl(Constants.WARNING_ICON).WithDescription(description).Build();
+        }
+
+        /// <summary>
+        /// Escapes user input for output. Best when wrapped in `backticks`.
+        /// </summary>
+        /// <param name="text">The user input text.</param>
+        /// <returns>The escaped result.</returns>
+        public static string EscapeUserInput(string text)
+        {
+            return text.Replace('`', '\'');
         }
     }
 }

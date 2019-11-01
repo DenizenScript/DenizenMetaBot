@@ -12,6 +12,7 @@ using Discord.WebSocket;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -66,6 +67,7 @@ namespace DenizenBot.CommandHandlers
                 return;
             }
             SendGenericPositiveMessageReply(message, "Reloading", "Yes, boss. Reloading meta documentation now...");
+            BuildNumberTracker.UpdateAll();
             MetaDocs docs = new MetaDocs();
             docs.DownloadAll();
             Program.CurrentMeta = docs;

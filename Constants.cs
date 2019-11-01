@@ -40,5 +40,9 @@ namespace DenizenBot
         /// </summary>
         public const string INFO_ICON = "https://i.alexgoodwin.media/i/for_real_usage/911f66.png";
 
+        /// <summary>
+        /// The base for the Jenkins CI URL.
+        /// </summary>
+        public const string JENKINS_URL_BASE = "https://ci.citizensnpcs.co";
     }
 }

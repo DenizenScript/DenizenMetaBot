@@ -13,6 +13,7 @@ using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 using DenizenBot.CommandHandlers;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot
 {
@@ -173,6 +174,7 @@ namespace DenizenBot
             // Utility
             // TODO: CMD_DScriptCheck
             RegisterCommand(utilCmds.CMD_LogCheck, "logcheck", "checklog", "logscheck", "checklogs");
+            RegisterCommand(utilCmds.CMD_VersionCheck, "versioncheck", "checkversion", "iscurrent", "isuptodate", "isupdated", "checkcurrent", "currentcheck");
             // Admin
             RegisterCommand(adminCmds.CMD_Restart, "restart");
             RegisterCommand(adminCmds.CMD_Reload, "reload");
@@ -292,6 +294,12 @@ namespace DenizenBot
             foreach (string rule in rulesSection.GetRootKeys())
             {
                 Rules.Add(rule, rulesSection.GetString(rule));
+            }
+            FDSSection buildNumbersSection = ConfigFile.GetSection("build_numbers");
+            foreach (string projectName in buildNumbersSection.GetRootKeys())
+            {
+                FDSSection project = buildNumbersSection.GetSection(projectName);
+                BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"));
             }
         }
 
