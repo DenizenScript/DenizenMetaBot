@@ -216,7 +216,12 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The name.</returns>
         public static string SplitToNameAndVersion(string fullText, out string version)
         {
-            return fullText.BeforeAndAfter(' ', out version);
+            string result = fullText.BeforeAndAfter(' ', out version);
+            if (version.StartsWith("version "))
+            {
+                version = version.Substring("version ".Length);
+            }
+            return result;
         }
     }
 }
