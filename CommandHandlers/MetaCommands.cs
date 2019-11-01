@@ -146,10 +146,6 @@ namespace DenizenBot.CommandHandlers
             {
                 if (objPair.Value.HasMultipleNames)
                 {
-                    tryProcesSingleMatch(objPair.Value, objPair.Key);
-                }
-                else
-                {
                     foreach (string name in objPair.Value.MultiNames)
                     {
                         if (tryProcesSingleMatch(objPair.Value, name))
@@ -157,6 +153,10 @@ namespace DenizenBot.CommandHandlers
                             break;
                         }
                     }
+                }
+                else
+                {
+                    tryProcesSingleMatch(objPair.Value, objPair.Key);
                 }
             }
             if (strongMatched.Count > 0)
