@@ -22,12 +22,17 @@ namespace DenizenBot.MetaObjects
             docs.Actions.Add(CleanName, this);
         }
 
-        public override IEnumerable<string> MultiNames => Actions;
+        public override IEnumerable<string> MultiNames => CleanActions;
 
         /// <summary>
         /// The names of the action.
         /// </summary>
         public string[] Actions = new string[0];
+
+        /// <summary>
+        /// The names of the actions, autocleaned.
+        /// </summary>
+        public string[] CleanActions = new string[0];
 
         /// <summary>
         /// The trigger reason.
@@ -60,6 +65,7 @@ namespace DenizenBot.MetaObjects
             {
                 case "actions":
                     Actions = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    CleanActions = Actions.Select(s => s.ToLowerFast()).ToArray();
                     HasMultipleNames = Actions.Length > 1;
                     return true;
                 case "triggers":

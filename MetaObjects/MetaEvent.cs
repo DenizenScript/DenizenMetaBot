@@ -22,12 +22,17 @@ namespace DenizenBot.MetaObjects
             docs.Events.Add(CleanName, this);
         }
 
-        public override IEnumerable<string> MultiNames => Events;
+        public override IEnumerable<string> MultiNames => CleanEvents;
 
         /// <summary>
         /// The names of the event.
         /// </summary>
         public string[] Events = new string[0];
+
+        /// <summary>
+        /// The names of the events, autocleaned.
+        /// </summary>
+        public string[] CleanEvents = new string[0];
 
         /// <summary>
         /// Switches available to the event.
@@ -92,6 +97,7 @@ namespace DenizenBot.MetaObjects
             {
                 case "events":
                     Events = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    CleanEvents = Events.Select(s => s.ToLowerFast()).ToArray();
                     HasMultipleNames = Events.Length > 1;
                     return true;
                 case "triggers":

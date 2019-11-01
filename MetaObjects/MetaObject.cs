@@ -30,7 +30,7 @@ namespace DenizenBot.MetaObjects
         /// <summary>
         /// If the object has multiple names, returns the full set of names.
         /// </summary>
-        public virtual IEnumerable<string> MultiNames => new string[] { Name };
+        public virtual IEnumerable<string> MultiNames => new string[] { CleanName };
 
         /// <summary>
         /// Get the clean lowercase name of the object.
