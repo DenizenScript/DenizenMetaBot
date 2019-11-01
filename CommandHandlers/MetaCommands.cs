@@ -77,7 +77,21 @@ namespace DenizenBot.CommandHandlers
             }
             if (altFindClosest == null)
             {
-                altFindClosest = () => StringConversionHelper.FindClosestString(docs.Keys, search, 20);
+                altFindClosest = () =>
+                {
+                    string initialPossibleResult = StringConversionHelper.FindClosestString(docs.Keys, search, out int lowestDistance, 20);
+                    string lowestStr = null;
+                    foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
+                    {
+                        int currentDistance = StringConversionHelper.GetLevenshteinDistance(search, possibleName);
+                        if (currentDistance < lowestDistance)
+                        {
+                            lowestDistance = currentDistance;
+                            lowestStr = possibleName;
+                        }
+                    }
+                    return lowestStr;
+                };
             }
             if (altMatchOrderer == null)
             {
@@ -103,26 +117,46 @@ namespace DenizenBot.CommandHandlers
             }
             List<T> matched = new List<T>();
             List<T> strongMatched = new List<T>();
-            foreach (KeyValuePair<string, T> objPair in docs)
+            bool tryProcesSingleMatch(T objVal, string objName)
             {
-                if (objPair.Key.Contains(search))
+                if (objName.Contains(search))
                 {
-                    strongMatched.Add(objPair.Value);
+                    strongMatched.Add(objVal);
+                    return true;
                 }
-                else if (secondarySearches != null)
+                if (secondarySearches != null)
                 {
                     foreach (string secondSearch in secondarySearches)
                     {
-                        if (objPair.Key.Contains(secondSearch))
+                        if (objName.Contains(secondSearch))
                         {
-                            strongMatched.Add(objPair.Value);
-                            break;
+                            strongMatched.Add(objVal);
+                            return true;
                         }
                     }
                 }
-                if (secondaryMatcher != null && secondaryMatcher(objPair.Value))
+                if (secondaryMatcher != null && secondaryMatcher(objVal))
                 {
-                    matched.Add(objPair.Value);
+                    matched.Add(objVal);
+                    return true;
+                }
+                return false;
+            }
+            foreach (KeyValuePair<string, T> objPair in docs)
+            {
+                if (objPair.Value.HasMultipleNames)
+                {
+                    tryProcesSingleMatch(objPair.Value, objPair.Key);
+                }
+                else
+                {
+                    foreach (string name in objPair.Value.MultiNames)
+                    {
+                        if (tryProcesSingleMatch(objPair.Value, name))
+                        {
+                            break;
+                        }
+                    }
                 }
             }
             if (strongMatched.Count > 0)

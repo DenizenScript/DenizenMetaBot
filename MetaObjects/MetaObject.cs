@@ -23,6 +23,16 @@ namespace DenizenBot.MetaObjects
         public abstract string Name { get; }
 
         /// <summary>
+        /// Whether this object has multiple names.
+        /// </summary>
+        public bool HasMultipleNames = false;
+
+        /// <summary>
+        /// If the object has multiple names, returns the full set of names.
+        /// </summary>
+        public virtual IEnumerable<string> MultiNames => new string[] { Name };
+
+        /// <summary>
         /// Get the clean lowercase name of the object.
         /// </summary>
         public virtual string CleanName => Name.ToLowerFast();

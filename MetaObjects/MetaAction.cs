@@ -22,6 +22,8 @@ namespace DenizenBot.MetaObjects
             docs.Actions.Add(CleanName, this);
         }
 
+        public override IEnumerable<string> MultiNames => Actions;
+
         /// <summary>
         /// The names of the action.
         /// </summary>
@@ -58,6 +60,7 @@ namespace DenizenBot.MetaObjects
             {
                 case "actions":
                     Actions = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    HasMultipleNames = Actions.Length > 1;
                     return true;
                 case "triggers":
                     Triggers = value;
