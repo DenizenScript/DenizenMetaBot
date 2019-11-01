@@ -87,7 +87,7 @@ namespace DenizenBot.UtilityProcessors
                     return false;
                 }
                 Match m = Matcher.Match(version);
-                if (!m.Success || m.Groups.Count != 1 || !int.TryParse(m.Groups[1].Value, out int bnResult))
+                if (!m.Success || m.Groups.Count != 2 || !int.TryParse(m.Groups[1].Value, out int bnResult))
                 {
                     buildNumber = 0;
                     return false;
@@ -150,7 +150,7 @@ namespace DenizenBot.UtilityProcessors
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
+                        Console.WriteLine("While updating " + Name + " via URL " + JenkinsURL + ": " + ex);
                     }
                     IsUpdating = false;
                 });

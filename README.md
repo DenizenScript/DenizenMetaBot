@@ -35,7 +35,7 @@ To configure the bot:
     - `rules` set to a submapping of rule IDs to their text.
     - `command_prefix` set to the command prefix (for non-ping-based usages of the bot).
     - `build_numbers` set to a submapping of project names to build number tracker details.
-        - `name` set to the human-friendly name.
+        - `name` set to the name that appears in the `plugin.yml`.
         - `jenkins_job` set to the Jenkins job name.
         `- regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
 
@@ -64,7 +64,7 @@ rules:
     1: This is an important rule!
 build_numbers:
     denizen_release:
-        name: Denizen Release
+        name: Denizen
         jenkins_job: Denizen
         regex: [\d.]+(?:-SNAPSHOT)? \(build (\d+)-REL\)
 ```
