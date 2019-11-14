@@ -105,6 +105,7 @@ namespace DenizenBot.CommandHandlers
             }
             if (secondarySearches != null)
             {
+                secondarySearches = secondarySearches.Select(s => s.ToLowerFast()).ToList();
                 foreach (string secondSearch in secondarySearches)
                 {
                     if (docs.TryGetValue(secondSearch, out obj))
