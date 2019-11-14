@@ -125,7 +125,7 @@ namespace DenizenBot.MetaObjects
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                builder.AddField(key, EscapeForDiscord(ProcessMetaLinksForDiscord(value)), true);
+                builder.AddField(key, EscapeForDiscord(ProcessMetaLinksForDiscord(value)), false);
             }
         }
 
