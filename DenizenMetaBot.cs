@@ -397,13 +397,13 @@ namespace DenizenBot
                 }
                 return Task.CompletedTask;
             };
-            Console.WriteLine("Starting monitor...");
-            BotMonitor.StartMonitorLoop();
             Console.WriteLine("Logging in to Discord...");
             Client.LoginAsync(TokenType.Bot, TOKEN).Wait();
             Console.WriteLine("Connecting to Discord...");
             Client.StartAsync().Wait();
             Console.WriteLine("Running Discord!");
+            Console.WriteLine("Starting monitor...");
+            BotMonitor.StartMonitorLoop();
             StoppedEvent.WaitOne();
         }
     }
