@@ -108,8 +108,7 @@ namespace DenizenBot
         /// </summary>
         public void StartMonitorLoop()
         {
-            Thread thr = new Thread(new ThreadStart(LoopUntilFail));
-            thr.Name = "connectionmonitor";
+            Thread thr = new Thread(new ThreadStart(LoopUntilFail)) { Name = "discordbotconnectionmonitor" };
             thr.Start();
         }
 
