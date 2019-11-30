@@ -239,6 +239,26 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Post-check handler for tags, used in <see cref="MetaCommand"/> and <see cref="MetaMechanism"/>.
+        /// </summary>
+        /// <param name="docs">The relevant docs object.</param>
+        /// <param name="tags">The relevant tags list.</param>
+        public void PostCheckTags(MetaDocs docs, string[] tags)
+        {
+            foreach (string tag in tags)
+            {
+                if (tag.EndsWith(">"))
+                {
+                    MetaTag realTag = Program.CurrentMeta.FindTag(tag);
+                    if (realTag == null)
+                    {
+                        docs.LoadErrors.Add($"{Type.Name} '{Name}' references tag '{tag}', which doesn't exist.");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Get all text for related to this object that may be useful for searches.
         /// </summary>
         public virtual string GetAllSearchableText()

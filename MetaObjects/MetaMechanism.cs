@@ -79,6 +79,11 @@ namespace DenizenBot.MetaObjects
             }
         }
 
+        public override void PostCheck(MetaDocs docs)
+        {
+            PostCheckTags(docs, Tags);
+        }
+
         public override string GetAllSearchableText()
         {
             string baseText = base.GetAllSearchableText();
