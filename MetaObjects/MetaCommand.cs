@@ -24,7 +24,7 @@ namespace DenizenBot.MetaObjects
         /// <summary>
         /// The name of the command.
         /// </summary>
-        public string CommandName = "";
+        public string CommandName;
 
         /// <summary>
         /// How many arguments are required, minimum.
@@ -34,17 +34,17 @@ namespace DenizenBot.MetaObjects
         /// <summary>
         /// The syntax guide.
         /// </summary>
-        public string Syntax = "";
+        public string Syntax;
 
         /// <summary>
         /// The short description.
         /// </summary>
-        public string Short = "";
+        public string Short;
 
         /// <summary>
         /// The long-form description.
         /// </summary>
-        public string Description = "";
+        public string Description;
 
         /// <summary>
         /// Tags documented for this command. One tag per string.
@@ -185,6 +185,7 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            Require(docs, Short, Description, Syntax, CommandName);
             PostCheckTags(docs, Tags);
             PostCheckLinkableText(docs, Description);
         }

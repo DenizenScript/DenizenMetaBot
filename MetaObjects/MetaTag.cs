@@ -121,6 +121,7 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            Require(docs, TagFull, Returns, Description);
             if (!string.IsNullOrWhiteSpace(Mechanism))
             {
                 if (!Program.CurrentMeta.Mechanisms.ContainsKey(Mechanism.ToLowerFast()))

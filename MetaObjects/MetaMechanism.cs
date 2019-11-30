@@ -81,6 +81,7 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            Require(docs, MechObject, MechName, Input, Description);
             PostCheckTags(docs, Tags);
             PostCheckLinkableText(docs, Description);
         }

@@ -47,7 +47,7 @@ namespace DenizenBot.MetaObjects
         /// <summary>
         /// The trigger reason.
         /// </summary>
-        public string Triggers = "";
+        public string Triggers;
 
         /// <summary>
         /// Context tags. One tag per string.
@@ -131,6 +131,7 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            Require(docs, Events[0], Triggers, RegexMatcher);
             PostCheckLinkableText(docs, Triggers);
             foreach (string context in Context)
             {

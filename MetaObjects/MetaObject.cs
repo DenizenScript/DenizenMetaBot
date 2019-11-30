@@ -240,12 +240,32 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Post-check handler to require specific values be set (not-null).
+        /// </summary>
+        /// <param name="docs">The relevant docs object.</param>
+        /// <param name="requiredValues">The values that are required.</param>
+        public void Require(MetaDocs docs, params object[] requiredValues)
+        {
+            foreach (object obj in requiredValues)
+            {
+                if (obj == null)
+                {
+                    docs.LoadErrors.Add($"{Type.Name} '{Name}' is missing a required meta key.");
+                }
+            }
+        }
+
+        /// <summary>
         /// Post-check handler for linkable text, to find bad links.
         /// </summary>
         /// <param name="docs">The relevant docs object.</param>
         /// <param name="linkedtext">The relevant linkable list.</param>
         public void PostCheckLinkableText(MetaDocs docs, string linkedtext)
         {
+            if (string.IsNullOrWhiteSpace(linkedtext))
+            {
+                return;
+            }
             int nextLinkIndex = linkedtext.IndexOf("<@link");
             if (nextLinkIndex < 0)
             {

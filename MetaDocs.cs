@@ -238,8 +238,16 @@ namespace DenizenBot
             }
             foreach (MetaObject obj in AllMetaObjects())
             {
-                obj.PostCheck(this);
-                obj.Searchable = obj.GetAllSearchableText().ToLowerFast();
+                try
+                {
+                    obj.PostCheck(this);
+                    obj.Searchable = obj.GetAllSearchableText().ToLowerFast();
+                }
+                catch (Exception ex)
+                {
+                    LoadErrors.Add($"Internal exception while checking {obj.Type.Name} '{obj.Name}' - {ex.GetType().FullName} ... see bot console for details.");
+                    Console.WriteLine($"Error with {obj.Type.Name} '{obj.Name}': {ex.ToString()}");
+                }
             }
             foreach (string str in LoadErrors)
             {

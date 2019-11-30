@@ -55,6 +55,7 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            Require(docs, LangName, Description);
             PostCheckLinkableText(docs, Description);
         }
 
