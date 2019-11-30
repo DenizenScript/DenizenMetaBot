@@ -81,7 +81,12 @@ namespace DenizenBot.MetaObjects
         {
             EmbedBuilder builder = GetEmbed();
             builder.Description = "";
+            if (Tags.IsEmpty())
+            {
+                return builder;
+            }
             int limitLengthRemaining = 1000;
+            StringBuilder tagsFieldBuilder = new StringBuilder(Tags.Length * 30);
             foreach (string tag in Tags)
             {
                 string tagOut = tag;
@@ -102,12 +107,13 @@ namespace DenizenBot.MetaObjects
                     tagOut = tagOut.Substring(0, 100) + "...";
                 }
                 limitLengthRemaining -= tagOut.Length;
-                AutoField(builder, "Related Tag", tagOut);
+                tagsFieldBuilder.Append(tagOut);
                 if (limitLengthRemaining <= 0)
                 {
                     break;
                 }
             }
+            AutoField(builder, "Related Tags", tagsFieldBuilder.ToString());
             return builder;
         }
 
