@@ -107,7 +107,7 @@ namespace DenizenBot.MetaObjects
                     tagOut = tagOut.Substring(0, 100) + "...";
                 }
                 limitLengthRemaining -= tagOut.Length;
-                tagsFieldBuilder.Append(tagOut);
+                tagsFieldBuilder.Append(tagOut).Append("\n");
                 if (limitLengthRemaining <= 0)
                 {
                     break;
