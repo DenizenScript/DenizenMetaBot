@@ -296,7 +296,7 @@ namespace DenizenBot
                 using (Stream entryStream = entry.Open())
                 {
                     lines.Add(START_OF_FILE_PREFIX + entry.FullName);
-                    lines.AddRange(entryStream.AllLinesOfText().Where((s) => s.TrimStart().StartsWith("// ")).Select((s) => s.Trim().Substring("// ".Length)));
+                    lines.AddRange(entryStream.AllLinesOfText().Where((s) => s.TrimStart().StartsWith("// ")).Select((s) => s.Trim().Substring("// ".Length).Replace("\r", "")));
                     lines.Add(END_OF_FILE_MARK);
                 }
             }
@@ -370,7 +370,7 @@ namespace DenizenBot
                     {
                         if (curKey != null && curValue != null)
                         {
-                            if (!obj.ApplyValue(curKey.ToLowerFast(), curValue.Trim(' ', '\t', '\n', '\r')))
+                            if (!obj.ApplyValue(curKey.ToLowerFast(), curValue.Trim(' ', '\t', '\n')))
                             {
                                 LoadErrors.Add($"While processing {file} in object type '{objectType}' for '{obj.Name}' could not apply key '{curKey}' with value '{curValue}'.");
                             }
