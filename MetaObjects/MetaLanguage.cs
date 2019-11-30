@@ -53,6 +53,11 @@ namespace DenizenBot.MetaObjects
             }
         }
 
+        public override void PostCheck(MetaDocs docs)
+        {
+            PostCheckLinkableText(docs, Description);
+        }
+
         public override string GetAllSearchableText()
         {
             string baseText = base.GetAllSearchableText();

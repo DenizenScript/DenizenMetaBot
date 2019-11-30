@@ -127,7 +127,9 @@ namespace DenizenBot.MetaObjects
                 {
                     docs.LoadErrors.Add($"Tag '{Name}' references mechanism '{Mechanism}', which doesn't exist.");
                 }
+                PostCheckLinkableText(docs, Mechanism);
             }
+            PostCheckLinkableText(docs, Description);
         }
 
         public override string GetAllSearchableText()

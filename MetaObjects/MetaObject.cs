@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Discord;
 using DenizenBot;
 using FreneticUtilities.FreneticExtensions;
@@ -239,6 +240,89 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Post-check handler for linkable text, to find bad links.
+        /// </summary>
+        /// <param name="docs">The relevant docs object.</param>
+        /// <param name="linkedtext">The relevant linkable list.</param>
+        public void PostCheckLinkableText(MetaDocs docs, string linkedtext)
+        {
+            int nextLinkIndex = linkedtext.IndexOf("<@link");
+            if (nextLinkIndex < 0)
+            {
+                return;
+            }
+            while (nextLinkIndex >= 0)
+            {
+                int endIndex = FindClosingTagMark(linkedtext, nextLinkIndex + 1);
+                if (endIndex < 0)
+                {
+                    return;
+                }
+                int startOfMetaCommand = nextLinkIndex + "<@link ".Length;
+                string metaCommand = linkedtext.Substring(startOfMetaCommand, endIndex - startOfMetaCommand);
+                if (!metaCommand.StartsWith("url"))
+                {
+                    int firstSpace = metaCommand.IndexOf(' ');
+                    if (firstSpace < 0)
+                    {
+                        docs.LoadErrors.Add($"{Type.Name} '{Name}' contains text link '{metaCommand}', which is formatted incorrectly.");
+                        return;
+                    }
+                    string type = metaCommand.Substring(0, firstSpace).ToLowerFast();
+                    string searchText = metaCommand.Substring(firstSpace + 1).ToLowerFast();
+                    bool exists;
+                    if (type.Equals("command"))
+                    {
+                        exists = docs.Commands.ContainsKey(searchText);
+                    }
+                    else if (type.Equals("tag"))
+                    {
+                        exists = docs.FindTag(searchText) != null;
+                    }
+                    else if (type.Equals("mechanism"))
+                    {
+                        exists = docs.Mechanisms.ContainsKey(searchText);
+                    }
+                    else if (type.Equals("event"))
+                    {
+                        if (searchText.StartsWith("on "))
+                        {
+                            searchText = searchText.Substring("on ".Length);
+                        }
+                        exists = docs.Events.Values.Any(e => e.CleanEvents.Any(s => s.Contains(searchText)));
+                        if (!exists)
+                        {
+                            exists = docs.Events.Values.Any(e => e.RegexMatcher.IsMatch(searchText));
+                        }
+                    }
+                    else if (type.Equals("action"))
+                    {
+                        if (searchText.StartsWith("on "))
+                        {
+                            searchText = searchText.Substring("on ".Length);
+                        }
+                        exists = docs.Actions.Values.Any(a => a.CleanActions.Any(s => s.Contains(searchText)));
+                    }
+                    else if (type.Equals("language"))
+                    {
+                        exists = docs.Languages.Keys.Any(s => s.Contains(searchText));
+                    }
+                    else
+                    {
+                        docs.LoadErrors.Add($"{Type.Name} '{Name}' contains text link '{metaCommand}', which refers to an unknown meta type.");
+                        return;
+                    }
+                    if (!exists)
+                    {
+                        docs.LoadErrors.Add($"{Type.Name} '{Name}' contains text link '{metaCommand}', which does not exist.");
+                        return;
+                    }
+                }
+                nextLinkIndex = linkedtext.IndexOf("<@link", endIndex + 1);
+            }
+        }
+
+        /// <summary>
         /// Post-check handler for tags, used in <see cref="MetaCommand"/> and <see cref="MetaMechanism"/>.
         /// </summary>
         /// <param name="docs">The relevant docs object.</param>
@@ -255,6 +339,7 @@ namespace DenizenBot.MetaObjects
                         docs.LoadErrors.Add($"{Type.Name} '{Name}' references tag '{tag}', which doesn't exist.");
                     }
                 }
+                PostCheckLinkableText(docs, tag);
             }
         }
 

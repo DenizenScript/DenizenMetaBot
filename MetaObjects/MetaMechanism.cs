@@ -82,6 +82,7 @@ namespace DenizenBot.MetaObjects
         public override void PostCheck(MetaDocs docs)
         {
             PostCheckTags(docs, Tags);
+            PostCheckLinkableText(docs, Description);
         }
 
         public override string GetAllSearchableText()

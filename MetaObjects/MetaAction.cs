@@ -81,6 +81,18 @@ namespace DenizenBot.MetaObjects
                     return base.ApplyValue(key, value);
             }
         }
+        public override void PostCheck(MetaDocs docs)
+        {
+            PostCheckLinkableText(docs, Triggers);
+            foreach (string context in Context)
+            {
+                PostCheckLinkableText(docs, context);
+            }
+            foreach (string determine in Determinations)
+            {
+                PostCheckLinkableText(docs, determine);
+            }
+        }
 
         public override string GetAllSearchableText()
         {
