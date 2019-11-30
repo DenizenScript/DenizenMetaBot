@@ -215,7 +215,7 @@ namespace DenizenBot.MetaObjects
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(Type.Name + ": " + Name)
                 .WithUrl(Constants.DOCS_URL_BASE + Type.WebPath + "/" + UrlEscape(CleanName));
-            AutoField(builder, "Required Plugin(s)", Plugin);
+            AutoField(builder, "Required Plugins or Platforms", Plugin);
             AutoField(builder, "Group", Group);
             foreach (string warn in Warnings)
             {
