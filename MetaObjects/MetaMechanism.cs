@@ -84,6 +84,13 @@ namespace DenizenBot.MetaObjects
             Require(docs, MechObject, MechName, Input, Description);
             PostCheckTags(docs, Tags);
             PostCheckLinkableText(docs, Description);
+            if (Tags.IsEmpty())
+            {
+                if (docs.Tags.ContainsKey(CleanName))
+                {
+                    docs.LoadErrors.Add($"Mechanism '{Name}' has no Tags link, but has the same name as an existing tag. A link should be added.");
+                }
+            }
         }
 
         public override string GetAllSearchableText()

@@ -130,6 +130,13 @@ namespace DenizenBot.MetaObjects
                 }
                 PostCheckLinkableText(docs, Mechanism);
             }
+            else
+            {
+                if (docs.Mechanisms.ContainsKey(CleanedName))
+                {
+                    docs.LoadErrors.Add($"Tag '{Name}' has no mechanism link, but has the same name as an existing mechanism. A link should be added.");
+                }
+            }
             PostCheckLinkableText(docs, Description);
         }
 
