@@ -85,35 +85,7 @@ namespace DenizenBot.MetaObjects
             {
                 return builder;
             }
-            int limitLengthRemaining = 1000;
-            StringBuilder tagsFieldBuilder = new StringBuilder(Tags.Length * 30);
-            foreach (string tag in Tags)
-            {
-                string tagOut = tag;
-                if (tagOut.EndsWith(">"))
-                {
-                    MetaTag realTag = Program.CurrentMeta.FindTag(tagOut);
-                    if (realTag == null)
-                    {
-                        tagOut += " (Invalid tag)";
-                    }
-                    else
-                    {
-                        tagOut += " " + realTag.Description.Replace("\n", " ");
-                    }
-                }
-                if (tagOut.Length > 128)
-                {
-                    tagOut = tagOut.Substring(0, 100) + "...";
-                }
-                limitLengthRemaining -= tagOut.Length;
-                tagsFieldBuilder.Append(tagOut).Append("\n");
-                if (limitLengthRemaining <= 0)
-                {
-                    break;
-                }
-            }
-            AutoField(builder, "Related Tags", tagsFieldBuilder.ToString());
+            AutoField(builder, "Related Tags", GetTagsField(Tags));
             return builder;
         }
 

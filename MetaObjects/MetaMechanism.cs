@@ -50,7 +50,7 @@ namespace DenizenBot.MetaObjects
         {
             EmbedBuilder builder = base.GetEmbed().WithTitle(MechObject + " mechanism: " + MechName);
             AutoField(builder, "Input", Input);
-            AutoField(builder, "Tags", String.Join("\n", Tags));
+            AutoField(builder, "Tags", GetTagsField(Tags));
             builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(Description.Length > 600 ? Description.Substring(0, 500) + "..." : Description));
             return builder;
         }

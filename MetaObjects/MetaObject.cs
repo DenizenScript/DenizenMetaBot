@@ -210,6 +210,45 @@ namespace DenizenBot.MetaObjects
         }
 
         /// <summary>
+        /// Converts a tags array to a valid tags field text output for embedding.
+        /// Used by <see cref="MetaCommand"/> and <see cref="MetaMechanism"/>.
+        /// </summary>
+        /// <param name="tags">The tags array.</param>
+        /// <returns>The tags field text.</returns>
+        public string GetTagsField(string[] tags)
+        {
+            int limitLengthRemaining = 1000;
+            StringBuilder tagsFieldBuilder = new StringBuilder(tags.Length * 30);
+            foreach (string tag in tags)
+            {
+                string tagOut = $"`{tag}`";
+                if (tagOut.EndsWith(">"))
+                {
+                    MetaTag realTag = Program.CurrentMeta.FindTag(tag);
+                    if (realTag == null)
+                    {
+                        tagOut += " (Invalid tag)";
+                    }
+                    else
+                    {
+                        tagOut += " " + realTag.Description.Replace("\n", " ");
+                    }
+                }
+                if (tagOut.Length > 128)
+                {
+                    tagOut = tagOut.Substring(0, 100) + "...";
+                }
+                limitLengthRemaining -= tagOut.Length;
+                tagsFieldBuilder.Append(tagOut).Append("\n");
+                if (limitLengthRemaining <= 0)
+                {
+                    break;
+                }
+            }
+            return tagsFieldBuilder.ToString();
+        }
+
+        /// <summary>
         /// Get an embed object for this meta object.
         /// </summary>
         public virtual EmbedBuilder GetEmbed()
