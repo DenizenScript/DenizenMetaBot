@@ -119,6 +119,17 @@ namespace DenizenBot.MetaObjects
             }
         }
 
+        public override void PostCheck(MetaDocs docs)
+        {
+            if (!string.IsNullOrWhiteSpace(Mechanism))
+            {
+                if (!Program.CurrentMeta.Mechanisms.ContainsKey(Mechanism.ToLowerFast()))
+                {
+                    docs.LoadErrors.Add($"Tag '{Name}' references mechanism '{Mechanism}', which doesn't exist.");
+                }
+            }
+        }
+
         public override string GetAllSearchableText()
         {
             string baseText = base.GetAllSearchableText();
