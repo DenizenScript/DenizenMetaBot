@@ -353,7 +353,7 @@ namespace DenizenBot.MetaObjects
             {
                 if (tag.EndsWith(">"))
                 {
-                    MetaTag realTag = Program.CurrentMeta.FindTag(tag);
+                    MetaTag realTag = docs.FindTag(tag);
                     if (realTag == null)
                     {
                         docs.LoadErrors.Add($"{Type.Name} '{Name}' references tag '{tag}', which doesn't exist.");

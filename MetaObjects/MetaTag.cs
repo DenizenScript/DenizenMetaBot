@@ -124,7 +124,7 @@ namespace DenizenBot.MetaObjects
             Require(docs, TagFull, Returns, Description);
             if (!string.IsNullOrWhiteSpace(Mechanism))
             {
-                if (!Program.CurrentMeta.Mechanisms.ContainsKey(Mechanism.ToLowerFast()))
+                if (!docs.Mechanisms.ContainsKey(Mechanism.ToLowerFast()))
                 {
                     docs.LoadErrors.Add($"Tag '{Name}' references mechanism '{Mechanism}', which doesn't exist.");
                 }
