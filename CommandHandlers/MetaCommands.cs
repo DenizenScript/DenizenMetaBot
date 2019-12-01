@@ -68,7 +68,7 @@ namespace DenizenBot.CommandHandlers
             string search = cmds[0].ToLowerFast();
             if (search == "all")
             {
-                SendGenericPositiveMessageReply(message, $"All {type.Name}", $"Find all {type.Name} at {Constants.DOCS_URL_BASE}{type.WebPath}/");
+                SendGenericPositiveMessageReply(message, $"All {type.Name}s", $"Find all {type.Name}s at {Constants.DOCS_URL_BASE}{type.WebPath}/");
                 return -1;
             }
             if (altSingleOutput == null)
