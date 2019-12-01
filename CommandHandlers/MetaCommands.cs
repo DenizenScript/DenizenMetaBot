@@ -99,7 +99,8 @@ namespace DenizenBot.CommandHandlers
             }
             if (docs.TryGetValue(search, out T obj))
             {
-                Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}'");
+                string multiNameData = string.Join("', '", obj.MultiNames);
+                Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for search '{search}': '{obj.CleanName}', multi={obj.HasMultipleNames}='{multiNameData}'");
                 altSingleOutput(obj);
                 return 0;
             }
@@ -110,7 +111,7 @@ namespace DenizenBot.CommandHandlers
                 {
                     if (docs.TryGetValue(secondSearch, out obj))
                     {
-                        Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for secondary search '{secondSearch}': '{obj.CleanName}'");
+                        Console.WriteLine($"Meta-Command for '{type.Name}' found perfect match for secondary search '{secondSearch}': '{obj.CleanName}', multi={obj.HasMultipleNames}");
                         altSingleOutput(obj);
                         return 0;
                     }
@@ -118,13 +119,13 @@ namespace DenizenBot.CommandHandlers
             }
             List<T> matched = new List<T>();
             List<T> strongMatched = new List<T>();
-            bool tryProcesSingleMatch(T objVal, string objName)
+            int tryProcesSingleMatch(T objVal, string objName, int min)
             {
                 if (objName.Contains(search))
                 {
                     Console.WriteLine($"Meta-Command for '{type.Name}' found a strong match (main contains) for search '{search}': '{objName}'");
                     strongMatched.Add(objVal);
-                    return true;
+                    return 2;
                 }
                 if (secondarySearches != null)
                 {
@@ -134,25 +135,27 @@ namespace DenizenBot.CommandHandlers
                         {
                             Console.WriteLine($"Meta-Command for '{type.Name}' found a strong match (secondary contains) for search '{secondSearch}': '{objName}'");
                             strongMatched.Add(objVal);
-                            return true;
+                            return 2;
                         }
                     }
                 }
-                if (secondaryMatcher != null && secondaryMatcher(objVal))
+                if (min < 1 && secondaryMatcher != null && secondaryMatcher(objVal))
                 {
                     Console.WriteLine($"Meta-Command for '{type.Name}' found a weak match (secondaryMatcher) for search '{search}': '{objName}'");
                     matched.Add(objVal);
-                    return true;
+                    return 1;
                 }
-                return false;
+                return min;
             }
             foreach (KeyValuePair<string, T> objPair in docs)
             {
                 if (objPair.Value.HasMultipleNames)
                 {
+                    int matchQuality = 0;
                     foreach (string name in objPair.Value.MultiNames)
                     {
-                        if (tryProcesSingleMatch(objPair.Value, name))
+                        matchQuality = tryProcesSingleMatch(objPair.Value, name, matchQuality);
+                        if (matchQuality == 2)
                         {
                             break;
                         }
@@ -160,7 +163,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    tryProcesSingleMatch(objPair.Value, objPair.Key);
+                    tryProcesSingleMatch(objPair.Value, objPair.Key, 0);
                 }
             }
             if (strongMatched.Count > 0)
