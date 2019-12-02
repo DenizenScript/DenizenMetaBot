@@ -222,7 +222,7 @@ namespace DenizenBot.MetaObjects
             foreach (string tag in tags)
             {
                 string tagOut = $"`{tag}`";
-                if (tagOut.EndsWith(">"))
+                if (tag.EndsWith(">"))
                 {
                     MetaTag realTag = Program.CurrentMeta.FindTag(tag);
                     if (realTag == null)
