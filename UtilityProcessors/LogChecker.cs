@@ -19,7 +19,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Plugins that go into the <see cref="DangerousPlugins"/> list.
         /// </summary>
-        public static string[] BAD_PLUGINS = new string[] { "SkinsRestorer", "AuthMe", "PlugMan", "CMI", "PluginManager", "MySkin" };
+        public static string[] BAD_PLUGINS = new string[] { "SkinsRestorer", "AuthMe", "PlugMan", "LoginSecurity", "CMI", "PluginManager", "MySkin" };
 
         /// <summary>
         /// Plugins that go into the <see cref="IffyPlugins"/> list.
