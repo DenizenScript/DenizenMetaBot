@@ -20,7 +20,7 @@ The `start.sh` file is used by the `restart` command and should be maintained as
 To configure the bot:
 - Create directory `config` within this bot's directory.
 - Within the `config` directory, create file `token.txt` containing only the Discord bot token without newlines or anything else.
-    - To create a bot token, refer to official Discord documentation. Alternately, you can follow the bot-user-creation parts of https://discord.foxbot.me/docs/guides/getting_started/intro.html (ignore the coding parts, just follow the first bits about creating a bot user on the Discord application system, and getting the token).
+    - To create a bot token, refer to official Discord documentation. Alternately, you can follow the bot-user-creation parts of https://discord.foxbot.me/stable/guides/getting_started/first-bot.html (ignore the coding parts, just follow the first bits about creating a bot user on the Discord application system, and getting the token).
 - Within the `config` directory, create file `config.fds` (a FreneticDataSyntax file) with the following options (See also the full file text sample below):
     - `valid_channels` set to a whitelist of channels the bot responds in (blank = responds anywhere).
     - `info_replies` set to a submapping of info commands and their replies, which allows comma-separated list keys. The first listed name on each line is the primary name. Type `\n` to add a line break.
@@ -30,7 +30,7 @@ To configure the bot:
         - `icon` set to a `.png` icon image URL.
     - `channel_details` set to a submapping of channels to details specific to the channel. Within each channel ID key is a submapping of the details, as follows:
         - `updates` set to what projects they correspond to (for the update command).
-		- `docs` set to whether meta docs are allowed in this channel.
+        - `docs` set to whether meta docs are allowed in this channel.
     - `url_base` set to the base URL of the meta website.
     - `rules` set to a submapping of rule IDs to their text.
     - `command_prefix` set to the command prefix (for non-ping-based usages of the bot).
@@ -58,7 +58,7 @@ project_details:
 channel_details:
     315163488085475337:
         updates: denizen spigot
-		docs: true
+        docs: true
 rules:
     all: Here's all the rules though!
     1: This is an important rule!
@@ -70,7 +70,7 @@ build_numbers:
 ```
 
 To start the bot up:
-- Run `./start.sh` while in the bot's directory (You made need to run `chmod +x ./start.sh` first).
+- Run `./start.sh` while in the bot's directory.
 
 To view the bot's terminal:
 - Connect to the screen - with an unaltered `start.sh` file, the way to connect to that is by running `screen -r DenizenMetaBot`.
