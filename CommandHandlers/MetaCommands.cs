@@ -95,7 +95,7 @@ namespace DenizenBot.CommandHandlers
                     if (words.Length > 1)
                     {
                         Console.WriteLine($"Pre-multi-word closest match is '{lowestStr}' at distance {lowestDistance}.");
-                        foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
+                        foreach (string possibleName in docs.Values.SelectMany(o => o.MultiNames))
                         {
                             int currentDistance = 0;
                             string[] nameWords = possibleName.Split(' ');
