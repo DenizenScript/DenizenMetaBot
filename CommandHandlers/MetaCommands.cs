@@ -80,6 +80,7 @@ namespace DenizenBot.CommandHandlers
                 altFindClosest = () =>
                 {
                     string initialPossibleResult = StringConversionHelper.FindClosestString(docs.Keys, search, out int lowestDistance, 20);
+                    Console.WriteLine($"Initial closest match to '{search}' is '{initialPossibleResult}' at distance {lowestDistance}.");
                     string lowestStr = null;
                     foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
                     {
@@ -93,6 +94,7 @@ namespace DenizenBot.CommandHandlers
                     string[] words = search.Split(' ');
                     if (words.Length > 1)
                     {
+                        Console.WriteLine($"Pre-multi-word closest match is '{lowestStr}' at distance {lowestDistance}.");
                         foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
                         {
                             int currentDistance = 0;
@@ -116,6 +118,7 @@ namespace DenizenBot.CommandHandlers
                             }
                         }
                     }
+                    Console.WriteLine($"Final closest match is '{lowestStr}' at distance {lowestDistance}.");
                     return lowestStr;
                 };
             }
