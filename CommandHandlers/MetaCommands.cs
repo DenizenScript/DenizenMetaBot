@@ -81,7 +81,7 @@ namespace DenizenBot.CommandHandlers
                 {
                     string initialPossibleResult = StringConversionHelper.FindClosestString(docs.Keys, search, out int lowestDistance, 20);
                     Console.WriteLine($"Initial closest match to '{search}' is '{initialPossibleResult}' at distance {lowestDistance}.");
-                    string lowestStr = null;
+                    string lowestStr = initialPossibleResult;
                     foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
                     {
                         int currentDistance = StringConversionHelper.GetLevenshteinDistance(search, possibleName);
