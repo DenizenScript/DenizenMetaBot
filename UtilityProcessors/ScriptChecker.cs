@@ -305,7 +305,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 tagParts.Add(tag.Substring(start, tag.Length - start));
             }
-            if (tagParts[0] == "entry")
+            if (tagParts[0] == "entry" || tagParts[0] == "context")
             {
                 return;
             }
@@ -1112,6 +1112,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         embed.AddField(title, thisListResult.ToString());
                     }
+                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list)}");
                 }
             }
             embedList(Errors, "Encountered Critical Errors");
