@@ -31,7 +31,8 @@ namespace DenizenBot.CommandHandlers
                 + "`update [project ...]` shows an update link for the named project(s)\n"
                 + "`github [project ...]` shows a GitHub link for the named project(s)\n"
                 + "`issues [project ...]` shows an issue posting link for the named project(s)\n"
-                + "`rule [rule ...]` shows the identified rule";
+                + "`rule [rule ...]` shows the identified rule\n"
+                + "`quote [quote ...]` shows a random quote that matches the search (if any)\n";
 
         /// <summary>
         /// Simple output string for meta commands.
