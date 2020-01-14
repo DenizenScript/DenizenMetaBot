@@ -28,7 +28,7 @@ namespace DenizenBot
         /// <summary>
         /// A warning emoji image URL.
         /// </summary>
-        public const string WARNING_ICON = "https://i.alexgoodwin.media/i/for_real_usage/13993d.png";
+        public const string WARNING_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/26a0.png";
 
         /// <summary>
         /// The Denizen logo.
@@ -38,12 +38,12 @@ namespace DenizenBot
         /// <summary>
         /// Generic reusable "information" icon.
         /// </summary>
-        public const string INFO_ICON = "https://i.alexgoodwin.media/i/for_real_usage/911f66.png";
+        public const string INFO_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2139.png";
 
         /// <summary>
         /// Generic reusable "speech bubble" icon.
         /// </summary>
-        public const string SPEECH_BUBBLE_ICON = "https://i.alexgoodwin.media/i/for_real_usage/7d81b4.png";
+        public const string SPEECH_BUBBLE_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f4ac.png";
 
         /// <summary>
         /// The base for the Jenkins CI URL.
