@@ -388,7 +388,8 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="commandText">The text of the argument.</param>
         public void CheckSingleArgument(int line, string argument)
         {
-            if (argument.Length > 2 && argument.CountCharacter('<') != argument.CountCharacter('>'))
+            string argNoArrows = argument.Replace("<-", "arrow_left").Replace("->", "arrow_right");
+            if (argument.Length > 2 && argNoArrows.CountCharacter('<') != argNoArrows.CountCharacter('>'))
             {
                 Warn(Warnings, line, "uneven_tags", $"Uneven number of tag marks (forgot to close a tag?).");
             }
@@ -492,7 +493,7 @@ namespace DenizenBot.UtilityProcessors
             string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
             if (!Program.CurrentMeta.Commands.TryGetValue(commandName, out MetaCommand command))
             {
-                if (commandName != "case")
+                if (commandName != "case" && commandName != "default")
                 {
                     Warn(Errors, line, "unknown_command", $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
                 }
@@ -1221,7 +1222,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         embed.AddField(title, thisListResult.ToString());
                     }
-                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list.Select(s => s.Line + ": " + s.CustomMessageForm))}");
+                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list.Select(s => $"{s.Line + 1}: {s.CustomMessageForm}"))}");
                 }
             }
             embedList(Errors, "Encountered Critical Errors");
