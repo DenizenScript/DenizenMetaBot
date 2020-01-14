@@ -276,6 +276,8 @@ namespace DenizenBot.UtilityProcessors
                     brackets++;
                     if (brackets == 1)
                     {
+                        tagParts.Add(tag.Substring(start, i - start));
+                        start = i;
                         firstBracket = i;
                     }
                 }
@@ -289,7 +291,6 @@ namespace DenizenBot.UtilityProcessors
                 }
                 else if (tag[i] == '.' && brackets == 0)
                 {
-                    tagParts.Add(tag.Substring(start, i - start));
                     start = i + 1;
                 }
             }
@@ -431,7 +432,7 @@ namespace DenizenBot.UtilityProcessors
                 else
                 {
                     mechanism = mechanism.Before(':').ToLowerFast();
-                    if (!Program.CurrentMeta.Mechanisms.ContainsKey(mechanism))
+                    if (!Program.CurrentMeta.Mechanisms.Values.Any(mech => mech.MechName == mechanism))
                     {
                         Warn(Errors, line, $"Malformed adjust command. Mechanism name given is unrecognized.");
                         Console.WriteLine($"Unrecognized mechanism '{mechanism}' for script check line {line}.");
