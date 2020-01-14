@@ -346,6 +346,10 @@ namespace DenizenBot
                     objectData.Add("@end_meta");
                     LoadInObject(objectType, file, objectData.ToArray());
                 }
+                else if (line.StartsWith("<--"))
+                {
+                    LoadErrors.Add($"While processing {file} at line {i + 1} found the '<--' meta starter, but not a valid meta start.");
+                }
             }
         }
 
