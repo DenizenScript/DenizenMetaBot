@@ -236,12 +236,14 @@ namespace DenizenBot.UtilityProcessors
         {
             if (string.IsNullOrWhiteSpace(ServerVersion) || !ServerVersion.StartsWith("This server is running "))
             {
+                Console.WriteLine("No server version, disregarding check.");
                 return;
             }
             string shortenedServerVersion = ServerVersion.Substring("This server is running ".Length);
             string[] subData = shortenedServerVersion.Split(' ', 4);
             if (subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(MC: "))
             {
+                Console.WriteLine("Server version doesn't match expected format, disregarding check.");
                 return;
             }
             string spigotVersionText = subData[2].Split('-', 3)[2];
@@ -249,6 +251,7 @@ namespace DenizenBot.UtilityProcessors
             string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
             if (!double.TryParse(majorMCVersion, out double versionNumb))
             {
+                Console.WriteLine($"Major MC version '{majorMCVersion}' is not a double, disregarding check.");
                 return;
             }
             if (versionNumb < DenizenMetaBot.LowestServerVersion)
@@ -265,10 +268,12 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (!int.TryParse(spigotVersionText, out int paperVersionNumber))
                 {
+                    Console.WriteLine($"Paper version '{spigotVersionText}' is not an integer, disregarding check.");
                     return;
                 }
                 if (!BuildNumberTracker.PaperBuildTrackers.TryGetValue(majorMCVersion, out BuildNumberTracker.BuildNumber buildTracker))
                 {
+                    Console.WriteLine($"Paper version {paperVersionNumber} is not tracked, disregarding check.");
                     return;
                 }
                 if (buildTracker.IsCurrent(paperVersionNumber, out int behindBy))
@@ -283,6 +288,10 @@ namespace DenizenBot.UtilityProcessors
             else if (subData[0] == "Spigot")
             {
                 // TODO
+            }
+            else
+            {
+                Console.WriteLine($"Server type '{subData[0]}' is not managed, disregarding check.");
             }
         }
 
