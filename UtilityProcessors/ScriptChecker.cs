@@ -1170,6 +1170,10 @@ namespace DenizenBot.UtilityProcessors
                     StringBuilder thisListResult = new StringBuilder(list.Count * 200);
                     foreach (ScriptWarning entry in list)
                     {
+                        if (usedKeys.Contains(entry.WarningUniqueKey))
+                        {
+                            continue;
+                        }
                         usedKeys.Add(entry.WarningUniqueKey);
                         StringBuilder lines = new StringBuilder(50);
                         lines.Append(entry.Line + 1);
