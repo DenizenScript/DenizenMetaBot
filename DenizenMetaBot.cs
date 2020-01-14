@@ -162,6 +162,7 @@ namespace DenizenBot
             RegisterCommand(InfoCmds.CMD_GitHub, "github", "git", "gh", "readme", "read", "link");
             RegisterCommand(InfoCmds.CMD_Issues, "issues", "issue", "error", "ghissues", "githubissues");
             RegisterCommand(InfoCmds.CMD_Rule, "rule", "rules");
+            RegisterCommand(InfoCmds.CMD_Quote, "quote", "quotes", "q");
             // Meta Docs
             RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
             RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m");
