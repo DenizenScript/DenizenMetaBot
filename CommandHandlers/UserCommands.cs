@@ -13,6 +13,7 @@ using Discord.Rest;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -59,6 +60,7 @@ namespace DenizenBot.CommandHandlers
             if (sentMessage != null)
             {
                 sentMessage.AddReactionsAsync(new IEmote[] { new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI) }).Wait();
+                ReactionsHandler.AddReactable(message, sentMessage, command);
             }
         }
 

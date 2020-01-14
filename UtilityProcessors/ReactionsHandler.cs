@@ -48,6 +48,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (now.Subtract(message.Value.TimeCreated) > MAX_REACT_TIME)
                 {
+                    Console.WriteLine($"Removing (due to timeout) reaction on repliable message {message.Key} with command '{message.Value.Command}'.");
                     Reactables.Remove(message.Key);
                     message.Value.RemoveReactions();
                 }
@@ -65,14 +66,18 @@ namespace DenizenBot.UtilityProcessors
             {
                 return;
             }
+            Console.WriteLine($"Found reaction on repliable message {messageId} with command '{message.Command}' with reaction: {reaction.Emote.Name}");
             if (reaction.Emote.Name == Constants.ACCEPT_EMOJI)
             {
+                Console.WriteLine("Reaction is an accept. Running.");
                 Program.CurrentBot.Respond(message.OriginalMessage, true, altContent: message.Command);
             }
             else if (reaction.Emote.Name != Constants.DENY_EMOJI)
             {
+                Console.WriteLine("Reaction is unknown. Ignoring.");
                 return;
             }
+            Console.WriteLine("Removing reaction...");
             Reactables.Remove(messageId);
             message.RemoveReactions();
         }
