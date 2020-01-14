@@ -301,7 +301,14 @@ namespace DenizenBot.UtilityProcessors
                     start = i + 1;
                 }
             }
-            tagParts.Add(tag.Substring(start, tag.Length - start));
+            if (!foundABracket)
+            {
+                tagParts.Add(tag.Substring(start, tag.Length - start));
+            }
+            if (tagParts[0] == "entry")
+            {
+                return;
+            }
             if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]))
             {
                 Warn(Warnings, line, $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
