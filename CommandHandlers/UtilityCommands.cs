@@ -183,5 +183,25 @@ namespace DenizenBot.CommandHandlers
             SendErrorMessageReply(message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project (or the version text is formatted incorrectly).");
             return;
         }
+
+        /// <summary>
+        /// Command to check for common issues in script pastes.
+        /// </summary>
+        public void CMD_ScriptCheck(string[] cmds, SocketMessage message)
+        {
+            if (cmds.Length == 0)
+            {
+                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!script <link>`");
+                return;
+            }
+            string data = GetWebLinkDataForCommand(cmds[0], message);
+            if (data == null)
+            {
+                return;
+            }
+            ScriptChecker checker = new ScriptChecker(data);
+            checker.Run();
+            SendReply(message, checker.GetResult());
+        }
     }
 }

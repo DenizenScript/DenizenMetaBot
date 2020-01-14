@@ -177,9 +177,9 @@ namespace DenizenBot
             RegisterCommand(metaCmds.CMD_Search, "search", "s", "find", "f", "get", "g", "locate", "what", "where", "how",
                 "w", "meta", "metainfo", "docs", "doc", "documentation", "documentations", "document", "documents");
             // Utility
-            // TODO: CMD_DScriptCheck
             RegisterCommand(utilCmds.CMD_LogCheck, "logcheck", "checklog", "logscheck", "checklogs");
             RegisterCommand(utilCmds.CMD_VersionCheck, "versioncheck", "checkversion", "iscurrent", "isuptodate", "isupdated", "checkcurrent", "currentcheck");
+            RegisterCommand(utilCmds.CMD_ScriptCheck, "script", "scriptcheck", "dscript", "ds", "checkscript", "dscriptcheck", "checkdscript");
             // Admin
             RegisterCommand(adminCmds.CMD_Restart, "restart");
             RegisterCommand(adminCmds.CMD_Reload, "reload");

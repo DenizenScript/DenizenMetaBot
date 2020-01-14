@@ -52,7 +52,8 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public static string CmdsUtility =
                 "`logcheck <link>` gathers information from a server log paste\n"
-                + "`versioncheck <version text>` checks whether a project version is current";
+                + "`versioncheck <version text>` checks whether a project version is current\n"
+                + "`script <link>` checks a linked script for basic syntax validity";
 
         /// <summary>
         /// Simple output string for admin commands.
