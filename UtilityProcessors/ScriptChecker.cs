@@ -76,6 +76,11 @@ namespace DenizenBot.UtilityProcessors
         public List<string> Debugs = new List<string>();
 
         /// <summary>
+        /// A track of all script names that appear to be injected, for false-warning reduction.
+        /// </summary>
+        public List<string> Injects = new List<string>();
+
+        /// <summary>
         /// Construct the ScriptChecker instance from a script string.
         /// </summary>
         /// <param name="script">The script contents string.</param>
@@ -160,6 +165,21 @@ namespace DenizenBot.UtilityProcessors
             catch (Exception ex)
             {
                 Errors.Add("Invalid YAML! Error message: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Looks for injects, to prevent issues with later checks.
+        /// </summary>
+        public void LoadInjects()
+        {
+            for (int i = 0; i < CleanedLines.Length; i++)
+            {
+                if (CleanedLines[i].StartsWith("- inject "))
+                {
+                    string target = CleanedLines[i].Substring("- inject ".Length).Before(" ");
+                    Injects.Add(target);
+                }
             }
         }
 
@@ -309,7 +329,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 return;
             }
-            if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]))
+            if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]) && tagParts[0].Length > 0)
             {
                 Warn(Warnings, line, $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
             }
@@ -499,7 +519,7 @@ namespace DenizenBot.UtilityProcessors
                     if (endSpot != -1)
                     {
                         string entryText = argument.Substring(entrySpot, endSpot - entrySpot).ToLowerFast();
-                        if (!definitions.Contains(ENTRY_PREFIX + entryText))
+                        if (!definitions.Contains(ENTRY_PREFIX + entryText) && !definitions.Contains("*"))
                         {
                             Warn(Warnings, line, "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
                         }
@@ -513,7 +533,7 @@ namespace DenizenBot.UtilityProcessors
                     if (endSpot != -1)
                     {
                         string defText = argument.Substring(defSpot, endSpot - defSpot).ToLowerFast();
-                        if (!definitions.Contains(defText))
+                        if (!definitions.Contains(defText) && !definitions.Contains("*"))
                         {
                             Warn(Warnings, line, "Definition tag points to non-existent definition (typo, or bad copypaste?).");
                         }
@@ -612,7 +632,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 void warnScript(List<string> warns, int line, string warning)
                 {
-                    Warn(warns, line, $"In script '{scriptPair.Key.Text.Replace('`', '\'')}': {warning}");
+                    Warn(warns, line, $"In script `{scriptPair.Key.Text.Replace('`', '\'')}`: {warning}");
                 }
                 try
                 {
@@ -654,6 +674,19 @@ namespace DenizenBot.UtilityProcessors
                         }
                         void checkAsScript(List<object> list, HashSet<string> definitionsKnown)
                         {
+                            if (scriptSection.TryGetValue(new LineTrackedString(0, "definitions"), out object defList) && defList is LineTrackedString defListVal)
+                            {
+                                definitionsKnown.UnionWith(defListVal.Text.ToLowerFast().Split('|').Select(s => s.Trim()));
+                            }
+                            if (typeString.Text == "task")
+                            {
+                                // Workaround the weird way shoot command does things
+                                definitionsKnown.UnionWith(new[] { "shot_entities", "last_entity", "location", "hit_entities" });
+                            }
+                            if (Injects.Contains(scriptPair.Key.Text))
+                            {
+                                definitionsKnown.Add("*");
+                            }
                             foreach (object entry in list)
                             {
                                 if (entry is LineTrackedString str)
@@ -1095,7 +1128,8 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The embed to send.</returns>
         public Embed GetResult()
         {
-            EmbedBuilder embed = new EmbedBuilder().WithTitle("Script Check Results").WithThumbnailUrl((Errors.Count + Warnings.Count > 0) ? Constants.WARNING_ICON : Constants.INFO_ICON);
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Script Check Results").WithThumbnailUrl((Errors.Count + Warnings.Count + MinorWarnings.Count > 0) ? Constants.WARNING_ICON : Constants.INFO_ICON);
+            int linesMissing = 0;
             void embedList(List<string> list, string title)
             {
                 if (list.Count > 0)
@@ -1106,6 +1140,10 @@ namespace DenizenBot.UtilityProcessors
                         if (thisListResult.Length + entry.Length < 1000 && embed.Length + thisListResult.Length + entry.Length < 1800)
                         {
                             thisListResult.Append($"{entry}\n");
+                        }
+                        else
+                        {
+                            linesMissing++;
                         }
                     }
                     if (thisListResult.Length > 0)
@@ -1119,6 +1157,7 @@ namespace DenizenBot.UtilityProcessors
             embedList(Warnings, "Script Warnings");
             embedList(MinorWarnings, "Minor Warnings");
             embedList(Infos, "Other Script Information");
+            embed.AddField("Missing Lines", $"There are {linesMissing} lines not able to fit in this result. Fix the listed errors to see the rest.");
             foreach (string debug in Debugs)
             {
                 Console.WriteLine($"Script checker debug: {debug}");
