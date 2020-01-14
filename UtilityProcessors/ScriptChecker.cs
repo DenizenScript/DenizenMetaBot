@@ -262,14 +262,82 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Performs the necessary checks on a single tag.
+        /// </summary>
+        /// <param name="line">The line number.</param>
+        /// <param name="commandText">The text of the tag.</param>
+        public void CheckSingleTag(int line, string tag)
+        {
+            tag = tag.ToLowerFast();
+            int brackets = 0;
+            List<string> tagParts = new List<string>(tag.CountCharacter('.'));
+            int firstBracket = 0;
+            int start = 0;
+            for (int i = 0; i < tag.Length; i++)
+            {
+                if (tag[i] == '[')
+                {
+                    brackets++;
+                    if (brackets == 1)
+                    {
+                        firstBracket = i;
+                    }
+                }
+                else if (tag[i] == ']')
+                {
+                    brackets--;
+                    if (brackets == 0)
+                    {
+                        CheckSingleArgument(line, tag.Substring(firstBracket + 1, i - firstBracket - 1));
+                    }
+                }
+                else if (tag[i] == '.' && brackets == 0)
+                {
+                    tagParts.Add(tag.Substring(start, i - start));
+                    start = i + 1;
+                }
+            }
+            tagParts.Add(tag.Substring(start, tag.Length - start));
+            if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]))
+            {
+                Warn(Warnings, line, $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
+            }
+            else if (tagParts[0].EndsWith("tag"))
+            {
+                Warn(Warnings, line, $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
+            }
+            for (int i = 1; i < tagParts.Count; i++)
+            {
+                if (!Program.CurrentMeta.TagParts.Contains(tagParts[i]))
+                {
+                    Warn(Warnings, line, $"Invalid tag part `{tagParts[i].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
+                    if (tagParts[i].EndsWith("tag"))
+                    {
+                        Warn(Warnings, line, $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Performs the necessary checks on a single argument.
         /// </summary>
         /// <param name="line">The line number.</param>
         /// <param name="commandText">The text of the argument.</param>
         public void CheckSingleArgument(int line, string argument)
         {
-            // TODO: Check each argument's tags
-            // TODO: check for object notation usage
+            int tagIndex = argument.IndexOf('<');
+            while (tagIndex != -1)
+            {
+                int endIndex = argument.IndexOf('>', tagIndex);
+                if (endIndex == -1)
+                {
+                    break;
+                }
+                string tag = argument.Substring(tagIndex + 1, endIndex - tagIndex - 1);
+                CheckSingleTag(line, tag);
+                tagIndex = argument.IndexOf('<', endIndex);
+            }
         }
 
         /// <summary>
@@ -341,6 +409,10 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="definitions">The definitions tracker.</param>
         public void CheckSingleCommand(int line, string commandText, HashSet<string> definitions)
         {
+            if (commandText.Contains("@"))
+            {
+                Warn(Warnings, line, "This line appears to contain raw object notation. There is almost always a better way to write a line than using raw object notation. Consider the relevant object constructor tags.");
+            }
             string[] parts = commandText.Split(' ', 2);
             string commandName = parts[0].ToLowerFast();
             string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
@@ -551,7 +623,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         if (scriptSection.ContainsKey(new LineTrackedString(0, key)))
                         {
-                            warnScript(Warnings, typeString.Line, $"Unexpected key `{key}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
+                            warnScript(Warnings, typeString.Line, $"Unexpected key `{key.Replace('`', '\'')}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
                     bool matchesSet(string key, string[] keySet)
@@ -591,7 +663,7 @@ namespace DenizenBot.UtilityProcessors
                                 }
                                 else
                                 {
-                                    warnScript(Warnings, keyPair.Key.Line, $"Key `{keyName}` appears to contain a script, when a data list was expected (check `!lang {typeString.Text} script containers` for format rules).");
+                                    warnScript(Warnings, keyPair.Key.Line, $"Key `{keyName.Replace('`', '\'')}` appears to contain a script, when a data list was expected (check `!lang {typeString.Text} script containers` for format rules).");
                                 }
                             }
                         }
@@ -607,11 +679,11 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (matchesSet(keyName, scriptType.ValueKeys))
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.CanHaveRandomScripts)
                             {
@@ -631,11 +703,11 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (matchesSet(keyName, scriptType.ListKeys) || matchesSet(keyName, scriptType.ScriptKeys))
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else
                             {
@@ -680,7 +752,7 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected submapping key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected submapping key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else
                             {
@@ -711,6 +783,10 @@ namespace DenizenBot.UtilityProcessors
                             foreach (LineTrackedString actionValue in actionsMap.Keys)
                             {
                                 string actionName = actionValue.Text.Substring("on ".Length);
+                                if (actionName.Contains("@"))
+                                {
+                                    Warn(Warnings, actionValue.Line, "This action line appears to contain raw object notation. Object notation is not allowed in action lines.");
+                                }
                                 if (!Program.CurrentMeta.Actions.ContainsKey(actionName))
                                 {
                                     bool exists = false;
@@ -737,6 +813,10 @@ namespace DenizenBot.UtilityProcessors
                             foreach (LineTrackedString eventValue in eventsMap.Keys)
                             {
                                 string eventName = eventValue.Text.Substring("on ".Length);
+                                if (eventName.Contains("@"))
+                                {
+                                    Warn(Warnings, eventValue.Line, "This event line appears to contain raw object notation. Object notation is not allowed in event lines.");
+                                }
                                 if (!Program.CurrentMeta.Events.ContainsKey(eventName))
                                 {
                                     bool exists = false;

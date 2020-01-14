@@ -123,6 +123,16 @@ namespace DenizenBot.UtilityProcessors
         public Dictionary<string, MetaLanguage> Languages = new Dictionary<string, MetaLanguage>(512);
 
         /// <summary>
+        /// A set of all known tag bases.
+        /// </summary>
+        public HashSet<string> TagBases = new HashSet<string>(512);
+
+        /// <summary>
+        /// A set of all known tag bits.
+        /// </summary>
+        public HashSet<string> TagParts = new HashSet<string>(2048);
+
+        /// <summary>
         /// Returns an enumerable of all objects in the meta documentation.
         /// </summary>
         /// <returns>All objects.</returns>

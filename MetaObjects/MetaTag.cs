@@ -22,6 +22,11 @@ namespace DenizenBot.MetaObjects
         public override void AddTo(MetaDocs docs)
         {
             docs.Tags.Add(CleanName, this);
+            docs.TagBases.Add(CleanName.BeforeAndAfter('.', out string otherBits));
+            foreach (string bit in otherBits.Split('.'))
+            {
+                docs.TagParts.Add(bit);
+            }
         }
 
         /// <summary>
