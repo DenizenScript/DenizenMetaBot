@@ -306,7 +306,7 @@ namespace DenizenBot.UtilityProcessors
                         string key = ((YamlScalarNode)values.Key).Value;
                         YamlSequenceNode parentList = (YamlSequenceNode)values.Value;
                         string parent = ((YamlScalarNode)parentList[0]).Value;
-                        SpigotCommitParents.Add(key, parent);
+                        SpigotCommitParents[key] = parent;
                     }
                     foreach (string versionKey in new List<string>(SpigotCommitParents.Values))
                     {
