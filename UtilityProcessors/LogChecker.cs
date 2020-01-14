@@ -290,8 +290,9 @@ namespace DenizenBot.UtilityProcessors
                     return $"Outdated build, behind by {behindBy}... Current build is {buildTracker.Value}";
                 }
             }
-            else if (subData[0] == "spigot")
+            else if (subData[0] == "spigot" || subData[0] == "craftbukkit")
             {
+                spigotVersionText = spigotVersionText.Before('-');
                 if (spigotVersionText.Length != 7 || !HEX_ASCII_MATCHER.IsOnlyMatches(spigotVersionText))
                 {
                     Console.WriteLine($"Spigot version '{spigotVersionText}' is wrong format, disregarding check.");

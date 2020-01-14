@@ -149,7 +149,7 @@ namespace DenizenBot.CommandHandlers
                 return;
             }
             string nameLower = projectName.ToLowerFast();
-            if (nameLower == "paper" || nameLower == "spigot")
+            if (nameLower == "paper" || nameLower == "spigot" || nameLower == "craftbukkit")
             {
                 string output = LogChecker.ServerVersionStatusOutput(combined, out bool isGood);
                 if (string.IsNullOrWhiteSpace(output))
