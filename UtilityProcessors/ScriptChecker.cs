@@ -392,11 +392,29 @@ namespace DenizenBot.UtilityProcessors
             if (argument.Length > 2 && argNoArrows.CountCharacter('<') != argNoArrows.CountCharacter('>'))
             {
                 Warn(Warnings, line, "uneven_tags", $"Uneven number of tag marks (forgot to close a tag?).");
+                Console.WriteLine("Uneven tag marks for: " + argNoArrows);
             }
             int tagIndex = argNoArrows.IndexOf('<');
             while (tagIndex != -1)
             {
-                int endIndex = argNoArrows.IndexOf('>', tagIndex);
+                int bracks = 0;
+                int endIndex = -1;
+                for (int i = tagIndex; i < argNoArrows.Length; i++)
+                {
+                    if (argNoArrows[i] == '<')
+                    {
+                        bracks++;
+                    }
+                    if (argNoArrows[i] == '>')
+                    {
+                        if (bracks == 0)
+                        {
+                            endIndex = i;
+                            break;
+                        }
+                        bracks--;
+                    }
+                }
                 if (endIndex == -1)
                 {
                     break;
