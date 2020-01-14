@@ -41,6 +41,11 @@ namespace DenizenBot.MetaObjects
         public string Triggers;
 
         /// <summary>
+        /// A hacked-in regex matcher.
+        /// </summary>
+        public Regex RegexMatcher = null;
+
+        /// <summary>
         /// Context tags. One tag per string.
         /// </summary>
         public string[] Context = new string[0];
@@ -68,6 +73,14 @@ namespace DenizenBot.MetaObjects
                     Actions = value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     CleanActions = Actions.Select(s => s.ToLowerFast()).ToArray();
                     HasMultipleNames = Actions.Length > 1;
+                    string regexable = Actions.FirstOrDefault(s => s.Contains("<")) ?? Actions[0];
+                    if (regexable.Contains("<"))
+                    {
+                        int start = regexable.IndexOf('<');
+                        int end = regexable.IndexOf('>');
+                        regexable = regexable.Substring(0, start) + "[^\\s]+" + regexable.Substring(end + 1);
+                    }
+                    RegexMatcher = new Regex(regexable, RegexOptions.Compiled);
                     return true;
                 case "triggers":
                     Triggers = value;

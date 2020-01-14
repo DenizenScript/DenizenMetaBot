@@ -6,6 +6,7 @@ using System.IO;
 using Discord;
 using YamlDotNet.RepresentationModel;
 using FreneticUtilities.FreneticExtensions;
+using DenizenBot.MetaObjects;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -261,6 +262,17 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Performs the necessary checks on a single argument.
+        /// </summary>
+        /// <param name="line">The line number.</param>
+        /// <param name="commandText">The text of the argument.</param>
+        public void CheckSingleArgument(int line, string argument)
+        {
+            // TODO: Check each argument's tags
+            // TODO: check for object notation usage
+        }
+
+        /// <summary>
         /// Performs the necessary checks on a single command line.
         /// </summary>
         /// <param name="line">The line number.</param>
@@ -271,8 +283,6 @@ namespace DenizenBot.UtilityProcessors
             string[] arguments = null; // TODO
             // TODO: Command name validity
             // TODO: Argument count
-            // TODO: Check each argument's tags
-            // TODO: check for object notation usage
             // TODO: Check for "quoted" arguments without any spaces in them (pointless).
             if (commandName == "adjust")
             {
@@ -374,99 +384,186 @@ namespace DenizenBot.UtilityProcessors
                 {
                     Warn(warns, line, $"In script '{scriptPair.Key.Text.Replace('`', '\'')}': {warning}");
                 }
-                Dictionary<LineTrackedString, object> scriptSection = (Dictionary<LineTrackedString, object>)scriptPair.Value;
-                if (!scriptSection.TryGetValue(new LineTrackedString(0, "type"), out object typeValue) || !(typeValue is LineTrackedString typeString))
+                try
                 {
-                    warnScript(Errors, scriptPair.Key.Line, "Missing 'type' key!");
-                    continue;
-                }
-                if (!KnownScriptTypes.TryGetValue(typeString.Text, out KnownScriptType scriptType))
-                {
-                    warnScript(Errors, typeString.Line, "Unknown script type (possibly a typo?)!");
-                    continue;
-                }
-                foreach (string key in scriptType.RequiredKeys)
-                {
-                    if (!scriptSection.ContainsKey(new LineTrackedString(0, key)))
+                    Dictionary<LineTrackedString, object> scriptSection = (Dictionary<LineTrackedString, object>)scriptPair.Value;
+                    if (!scriptSection.TryGetValue(new LineTrackedString(0, "type"), out object typeValue) || !(typeValue is LineTrackedString typeString))
                     {
-                        warnScript(Warnings, typeString.Line, $"Missing required key `{key}` (check `!lang {typeString.Text} script containers` for format rules)!");
+                        warnScript(Errors, scriptPair.Key.Line, "Missing 'type' key!");
+                        continue;
                     }
-                }
-                foreach (string key in scriptType.LikelyBadKeys)
-                {
-                    if (scriptSection.ContainsKey(new LineTrackedString(0, key)))
+                    if (!KnownScriptTypes.TryGetValue(typeString.Text, out KnownScriptType scriptType))
                     {
-                        warnScript(Warnings, typeString.Line, $"Unexpected key `{key}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
+                        warnScript(Errors, typeString.Line, "Unknown script type (possibly a typo?)!");
+                        continue;
                     }
-                }
-                bool matchesSet(string key, string[] keySet)
-                {
-                    return keySet.Contains(key) || keySet.Contains($"{key}.*") || keySet.Contains("*");
-                }
-                foreach (KeyValuePair<LineTrackedString, object> keyPair in scriptSection)
-                {
-                    bool isList = keyPair.Value is List<LineTrackedString>;
-                    if (isList)
+                    foreach (string key in scriptType.RequiredKeys)
                     {
-                        if (matchesSet(keyPair.Key.Text, scriptType.ListKeys))
+                        if (!scriptSection.ContainsKey(new LineTrackedString(0, key)))
                         {
-                            // Proper list, all is well
-                        }
-                        else if (matchesSet(keyPair.Key.Text, scriptType.ScriptKeys))
-                        {
-                            // TODO: Script check
-                        }
-                        else if (matchesSet(keyPair.Key.Text, scriptType.ValueKeys))
-                        {
-                            warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyPair.Key.Text}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
-                        }
-                        else if (scriptType.Strict)
-                        {
-                            warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyPair.Key.Text}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
-                        }
-                        else if (scriptType.CanHaveRandomScripts)
-                        {
-                            // TODO: Script check
+                            warnScript(Warnings, typeString.Line, $"Missing required key `{key}` (check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
-                    else
+                    foreach (string key in scriptType.LikelyBadKeys)
                     {
-                        if (matchesSet(keyPair.Key.Text, scriptType.ValueKeys))
+                        if (scriptSection.ContainsKey(new LineTrackedString(0, key)))
                         {
-                            // Proper value, all is well
-                        }
-                        else if (matchesSet(keyPair.Key.Text, scriptType.ListKeys) || matchesSet(keyPair.Key.Text, scriptType.ScriptKeys))
-                        {
-                            warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyPair.Key.Text}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
-                        }
-                        else if (scriptType.Strict)
-                        {
-                            warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyPair.Key.Text}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                            warnScript(Warnings, typeString.Line, $"Unexpected key `{key}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
-                }
-                if (typeString.Text == "command")
-                {
-                    if (scriptSection.TryGetValue(new LineTrackedString(0, "name"), out object nameValue) && scriptSection.TryGetValue(new LineTrackedString(0, "usage"), out object usageValue))
+                    bool matchesSet(string key, string[] keySet)
                     {
-                        if (usageValue is LineTrackedString usageString && nameValue is LineTrackedString nameString)
+                        return keySet.Contains(key) || keySet.Contains($"{key}.*") || keySet.Contains("*");
+                    }
+                    foreach (KeyValuePair<LineTrackedString, object> keyPair in scriptSection)
+                    {
+                        string keyName = keyPair.Key.Text;
+                        if (keyName == "debug" || keyName == "speed" || keyName == "type")
                         {
-                            if (!usageString.Text.StartsWith($"/{nameString.Text}"))
+                            continue;
+                        }
+                        if (keyPair.Value is List<LineTrackedString> keyPairList)
+                        {
+                            if (matchesSet(keyName, scriptType.ListKeys))
                             {
-                                warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help')!");
+                                foreach (LineTrackedString str in keyPairList)
+                                {
+                                    CheckSingleArgument(str.Line, str.Text);
+                                }
+                            }
+                            else if (matchesSet(keyName, scriptType.ScriptKeys))
+                            {
+                                // TODO: Script check
+                            }
+                            else if (matchesSet(keyName, scriptType.ValueKeys))
+                            {
+                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
+                            }
+                            else if (scriptType.Strict)
+                            {
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                            }
+                            else if (scriptType.CanHaveRandomScripts)
+                            {
+                                // TODO: Script check
+                            }
+                            else if (typeString.Text != "yaml data")
+                            {
+                                foreach (LineTrackedString str in keyPairList)
+                                {
+                                    CheckSingleArgument(str.Line, str.Text);
+                                }
+                            }
+
+                        }
+                        else if (keyPair.Value is LineTrackedString keyPairLine)
+                        {
+                            if (matchesSet(keyName, scriptType.ValueKeys))
+                            {
+                                CheckSingleArgument(keyPair.Key.Line, keyPairLine.Text);
+                            }
+                            else if (matchesSet(keyName, scriptType.ListKeys) || matchesSet(keyName, scriptType.ScriptKeys))
+                            {
+                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
+                            }
+                            else if (scriptType.Strict)
+                            {
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                            }
+                            else
+                            {
+                                CheckSingleArgument(keyPair.Key.Line, keyPairLine.Text);
+                            }
+                        }
+                        else // Must be a submap
+                        {
+                            string keyText = keyName + ".*";
+                            if (scriptType.ValueKeys.Contains(keyText) || scriptType.ListKeys.Contains(keyText) || scriptType.ScriptKeys.Contains(keyText)
+                                || scriptType.ValueKeys.Contains("*") || scriptType.ListKeys.Contains("*") || scriptType.ScriptKeys.Contains("*"))
+                            {
+                                // TODO: Check submapped stuff
+                            }
+                            else if (scriptType.Strict)
+                            {
+                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected submapping key `{keyName}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                            }
+                            else
+                            {
+                                // TODO: Check submapped stuff
+                            }
+                        }
+                    }
+                    if (typeString.Text == "command")
+                    {
+                        if (scriptSection.TryGetValue(new LineTrackedString(0, "name"), out object nameValue) && scriptSection.TryGetValue(new LineTrackedString(0, "usage"), out object usageValue))
+                        {
+                            if (usageValue is LineTrackedString usageString && nameValue is LineTrackedString nameString)
+                            {
+                                if (!usageString.Text.StartsWith($"/{nameString.Text}"))
+                                {
+                                    warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help')!");
+                                }
+                            }
+                        }
+                    }
+                    else if (typeString.Text == "assignment")
+                    {
+                        if (scriptSection.TryGetValue(new LineTrackedString(0, "actions"), out object actionsValue) && actionsValue is Dictionary<LineTrackedString, object> actionsMap)
+                        {
+                            foreach (LineTrackedString actionValue in actionsMap.Keys)
+                            {
+                                string actionName = actionValue.Text.Substring("on ".Length);
+                                if (!Program.CurrentMeta.Actions.ContainsKey(actionName))
+                                {
+                                    bool exists = false;
+                                    foreach (MetaAction action in Program.CurrentMeta.Actions.Values)
+                                    {
+                                        if (action.RegexMatcher.IsMatch(actionName))
+                                        {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exists)
+                                    {
+                                        warnScript(Warnings, actionValue.Line, $"Assignment script action listed doesn't exist. (Check `!act ...` to find proper action names)!");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (typeString.Text == "events")
+                    {
+                        if (scriptSection.TryGetValue(new LineTrackedString(0, "events"), out object eventsValue) && eventsValue is Dictionary<LineTrackedString, object> eventsMap)
+                        {
+                            foreach (LineTrackedString eventValue in eventsMap.Keys)
+                            {
+                                string eventName = eventValue.Text.Substring("on ".Length);
+                                if (!Program.CurrentMeta.Events.ContainsKey(eventName))
+                                {
+                                    bool exists = false;
+                                    foreach (MetaEvent evt in Program.CurrentMeta.Events.Values)
+                                    {
+                                        if (evt.RegexMatcher.IsMatch(eventName))
+                                        {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exists)
+                                    {
+                                        warnScript(Warnings, eventValue.Line, $"Script Event listed doesn't exist. (Check `!event ...` to find proper event lines)!");
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                else if (typeString.Text == "assignment")
+                catch (Exception ex)
                 {
-                    // TODO: Check actions for existence
+                    warnScript(Warnings, scriptPair.Key.Line, $"Internal exception (check bot debug console)!");
+                    Console.WriteLine($"Script check exception: {ex}");
                 }
-                else if (typeString.Text == "events")
-                {
-                    // TODO: Check events for existence
-                }
-                // TODO: Tag existent-name per-piece check (generic argument checker, for all values?) Except yaml data.
             }
         }
 
