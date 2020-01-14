@@ -1176,8 +1176,11 @@ namespace DenizenBot.UtilityProcessors
                         }
                         usedKeys.Add(entry.WarningUniqueKey);
                         StringBuilder lines = new StringBuilder(50);
-                        lines.Append(entry.Line + 1);
-                        foreach (ScriptWarning subEntry in list.SkipWhile(s => s != entry).Where(s => s.WarningUniqueKey == entry.WarningUniqueKey))
+                        if (entry.Line != -1)
+                        {
+                            lines.Append(entry.Line + 1);
+                        }
+                        foreach (ScriptWarning subEntry in list.SkipWhile(s => s != entry).Skip(1).Where(s => s.WarningUniqueKey == entry.WarningUniqueKey))
                         {
                             shortened++;
                             if (lines.Length < 40)
@@ -1203,7 +1206,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         embed.AddField(title, thisListResult.ToString());
                     }
-                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list)}");
+                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list.Select(s => s.Line + ": " + s.CustomMessageForm))}");
                 }
             }
             embedList(Errors, "Encountered Critical Errors");
