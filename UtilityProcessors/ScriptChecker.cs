@@ -174,11 +174,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     Warn(MinorWarnings, i, "Stray space after end of line (possible copy/paste mixup. Enable View->Render Whitespace in VS Code).");
                 }
-                else if (!CleanedLines[i].StartsWith("-") && (CleanedLines[i].Contains(":") && !CleanedLines[i].EndsWith(":")))
-                {
-                    Warn(Warnings, i, "Text after end of script key (possible malformed line).");
-                }
-                else if (CleanedLines[i].Length > 0 && !CleanedLines[i].StartsWith("-") && !CleanedLines[i].EndsWith(":"))
+                else if (CleanedLines[i].Length > 0 && !CleanedLines[i].StartsWith("-") && !CleanedLines[i].Contains(":"))
                 {
                     Warn(Warnings, i, "Useless/invalid line (possibly missing a `-` or a `:`, or just accidentally hit enter or paste).");
                 }
@@ -471,7 +467,7 @@ namespace DenizenBot.UtilityProcessors
             string saveArgument = arguments.FirstOrDefault(s => s.StartsWith("save:"));
             if (saveArgument != null)
             {
-                definitions.Add(ENTRY_PREFIX + saveArgument.ToLowerFast());
+                definitions.Add(ENTRY_PREFIX + saveArgument.Substring("save:".Length).ToLowerFast());
             }
             foreach (string argument in arguments)
             {
