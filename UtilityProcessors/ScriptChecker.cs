@@ -320,9 +320,14 @@ namespace DenizenBot.UtilityProcessors
             public bool Strict = false;
 
             /// <summary>
+            /// Whether this type can have random extra scripts attached.
+            /// </summary>
+            public bool CanHaveRandomScripts = true;
+
+            /// <summary>
             /// Constructs the <see cref="KnownScriptType"/> instance.
             /// </summary>
-            public KnownScriptType(string[] required = null, string[] bad = null, string[] valueKeys = null, string[] listKeys = null, string[] scriptKeys = null, bool strict = false)
+            public KnownScriptType(string[] required = null, string[] bad = null, string[] valueKeys = null, string[] listKeys = null, string[] scriptKeys = null, bool strict = false, bool canHaveScripts = true)
             {
                 RequiredKeys = required ?? RequiredKeys;
                 LikelyBadKeys = bad ?? LikelyBadKeys;
@@ -330,6 +335,7 @@ namespace DenizenBot.UtilityProcessors
                 ListKeys = listKeys ?? ListKeys;
                 ScriptKeys = scriptKeys ?? ScriptKeys;
                 Strict = strict;
+                CanHaveRandomScripts = canHaveScripts;
             }
         }
 
@@ -339,22 +345,22 @@ namespace DenizenBot.UtilityProcessors
         public static readonly Dictionary<string, KnownScriptType> KnownScriptTypes = new Dictionary<string, KnownScriptType>()
         {
             // Denizen Core
-            { "custom", new KnownScriptType(bad: new[] { "script", "actions", "events", "steps" }, valueKeys: new[] { "inherit", "*" }, scriptKeys: new[] { "tags.*", "mechanisms.*" }, strict: false) },
+            { "custom", new KnownScriptType(bad: new[] { "script", "actions", "events", "steps" }, valueKeys: new[] { "inherit", "*" }, scriptKeys: new[] { "tags.*", "mechanisms.*" }, strict: false, canHaveScripts: false) },
             { "procedure", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: true) },
             { "task", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: false) },
             { "world", new KnownScriptType(required: new[] { "events" }, bad: new[] { "script", "actions", "steps" }, scriptKeys: new[] { "events.*" }, strict: false) },
-            { "yaml data", new KnownScriptType(bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, listKeys: new[] { "*" }, strict: false) },
+            { "yaml data", new KnownScriptType(bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, listKeys: new[] { "*" }, strict: false, canHaveScripts: false) },
             // Denizen-Bukkit
             { "assignment", new KnownScriptType(required: new[] { "actions", "interact scripts" }, bad: new[] { "script", "steps", "events" }, valueKeys: new[] { "default constants.*", "constants.*" }, listKeys: new[] { "interact scripts" }, scriptKeys: new[] { "actions.*" }, strict: true) },
-            { "book", new KnownScriptType(required: new[] { "title", "author", "text" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "title", "author", "signed" }, listKeys: new[] { "text" }, strict: true) },
+            { "book", new KnownScriptType(required: new[] { "title", "author", "text" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "title", "author", "signed" }, listKeys: new[] { "text" }, strict: true, canHaveScripts: false) },
             { "command", new KnownScriptType(required: new[] { "name", "description", "usage", "script" }, bad: new[] { "steps", "actions", "events" }, valueKeys: new[] { "name", "description", "usage", "permission", "permission message" }, listKeys: new[] { "aliases" }, scriptKeys: new[] { "allowed help", "tab complete", "script" }, strict: false) },
-            { "economy", new KnownScriptType(required: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has", "withdraw", "deposit" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has" }, scriptKeys: new[] { "withdraw", "deposit" }, strict: true) },
+            { "economy", new KnownScriptType(required: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has", "withdraw", "deposit" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has" }, scriptKeys: new[] { "withdraw", "deposit" }, strict: true, canHaveScripts: false) },
             { "entity", new KnownScriptType(required: new[] { "entity_type" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, strict: false) },
-            { "format", new KnownScriptType(required: new[] { "format" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "format" }, strict: true) },
+            { "format", new KnownScriptType(required: new[] { "format" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "format" }, strict: true, canHaveScripts: false) },
             { "interact", new KnownScriptType(required: new[] { "steps" }, bad: new[] { "script", "actions", "events" }, scriptKeys: new[] { "steps.*" }, strict: true) },
-            { "inventory", new KnownScriptType(required: new[] { "inventory" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "inventory", "title", "size", "definitions.*" }, scriptKeys: new[] { "procedural items" }, listKeys: new[] { "slots" }, strict: true) },
-            { "item", new KnownScriptType(required: new[] { "material" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "material", "mechanisms.*", "display name", "durability", "recipes.*", "no_id", "color", "book" }, listKeys: new[] { "mechanisms.*", "lore", "enchantments", "recipes.*" }, strict: false) },
-            { "map", new KnownScriptType(bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "original", "display name", "auto update", "objects.*" }, strict: true) }
+            { "inventory", new KnownScriptType(required: new[] { "inventory" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "inventory", "title", "size", "definitions.*" }, scriptKeys: new[] { "procedural items" }, listKeys: new[] { "slots" }, strict: true, canHaveScripts: false) },
+            { "item", new KnownScriptType(required: new[] { "material" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "material", "mechanisms.*", "display name", "durability", "recipes.*", "no_id", "color", "book" }, listKeys: new[] { "mechanisms.*", "lore", "enchantments", "recipes.*" }, strict: false, canHaveScripts: false) },
+            { "map", new KnownScriptType(bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "original", "display name", "auto update", "objects.*" }, strict: true, canHaveScripts: false) }
         };
 
         /// <summary>
@@ -374,15 +380,93 @@ namespace DenizenBot.UtilityProcessors
                     warnScript(Errors, scriptPair.Key.Line, "Missing 'type' key!");
                     continue;
                 }
-                if (!KnownScriptTypes.ContainsKey(typeString.Text))
+                if (!KnownScriptTypes.TryGetValue(typeString.Text, out KnownScriptType scriptType))
                 {
                     warnScript(Errors, typeString.Line, "Unknown script type (possibly a typo?)!");
                     continue;
                 }
-                // TODO: Check events for existence
-                // TODO: Tag existent-name per-piece check
-                // TODO: script required keys check
-                // Check that command script name == alias
+                foreach (string key in scriptType.RequiredKeys)
+                {
+                    if (!scriptSection.ContainsKey(new LineTrackedString(0, key)))
+                    {
+                        warnScript(Warnings, typeString.Line, $"Missing required key `{key}` (check `!lang {typeString.Text} script containers` for format rules)!");
+                    }
+                }
+                foreach (string key in scriptType.LikelyBadKeys)
+                {
+                    if (scriptSection.ContainsKey(new LineTrackedString(0, key)))
+                    {
+                        warnScript(Warnings, typeString.Line, $"Unexpected key `{key}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
+                    }
+                }
+                bool matchesSet(string key, string[] keySet)
+                {
+                    return keySet.Contains(key) || keySet.Contains($"{key}.*") || keySet.Contains("*");
+                }
+                foreach (KeyValuePair<LineTrackedString, object> keyPair in scriptSection)
+                {
+                    bool isList = keyPair.Value is List<LineTrackedString>;
+                    if (isList)
+                    {
+                        if (matchesSet(keyPair.Key.Text, scriptType.ListKeys))
+                        {
+                            // Proper list, all is well
+                        }
+                        else if (matchesSet(keyPair.Key.Text, scriptType.ScriptKeys))
+                        {
+                            // TODO: Script check
+                        }
+                        else if (matchesSet(keyPair.Key.Text, scriptType.ValueKeys))
+                        {
+                            warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyPair.Key.Text}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
+                        }
+                        else if (scriptType.Strict)
+                        {
+                            warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyPair.Key.Text}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                        }
+                        else if (scriptType.CanHaveRandomScripts)
+                        {
+                            // TODO: Script check
+                        }
+                    }
+                    else
+                    {
+                        if (matchesSet(keyPair.Key.Text, scriptType.ValueKeys))
+                        {
+                            // Proper value, all is well
+                        }
+                        else if (matchesSet(keyPair.Key.Text, scriptType.ListKeys) || matchesSet(keyPair.Key.Text, scriptType.ScriptKeys))
+                        {
+                            warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyPair.Key.Text}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
+                        }
+                        else if (scriptType.Strict)
+                        {
+                            warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyPair.Key.Text}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                        }
+                    }
+                }
+                if (typeString.Text == "command")
+                {
+                    if (scriptSection.TryGetValue(new LineTrackedString(0, "name"), out object nameValue) && scriptSection.TryGetValue(new LineTrackedString(0, "usage"), out object usageValue))
+                    {
+                        if (usageValue is LineTrackedString usageString && nameValue is LineTrackedString nameString)
+                        {
+                            if (!usageString.Text.StartsWith($"/{nameString.Text}"))
+                            {
+                                warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help')!");
+                            }
+                        }
+                    }
+                }
+                else if (typeString.Text == "assignment")
+                {
+                    // TODO: Check actions for existence
+                }
+                else if (typeString.Text == "events")
+                {
+                    // TODO: Check events for existence
+                }
+                // TODO: Tag existent-name per-piece check (generic argument checker, for all values?) Except yaml data.
             }
         }
 
@@ -424,6 +508,14 @@ namespace DenizenBot.UtilityProcessors
             public override bool Equals(object obj)
             {
                 return (obj is LineTrackedString lts2) && Text == lts2.Text;
+            }
+
+            /// <summary>
+            /// ToString override, returns <see cref="Text"/>.
+            /// </summary>
+            public override string ToString()
+            {
+                return Text;
             }
         }
 
@@ -531,11 +623,11 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (endofline.Length == 0)
                 {
-                    secwaiting = new LineTrackedString(i, startofline);
+                    secwaiting = new LineTrackedString(i, startofline.ToLowerFast());
                 }
                 else
                 {
-                    currentSection[new LineTrackedString(i, startofline)] = new LineTrackedString(i, endofline);
+                    currentSection[new LineTrackedString(i, startofline.ToLowerFast())] = new LineTrackedString(i, endofline);
                 }
                 pspaces = spaces;
             }
