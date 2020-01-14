@@ -90,6 +90,32 @@ namespace DenizenBot.CommandHandlers
                             lowestStr = possibleName;
                         }
                     }
+                    string[] words = search.Split(' ');
+                    if (words.Length > 1)
+                    {
+                        foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
+                        {
+                            int currentDistance = 0;
+                            foreach (string nameWord in possibleName.Split(' '))
+                            {
+                                int lowestWordDistance = 9999;
+                                foreach (string searcHword in words)
+                                {
+                                    int currentWordDistance = StringConversionHelper.GetLevenshteinDistance(searcHword, nameWord);
+                                    if (currentWordDistance < lowestWordDistance)
+                                    {
+                                        lowestWordDistance = currentWordDistance;
+                                    }
+                                }
+                                currentDistance += lowestWordDistance;
+                            }
+                            if (currentDistance < lowestDistance)
+                            {
+                                lowestDistance = currentDistance;
+                                lowestStr = possibleName;
+                            }
+                        }
+                    }
                     return lowestStr;
                 };
             }
