@@ -256,6 +256,16 @@ namespace DenizenBot
         public static double HighestServerVersion = 0.0;
 
         /// <summary>
+        /// All quotes in the quotes file.
+        /// </summary>
+        public string[] Quotes = new string[0];
+
+        /// <summary>
+        /// All quotes in the quotes file, pre-lowercased for searching.
+        /// </summary>
+        public string[] QuotesLower = new string[0];
+
+        /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
         public void PopulateFromConfig()
@@ -331,6 +341,11 @@ namespace DenizenBot
                 BuildNumberTracker.AddPaperTracker(version);
             }
             BuildNumberTracker.LoadSpigotData();
+            if (File.Exists(CONFIG_FOLDER + "quotes.txt"))
+            {
+                Quotes = File.ReadAllText(CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Split("\n\n", StringSplitOptions.RemoveEmptyEntries);
+                QuotesLower = Quotes.Select(s => s.ToLowerFast()).ToArray();
+            }
         }
 
         /// <summary>

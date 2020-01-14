@@ -254,5 +254,89 @@ namespace DenizenBot.CommandHandlers
                 }
             }
         }
+
+        /// <summary>
+        /// Dictionary of quotes recently seen to the time it was last seen, to reduce duplication.
+        /// </summary>
+        public Dictionary<int, DateTimeOffset> QuotesSeen = new Dictionary<int, DateTimeOffset>();
+
+        private static readonly Random _Random = new Random();
+
+        /// <summary>
+        /// User command to display a quote.
+        /// </summary>
+        public void CMD_Quote(string[] cmds, SocketMessage message)
+        {
+            if (Bot.Quotes.Length == 0)
+            {
+                SendErrorMessageReply(message, "Quotes Unavailable", "This bot currently has no quotes configured.");
+                return;
+            }
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            foreach (KeyValuePair<int, DateTimeOffset> recentlySeen in new Dictionary<int, DateTimeOffset>(QuotesSeen))
+            {
+                if (Math.Abs(now.Subtract(recentlySeen.Value).TotalMinutes) > 5)
+                {
+                    QuotesSeen.Remove(recentlySeen.Key);
+                }
+            }
+            void sendQuote(int quoteId)
+            {
+                QuotesSeen[quoteId] = now;
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.SPEECH_BUBBLE_ICON).WithTitle($"Quote #{quoteId + 1}").WithDescription(Bot.Quotes[quoteId]).Build());
+            }
+            if (cmds.Length == 0)
+            {
+                int qid = 0;
+                for (int i = 0; i < 15; i++)
+                {
+                    qid = _Random.Next(Bot.Quotes.Length);
+                    if (!QuotesSeen.ContainsKey(qid))
+                    {
+                        break;
+                    }
+                }
+                sendQuote(qid);
+                return;
+            }
+            if (cmds.Length == 1 && int.TryParse(cmds[0].Replace("#", ""), out int id))
+            {
+                if (id < 1)
+                {
+                    id = 1;
+                }
+                else if (id > Bot.Quotes.Length)
+                {
+                    id = Bot.Quotes.Length;
+                }
+                sendQuote(id - 1);
+                return;
+            }
+            List<int> matchedQuoteIDs = new List<int>(32);
+            string rawInputLow = string.Join(" ", cmds).ToLowerInvariant();
+            for (int i = 0; i < Bot.Quotes.Length; i++)
+            {
+                if (Bot.QuotesLower[i].Contains(rawInputLow))
+                {
+                    matchedQuoteIDs.Add(i);
+                }
+            }
+            if (matchedQuoteIDs.Count == 0)
+            {
+                SendErrorMessageReply(message, "Quote Unknown", "No quote found for that search text.");
+                return;
+            }
+            int matchId = matchedQuoteIDs[0];
+            for (int i = 0; i < 15; i++)
+            {
+                int temp = _Random.Next(matchedQuoteIDs.Count);
+                matchId = matchedQuoteIDs[temp];
+                if (!QuotesSeen.ContainsKey(matchId))
+                {
+                    break;
+                }
+            }
+            sendQuote(matchId);
+        }
     }
 }

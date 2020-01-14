@@ -41,6 +41,11 @@ namespace DenizenBot
         public const string INFO_ICON = "https://i.alexgoodwin.media/i/for_real_usage/911f66.png";
 
         /// <summary>
+        /// Generic reusable "speech bubble" icon.
+        /// </summary>
+        public const string SPEECH_BUBBLE_ICON = "https://i.alexgoodwin.media/i/for_real_usage/7d81b4.png";
+
+        /// <summary>
         /// The base for the Jenkins CI URL.
         /// </summary>
         public const string JENKINS_URL_BASE = "https://ci.citizensnpcs.co";
