@@ -221,9 +221,10 @@ namespace DenizenBot.MetaObjects
             StringBuilder tagsFieldBuilder = new StringBuilder(tags.Length * 30);
             foreach (string tag in tags)
             {
-                string tagOut = $"`{tag}`";
+                string tagOut;
                 if (tag.EndsWith(">"))
                 {
+                    tagOut = $"`{tag}`";
                     MetaTag realTag = Program.CurrentMeta.FindTag(tag);
                     if (realTag == null)
                     {
@@ -232,6 +233,18 @@ namespace DenizenBot.MetaObjects
                     else
                     {
                         tagOut += " " + realTag.Description.Replace("\n", " ");
+                    }
+                }
+                else
+                {
+                    int endMark = tag.IndexOf('>') + 1;
+                    if (endMark == 0)
+                    {
+                        tagOut = tag + " (Invalid tag)";
+                    }
+                    else
+                    {
+                        tagOut = $"`{tag.Substring(0, endMark)}`{tag.Substring(endMark)}";
                     }
                 }
                 if (tagOut.Length > 128)
