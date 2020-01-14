@@ -186,6 +186,7 @@ namespace DenizenBot.UtilityProcessors
             catch (Exception ex)
             {
                 Warn(Errors, -1, "yaml_load", "Invalid YAML! Error message: " + ex.Message);
+                Console.WriteLine($"YAML error: {ex}\n\nFrom:\n{CleanScriptForYAMLProcessing()}");
             }
         }
 
@@ -207,6 +208,7 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 string scriptName = CleanedLines[x].Substring(0, CleanedLines[x].Length - 1);
                                 Injects.Add(scriptName);
+                                Console.WriteLine($"ScriptChecker: Inject locally became {scriptName}");
                                 break;
                             }
                         }
@@ -218,6 +220,7 @@ namespace DenizenBot.UtilityProcessors
                         if (target.Contains("<"))
                         {
                             Injects.Add("*");
+                            Console.WriteLine("ScriptChecker: Inject EVERYTHING");
                         }
                     }
                 }
@@ -767,9 +770,9 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 // Workaround the weird way shoot command does things
                                 definitionsKnown.UnionWith(new[] { "shot_entities", "last_entity", "location", "hit_entities" });
-                                // Default task definitions get used sometimes
-                                definitionsKnown.UnionWith(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" });
                             }
+                            // Default run command definitions get used sometimes
+                            definitionsKnown.UnionWith(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" });
                             if (Injects.Contains(scriptPair.Key.Text) || Injects.Contains("*"))
                             {
                                 definitionsKnown.Add("*");
