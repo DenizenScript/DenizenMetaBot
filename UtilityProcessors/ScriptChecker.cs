@@ -338,22 +338,104 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         /// <param name="line">The line number.</param>
         /// <param name="commandText">The text of the command line.</param>
-        public void CheckSingleCommand(int line, string commandText)
+        /// <param name="definitions">The definitions tracker.</param>
+        public void CheckSingleCommand(int line, string commandText, HashSet<string> definitions)
         {
-            string commandName = null; // TODO
-            string[] arguments = null; // TODO
-            // TODO: Command name validity
-            // TODO: Argument count
-            // TODO: Check for "quoted" arguments without any spaces in them (pointless).
+            string[] parts = commandText.Split(' ', 2);
+            string commandName = parts[0].ToLowerFast();
+            string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
+            if (!Program.CurrentMeta.Commands.TryGetValue(commandName, out MetaCommand command))
+            {
+                Warn(Errors, line, "Unknown command (typo? Use `!command [...]` to find a valid command).");
+                return;
+            }
+            if (arguments.Length < command.Required)
+            {
+                Warn(Errors, line, $"Insufficient arguments... the `{command.Name}` command requires at least {command.Required} arguments, but you only provided {arguments.Length}.");
+            }
             if (commandName == "adjust")
             {
-                // TODO: Mechanism exists check
+                string mechanism = arguments.FirstOrDefault(s => s.Contains(":") && !s.StartsWith("def:")) ?? arguments.FirstOrDefault(s => !s.Contains("<"));
+                if (mechanism == null)
+                {
+                    Warn(Errors, line, $"Malformed adjust command. No mechanism input given.");
+                }
+                else
+                {
+                    mechanism = mechanism.Before(':').ToLowerFast();
+                    if (!Program.CurrentMeta.Mechanisms.ContainsKey(mechanism))
+                    {
+                        Warn(Errors, line, $"Malformed adjust command. Mechanism name given is unrecognized.");
+                        Console.WriteLine($"Unrecognized mechanism '{mechanism}' for script check line {line}.");
+                    }
+                }
             }
-            if (commandName == "queue" && arguments.Length == 1 && (arguments[0] == "stop" || arguments[0] == "clear"))
+            else if (commandName == "queue" && arguments.Length == 1 && (arguments[0] == "stop" || arguments[0] == "clear"))
             {
                 Warn(MinorWarnings, line, "Old style 'queue clear'. Use the modern 'stop' command instead. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#stop-is-the-new-queue-clear> for more info.");
             }
+            else if (commandName == "define")
+            {
+                string defName = arguments[0].Before(":").ToLowerFast();
+                definitions.Add(defName);
+            }
+            else if (commandName == "foreach" || commandName == "while" || commandName == "repeat")
+            {
+                string asArgument = arguments.FirstOrDefault(s => s.StartsWith("as:"));
+                if (asArgument == null)
+                {
+                    asArgument = "value";
+                }
+                else
+                {
+                    asArgument = asArgument.Substring("as:".Length);
+                }
+                definitions.Add(asArgument.ToLowerFast());
+                if (commandName == "foreach")
+                {
+                    definitions.Add("loop_index");
+                }
+            }
+            string saveArgument = arguments.FirstOrDefault(s => s.StartsWith("save:"));
+            if (saveArgument != null)
+            {
+                definitions.Add(ENTRY_PREFIX + saveArgument.ToLowerFast());
+            }
+            foreach (string argument in arguments)
+            {
+                CheckSingleArgument(line, argument);
+                int entrySpot = argument.IndexOf("<entry[");
+                if (entrySpot != -1)
+                {
+                    entrySpot += "<entry[".Length;
+                    int endSpot = argument.IndexOf("]", entrySpot);
+                    if (endSpot != -1)
+                    {
+                        string entryText = argument.Substring(entrySpot, endSpot - entrySpot).ToLowerFast();
+                        if (!definitions.Contains(ENTRY_PREFIX + entryText))
+                        {
+                            Warn(Warnings, line, "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
+                        }
+                    }
+                }
+                int defSpot = argument.IndexOf("<[");
+                if (defSpot != -1)
+                {
+                    defSpot += "<[".Length;
+                    int endSpot = argument.IndexOf("]", defSpot);
+                    if (endSpot != -1)
+                    {
+                        string defText = argument.Substring(defSpot, endSpot - defSpot).ToLowerFast();
+                        if (!definitions.Contains(defText))
+                        {
+                            Warn(Warnings, line, "Definition tag points to non-existent definition (typo, or bad copypaste?).");
+                        }
+                    }
+                }
+            }
         }
+
+        private static readonly string ENTRY_PREFIX = ((char)0x01) + "entry_";
 
         /// <summary>
         /// Basic metadata about a known script type.
