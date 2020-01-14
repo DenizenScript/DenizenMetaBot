@@ -148,12 +148,12 @@ namespace DenizenBot.CommandHandlers
                 SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (single word input?).");
                 return;
             }
-            if (projectName == "paper")
+            if (projectName.ToLowerFast() == "paper")
             {
                 string output = LogChecker.ServerVersionStatusOutput(combined, out bool isGood);
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    SendErrorMessageReply(message, "Bad Input", "Input text looks like a Paper version, but doesn't fit the expected Paper server version format. Should start with 'This server is running Paper version git-Paper-...'");
+                    SendErrorMessageReply(message, "Bad Input", "Input text looks like a Paper version, but doesn't fit the expected Paper server version format. Should start with 'Paper version git-Paper-...'");
                     return;
                 }
                 if (isGood)
