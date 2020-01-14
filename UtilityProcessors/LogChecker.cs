@@ -247,7 +247,7 @@ namespace DenizenBot.UtilityProcessors
                 return;
             }
             string spigotVersionText = subData[2].Split('-', 3)[2];
-            string mcVersionText = subData[3].Substring("(MC: ".Length).BeforeLast(')');
+            string mcVersionText = subData[3].Substring("(MC: ".Length).Before(')');
             string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
             if (!double.TryParse(majorMCVersion, out double versionNumb))
             {
