@@ -113,6 +113,14 @@ namespace DenizenBot.UtilityProcessors
                 {
                     BlankLines++;
                 }
+                else if (CleanedLines[i].StartsWith("-"))
+                {
+                    CodeLines++;
+                }
+                else if (CleanedLines[i].EndsWith(":"))
+                {
+                    StructureLines++;
+                }
             }
         }
 
@@ -350,55 +358,188 @@ namespace DenizenBot.UtilityProcessors
         };
 
         /// <summary>
-        /// Checks all findable script containers, their keys, and the keys within.
+        /// Checks a dictionary full of script containers, performing all checks on the scripts from there on.
         /// </summary>
-        public void CheckContainerTypes()
+        public void CheckAllContainers(Dictionary<LineTrackedString, object> scriptContainers)
         {
-            int scriptStartLine = -1;
-            string type = null;
-            KnownScriptType actualType = null;
+            foreach (KeyValuePair<LineTrackedString, object> scriptPair in scriptContainers)
+            {
+                void warnScript(List<string> warns, int line, string warning)
+                {
+                    Warn(warns, line, $"In script '{scriptPair.Key.Text.Replace('`', '\'')}': {warning}");
+                }
+                Dictionary<LineTrackedString, object> scriptSection = (Dictionary<LineTrackedString, object>)scriptPair.Value;
+                if (!scriptSection.TryGetValue(new LineTrackedString(0, "type"), out object typeValue) || !(typeValue is LineTrackedString typeString))
+                {
+                    warnScript(Errors, scriptPair.Key.Line, "Missing 'type' key!");
+                    continue;
+                }
+                if (!KnownScriptTypes.ContainsKey(typeString.Text))
+                {
+                    warnScript(Errors, typeString.Line, "Unknown script type (possibly a typo?)!");
+                    continue;
+                }
+                // TODO: Check events for existence
+                // TODO: Tag existent-name per-piece check
+                // TODO: script required keys check
+                // Check that command script name == alias
+            }
+        }
+
+        /// <summary>
+        /// Helper class for strings that remember where they came from.
+        /// </summary>
+        public class LineTrackedString
+        {
+            /// <summary>
+            /// The text of the line.
+            /// </summary>
+            public string Text;
+
+            /// <summary>
+            /// The line number.
+            /// </summary>
+            public int Line;
+
+            /// <summary>
+            /// Constructs the LineTrackedString.
+            /// </summary>
+            public LineTrackedString(int line, string text)
+            {
+                Line = line;
+                Text = text;
+            }
+
+            /// <summary>
+            /// HashCode impl, for Dictionary functionality.
+            /// </summary>
+            public override int GetHashCode()
+            {
+                return Text.GetHashCode();
+            }
+
+            /// <summary>
+            /// Equals impl, for Dictionary functionality.
+            /// </summary>
+            public override bool Equals(object obj)
+            {
+                return (obj is LineTrackedString lts2) && Text == lts2.Text;
+            }
+        }
+
+        /// <summary>
+        /// Gathers a dictionary of all actual containers, checking for errors as it goes, and returning the dictionary.
+        /// </summary>
+        public Dictionary<LineTrackedString, object> GatherActualContainers()
+        {
+            Dictionary<LineTrackedString, object> rootScriptSection = new Dictionary<LineTrackedString, object>();
+            Dictionary<int, Dictionary<LineTrackedString, object>> spacedsections = new Dictionary<int, Dictionary<LineTrackedString, object>>() { { 0, rootScriptSection } };
+            Dictionary<LineTrackedString, object> currentSection = rootScriptSection;
+            int pspaces = 0;
+            LineTrackedString secwaiting = null;
+            List<LineTrackedString> clist = null;
             for (int i = 0; i < Lines.Length; i++)
             {
-                string line = Lines[i];
                 string cleaned = CleanedLines[i];
-                if (line.Length > 0 && cleaned.EndsWith(":") && char.ToLowerInvariant(line[0]) == cleaned[0])
+                if (cleaned.Length == 0)
                 {
-                    scriptStartLine = i;
-                    type = null;
-                    actualType = null;
+                    continue;
                 }
-                else if (scriptStartLine == -1 && line.Length > 0)
+                string line = Lines[i].Replace("\t", "    ");
+                int spaces;
+                for (spaces = 0; spaces < line.Length; spaces++)
                 {
-                    Warn(Errors, i, "Script didn't start with a container name (Possible spacing mishap?).");
-                }
-                else if (cleaned.StartsWith("type:"))
-                {
-                    type = cleaned.Substring("type:".Length).Trim();
-                    if (!KnownScriptTypes.TryGetValue(type, out actualType))
+                    if (line[spaces] != ' ')
                     {
-                        Warn(Errors, i, "Unknown script type (possible typo?).");
+                        break;
                     }
                 }
-                else if (cleaned.StartsWith("debug:"))
+                if (spaces < pspaces)
                 {
-                    string debugMode = cleaned.Substring("debug:".Length).Trim();
-                    if (debugMode != "false")
+                    if (spacedsections.TryGetValue(spaces, out Dictionary<LineTrackedString, object> temp))
                     {
-                        if (debugMode == "true")
+                        currentSection = temp;
+                        foreach (int test in new List<int>(spacedsections.Keys))
                         {
-                            Warn(MinorWarnings, i, "Debug mode 'true' is default, and thus the line should simply be removed.");
+                            if (test > spaces)
+                            {
+                                spacedsections.Remove(test);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Warn(Warnings, i, $"Simple spacing error - shrunk unexpectedly to new space count, from {pspaces} down to {spaces}, while expecting any of: {string.Join(", ", spacedsections.Keys)}.");
+                        pspaces = spaces;
+                        continue;
+                    }
+                }
+                if (cleaned.StartsWith("- "))
+                {
+                    if (clist == null)
+                    {
+                        if (spaces >= pspaces && secwaiting != null)
+                        {
+                            clist = new List<LineTrackedString>();
+                            currentSection[secwaiting] = clist;
+                            secwaiting = null;
                         }
                         else
                         {
-                            Warn(MinorWarnings, i, "Debug mode specified is unrecognized. The only valid debug mode setting is 'false' (or leave the line entirely off).");
+                            Warn(Warnings, i, "Line purpose unknown, attempted list entry when not building a list (likely line format error, perhaps missing or misplaced a `:` on lines above?).");
+                            pspaces = spaces;
+                            continue;
                         }
                     }
+                    clist.Add(new LineTrackedString(i, cleaned.Substring("- ".Length)));
+                    continue;
                 }
-                else if (cleaned.StartsWith("speed:"))
+                clist = null;
+                string startofline;
+                string endofline = "";
+                if (cleaned.EndsWith(":"))
                 {
-                    // Ignore this line, anything's fine really.
+                    startofline = cleaned.Substring(0, cleaned.Length - 1);
                 }
+                else if (cleaned.Contains(": "))
+                {
+                    startofline = cleaned.BeforeAndAfter(": ", out endofline);
+                }
+                else
+                {
+                    Warn(Warnings, i, "Line purpose unknown, no identifier (missing a `:` or a `-`?).");
+                    continue;
+                }
+                if (startofline.Length == 0)
+                {
+                    Warn(Warnings, i, "key line missing contents (misplaced a `:`)?");
+                    continue;
+                }
+                if (spaces > pspaces)
+                {
+                    if (secwaiting == null)
+                    {
+                        Warn(Warnings, i, "Spacing grew for no reason (missing a ':', or accidental over-spacing?).");
+                        pspaces = spaces;
+                        continue;
+                    }
+                    Dictionary<LineTrackedString, object> sect = new Dictionary<LineTrackedString, object>();
+                    currentSection[secwaiting] = sect;
+                    currentSection = sect;
+                    spacedsections[spaces] = sect;
+                    secwaiting = null;
+                }
+                if (endofline.Length == 0)
+                {
+                    secwaiting = new LineTrackedString(i, startofline);
+                }
+                else
+                {
+                    currentSection[new LineTrackedString(i, startofline)] = new LineTrackedString(i, endofline);
+                }
+                pspaces = spaces;
             }
+            return rootScriptSection;
         }
 
         /// <summary>
@@ -424,14 +565,8 @@ namespace DenizenBot.UtilityProcessors
             CheckForBraces();
             CheckForAncientDefs();
             CheckForOldDefs();
-            CheckContainerTypes();
-            // TODO: Check events for existence
-            // TODO: line growth oddities check
-            // TODO: line type statistic gathering
-            // TODO: Tag existent-name per-piece check
-            // TODO: script type validity check
-            // TODO: script required keys check
-            // Check that command script name == alias
+            Dictionary<LineTrackedString, object> containers = GatherActualContainers();
+            CheckAllContainers(containers);
             CollectStatisticInfos();
         }
 
