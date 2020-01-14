@@ -393,17 +393,17 @@ namespace DenizenBot.UtilityProcessors
             {
                 Warn(Warnings, line, "uneven_tags", $"Uneven number of tag marks (forgot to close a tag?).");
             }
-            int tagIndex = argument.IndexOf('<');
+            int tagIndex = argNoArrows.IndexOf('<');
             while (tagIndex != -1)
             {
-                int endIndex = argument.IndexOf('>', tagIndex);
+                int endIndex = argNoArrows.IndexOf('>', tagIndex);
                 if (endIndex == -1)
                 {
                     break;
                 }
-                string tag = argument.Substring(tagIndex + 1, endIndex - tagIndex - 1);
+                string tag = argNoArrows.Substring(tagIndex + 1, endIndex - tagIndex - 1);
                 CheckSingleTag(line, tag);
-                tagIndex = argument.IndexOf('<', endIndex);
+                tagIndex = argNoArrows.IndexOf('<', endIndex);
             }
         }
 
