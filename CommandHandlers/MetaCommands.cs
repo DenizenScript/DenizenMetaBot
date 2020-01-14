@@ -448,7 +448,12 @@ namespace DenizenBot.CommandHandlers
             }
             if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
             {
+                string possible = StringConversionHelper.FindClosestString(Program.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
                 SendErrorMessageReply(message, "Search Command Has No Results", "Input search text could not be found.");
+                if (!string.IsNullOrWhiteSpace(possible))
+                {
+                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?");
+                }
                 return;
             }
             string suffix = ".";
