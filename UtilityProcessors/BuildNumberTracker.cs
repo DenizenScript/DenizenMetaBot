@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -49,11 +50,12 @@ namespace DenizenBot.UtilityProcessors
             /// <param name="projectName">The name of the project.</param>
             /// <param name="regexText">The regex matcher text.</param>
             /// <param name="jenkinsJobName">The jenkins job name.</param>
-            public BuildNumber(string projectName, string regexText, string jenkinsJobName)
+            /// <param name="jenkinsUrlBase">The jenkins URL base path, if not the default <see cref="Constants.JENKINS_URL_BASE"/>.</param>
+            public BuildNumber(string projectName, string regexText, string jenkinsJobName, string jenkinsUrlBase = Constants.JENKINS_URL_BASE)
             {
                 Name = projectName;
                 Matcher = new Regex(regexText, RegexOptions.Compiled);
-                JenkinsURL = $"{Constants.JENKINS_URL_BASE}/job/{jenkinsJobName}/lastSuccessfulBuild/buildNumber";
+                JenkinsURL = $"{jenkinsUrlBase}/job/{jenkinsJobName}/lastSuccessfulBuild/buildNumber";
                 UpdateValue();
             }
 
@@ -163,11 +165,16 @@ namespace DenizenBot.UtilityProcessors
         public static List<BuildNumber> BuildNumbers = new List<BuildNumber>(64);
 
         /// <summary>
+        /// A mapping from version names to the relevant paper build number trackers.
+        /// </summary>
+        public static Dictionary<string, BuildNumber> PaperBuildTrackers = new Dictionary<string, BuildNumber>();
+
+        /// <summary>
         /// Causes all tracked build numbers to update immediately.
         /// </summary>
         public static void UpdateAll()
         {
-            foreach (BuildNumber number in BuildNumbers)
+            foreach (BuildNumber number in BuildNumbers.JoinWith(PaperBuildTrackers.Values))
             {
                 number.UpdateValue();
             }
@@ -182,6 +189,16 @@ namespace DenizenBot.UtilityProcessors
         public static void AddTracker(string name, string regex, string jenkinsJob)
         {
             BuildNumbers.Add(new BuildNumber(name, regex, jenkinsJob));
+        }
+
+        /// <summary>
+        /// Adds a tracker for a Paper version.
+        /// </summary>
+        /// <param name="version">The version.</param>
+        public static void AddPaperTracker(string version)
+        {
+            BuildNumber tracker = new BuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}\\(\\.\\d+)?\\)", "Paper-" + version, "https://papermc.io/ci");
+            PaperBuildTrackers.Add(version, tracker);
         }
 
         /// <summary>

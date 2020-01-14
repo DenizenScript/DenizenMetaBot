@@ -241,6 +241,21 @@ namespace DenizenBot
         public Dictionary<string, string> Rules = new Dictionary<string, string>(128);
 
         /// <summary>
+        /// A list of MC versions that are acceptable+known.
+        /// </summary>
+        public List<string> AcceptableServerVersions = new List<string>();
+
+        /// <summary>
+        /// The lowest (oldest) acceptable server version, as a double.
+        /// </summary>
+        public static double LowestServerVersion = 0.0;
+
+        /// <summary>
+        /// The highest (newest) acceptable server version, as a double.
+        /// </summary>
+        public static double HighestServerVersion = 0.0;
+
+        /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
         public void PopulateFromConfig()
@@ -300,6 +315,20 @@ namespace DenizenBot
             {
                 FDSSection project = buildNumbersSection.GetSection(projectName);
                 BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"));
+            }
+            AcceptableServerVersions = ConfigFile.GetStringList("acceptable_server_versions");
+            foreach (string version in AcceptableServerVersions)
+            {
+                double versionNumber = double.Parse(version);
+                if (LowestServerVersion <= 0.01 || versionNumber < LowestServerVersion)
+                {
+                    LowestServerVersion = versionNumber;
+                }
+                if (versionNumber > HighestServerVersion)
+                {
+                    HighestServerVersion = versionNumber;
+                }
+                BuildNumberTracker.AddPaperTracker(version);
             }
         }
 

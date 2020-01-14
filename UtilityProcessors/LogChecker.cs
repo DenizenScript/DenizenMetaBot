@@ -223,6 +223,67 @@ namespace DenizenBot.UtilityProcessors
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
             }
             Console.WriteLine($"ServerVersion={ServerVersion}");
+            CheckServerVersion();
+            Console.WriteLine($"ServerVersionChecked={ServerVersion}");
+        }
+
+        /// <summary>
+        /// Checks the linked server version against the current known server version.
+        /// Expects a version output of the format: "This server is running {TYPE} version git-{TYPE}-{VERS} (MC: {MCVERS}) (Implementing API version {MCVERS}-{SUBVERS}-SNAPSHOT)".
+        /// Will note on outdated MCVERS (per config), or note on newer. Will identify an outdated Spigot (or paper) sub-version.
+        /// </summary>
+        public void CheckServerVersion()
+        {
+            if (string.IsNullOrWhiteSpace(ServerVersion) || !ServerVersion.StartsWith("This server is running "))
+            {
+                return;
+            }
+            string shortenedServerVersion = ServerVersion.Substring("This server is running ".Length);
+            string[] subData = shortenedServerVersion.Split(' ', 4);
+            if (subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(MC: "))
+            {
+                return;
+            }
+            string spigotVersionText = subData[2].Split('-', 3)[2];
+            string mcVersionText = subData[3].Substring("(MC: ".Length).BeforeLast(')');
+            string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
+            if (!double.TryParse(majorMCVersion, out double versionNumb))
+            {
+                return;
+            }
+            if (versionNumb < DenizenMetaBot.LowestServerVersion)
+            {
+                ServerVersion += " -- Outdated MC version";
+                return;
+            }
+            if (versionNumb > DenizenMetaBot.HighestServerVersion)
+            {
+                ServerVersion += " -- (New MC version? Bot may need config update)";
+                return;
+            }
+            if (subData[0] == "Paper")
+            {
+                if (!int.TryParse(spigotVersionText, out int paperVersionNumber))
+                {
+                    return;
+                }
+                if (!BuildNumberTracker.PaperBuildTrackers.TryGetValue(majorMCVersion, out BuildNumberTracker.BuildNumber buildTracker))
+                {
+                    return;
+                }
+                if (buildTracker.IsCurrent(paperVersionNumber, out int behindBy))
+                {
+                    ServerVersion += " -- (Current build)";
+                }
+                else
+                {
+                    ServerVersion += $" -- (Outdated build, behind by {behindBy})";
+                }
+            }
+            else if (subData[0] == "Spigot")
+            {
+                // TODO
+            }
         }
 
         /// <summary>

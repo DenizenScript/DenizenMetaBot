@@ -38,6 +38,7 @@ To configure the bot:
         - `name` set to the name that appears in the `plugin.yml`.
         - `jenkins_job` set to the Jenkins job name.
         `- regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
+    - `acceptable_server_versions` set to a list of server MC versions (just the main version without sub-version, like "1.15", not "1.15.1") that are acceptable + tracked (older = outdated, newer = unknown).
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -67,6 +68,8 @@ build_numbers:
         name: Denizen
         jenkins_job: Denizen
         regex: [\d.]+(?:-SNAPSHOT)? \(build (\d+)-REL\)
+acceptable_server_versions:
+    - 1.15
 ```
 
 To start the bot up:
