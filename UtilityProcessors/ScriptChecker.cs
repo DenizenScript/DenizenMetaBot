@@ -590,10 +590,7 @@ namespace DenizenBot.UtilityProcessors
                     asArgument = asArgument.Substring("as:".Length);
                 }
                 definitions.Add(asArgument.ToLowerFast());
-                if (commandName == "foreach")
-                {
-                    definitions.Add("loop_index");
-                }
+                definitions.Add("loop_index");
             }
             string saveArgument = arguments.FirstOrDefault(s => s.StartsWith("save:"));
             if (saveArgument != null)
