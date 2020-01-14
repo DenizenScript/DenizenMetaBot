@@ -283,7 +283,7 @@ namespace DenizenBot.CommandHandlers
             void sendQuote(int quoteId)
             {
                 QuotesSeen[quoteId] = now;
-                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.SPEECH_BUBBLE_ICON).WithTitle($"Quote #{quoteId + 1}").WithDescription(Bot.Quotes[quoteId]).Build());
+                SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.SPEECH_BUBBLE_ICON).WithTitle($"Quote #{quoteId + 1}").WithDescription($"```xml\n{Bot.Quotes[quoteId]}\n```").Build());
             }
             if (cmds.Length == 0)
             {

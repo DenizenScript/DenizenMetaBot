@@ -344,7 +344,7 @@ namespace DenizenBot
             BuildNumberTracker.LoadSpigotData();
             if (File.Exists(CONFIG_FOLDER + "quotes.txt"))
             {
-                Quotes = File.ReadAllText(CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Split("\n\n", StringSplitOptions.RemoveEmptyEntries);
+                Quotes = File.ReadAllText(CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Replace('`', '\'').Split("\n\n", StringSplitOptions.RemoveEmptyEntries);
                 QuotesLower = Quotes.Select(s => s.ToLowerFast()).ToArray();
             }
         }
