@@ -326,12 +326,37 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// A set of all known script type names.
+        /// </summary>
+        public static readonly Dictionary<string, KnownScriptType> KnownScriptTypes = new Dictionary<string, KnownScriptType>()
+        {
+            // Denizen Core
+            { "custom", new KnownScriptType(bad: new[] { "script", "actions", "events", "steps" }, valueKeys: new[] { "inherit", "*" }, scriptKeys: new[] { "tags.*", "mechanisms.*" }, strict: false) },
+            { "procedure", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: true) },
+            { "task", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: false) },
+            { "world", new KnownScriptType(required: new[] { "events" }, bad: new[] { "script", "actions", "steps" }, scriptKeys: new[] { "events.*" }, strict: false) },
+            { "yaml data", new KnownScriptType(bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, listKeys: new[] { "*" }, strict: false) },
+            // Denizen-Bukkit
+            { "assignment", new KnownScriptType(required: new[] { "actions", "interact scripts" }, bad: new[] { "script", "steps", "events" }, valueKeys: new[] { "default constants.*", "constants.*" }, listKeys: new[] { "interact scripts" }, scriptKeys: new[] { "actions.*" }, strict: true) },
+            { "book", new KnownScriptType(required: new[] { "title", "author", "text" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "title", "author", "signed" }, listKeys: new[] { "text" }, strict: true) },
+            { "command", new KnownScriptType(required: new[] { "name", "description", "usage", "script" }, bad: new[] { "steps", "actions", "events" }, valueKeys: new[] { "name", "description", "usage", "permission", "permission message" }, listKeys: new[] { "aliases" }, scriptKeys: new[] { "allowed help", "tab complete", "script" }, strict: false) },
+            { "economy", new KnownScriptType(required: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has", "withdraw", "deposit" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has" }, scriptKeys: new[] { "withdraw", "deposit" }, strict: true) },
+            { "entity", new KnownScriptType(required: new[] { "entity_type" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, strict: false) },
+            { "format", new KnownScriptType(required: new[] { "format" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "format" }, strict: true) },
+            { "interact", new KnownScriptType(required: new[] { "steps" }, bad: new[] { "script", "actions", "events" }, scriptKeys: new[] { "steps.*" }, strict: true) },
+            { "inventory", new KnownScriptType(required: new[] { "inventory" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "inventory", "title", "size", "definitions.*" }, scriptKeys: new[] { "procedural items" }, listKeys: new[] { "slots" }, strict: true) },
+            { "item", new KnownScriptType(required: new[] { "material" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "material", "mechanisms.*", "display name", "durability", "recipes.*", "no_id", "color", "book" }, listKeys: new[] { "mechanisms.*", "lore", "enchantments", "recipes.*" }, strict: false) },
+            { "map", new KnownScriptType(bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "original", "display name", "auto update", "objects.*" }, strict: true) }
+        };
+
+        /// <summary>
         /// Checks all findable script containers, their keys, and the keys within.
         /// </summary>
         public void CheckContainerTypes()
         {
             int scriptStartLine = -1;
             string type = null;
+            KnownScriptType actualType = null;
             for (int i = 0; i < Lines.Length; i++)
             {
                 string line = Lines[i];
@@ -349,6 +374,10 @@ namespace DenizenBot.UtilityProcessors
                 else if (cleaned.StartsWith("type:"))
                 {
                     type = cleaned.Substring("type:".Length).Trim();
+                    if (!KnownScriptTypes.TryGetValue(type, out actualType))
+                    {
+                        Warn(Errors, i, "Unknown script type (possible typo?).");
+                    }
                 }
                 else if (cleaned.StartsWith("debug:"))
                 {
