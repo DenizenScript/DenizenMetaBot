@@ -65,15 +65,15 @@ namespace DenizenBot.CommandHandlers
         public void CMD_Help(string[] cmds, SocketMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
-            embed.AddField("**Available Informational Commands:**", CmdsInfo, true);
-            embed.AddField("**Available Utility Commands:**", CmdsUtility, true);
+            embed.AddField("**Available Informational Commands:**", CmdsInfo);
+            embed.AddField("**Available Utility Commands:**", CmdsUtility);
             if (Bot.MetaCommandsAllowed(message.Channel))
             {
-                embed.AddField("**Available Meta Docs Commands:**", CmdsMeta, true);
+                embed.AddField("**Available Meta Docs Commands:**", CmdsMeta);
             }
             if (Bot.IsBotCommander(message.Author as SocketGuildUser))
             {
-                embed.AddField("**Available Admin Commands:**", CmdsAdmin, true);
+                embed.AddField("**Available Admin Commands:**", CmdsAdmin);
             }
             SendReply(message, embed.Build());
         }
