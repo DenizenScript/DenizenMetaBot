@@ -255,7 +255,7 @@ namespace DenizenBot.UtilityProcessors
             if (IsDenizenDebug)
             {
                 string mode = GetFromTextTilEndOfLine(FullLogText, "Mode: ");
-                IsBungee = mode.Contains("BungeeCoord");
+                IsBungee = mode.Contains("BungeeCord");
                 IsOffline = mode.Contains("offline");
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, "CraftBukkit Version: ");
             }
@@ -381,12 +381,17 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void CheckServerVersion()
         {
-            if (string.IsNullOrWhiteSpace(ServerVersion) || !ServerVersion.StartsWith("This server is running "))
+            if (string.IsNullOrWhiteSpace(ServerVersion) || (!IsDenizenDebug && !ServerVersion.StartsWith("This server is running ")))
             {
                 Console.WriteLine("No server version, disregarding check.");
                 return;
             }
-            string output = ServerVersionStatusOutput(ServerVersion, out _);
+            string versionToCheck = ServerVersion.ToLowerFast();
+            if (IsDenizenDebug)
+            {
+                versionToCheck = versionToCheck.Replace("version:", "version");
+            }
+            string output = ServerVersionStatusOutput(versionToCheck, out _);
             if (!string.IsNullOrWhiteSpace(output))
             {
                 ServerVersion += $"-- ({output})";
@@ -398,10 +403,11 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessUUIDCheck()
         {
-            string firstUUID = GetFromTextTilEndOfLine(FullLogText, IsDenizenDebug ? "p@" : PLAYER_UUID_PREFIX);
+            string prefix = IsDenizenDebug ? "p@" : PLAYER_UUID_PREFIX;
+            string firstUUID = GetFromTextTilEndOfLine(FullLogText, prefix);
             if (firstUUID.Length > UUID_LENGTH)
             {
-                string uuid = firstUUID.Substring(firstUUID.Length - UUID_LENGTH, UUID_LENGTH);
+                string uuid = firstUUID.Substring(prefix.Length, UUID_LENGTH - prefix.Length);
                 Console.WriteLine($"Player UUID: {uuid}");
                 if (UUID_ASCII_MATCHER.IsOnlyMatches(uuid))
                 {
