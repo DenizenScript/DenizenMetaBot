@@ -292,7 +292,26 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (subData[0] == "spigot")
             {
-                // TODO
+                if (spigotVersionText.Length != 7 || !HEX_ASCII_MATCHER.IsOnlyMatches(spigotVersionText))
+                {
+                    Console.WriteLine($"Spigot version '{spigotVersionText}' is wrong format, disregarding check.");
+                    return "";
+                }
+                int behind = BuildNumberTracker.GetSpigotVersionsBehindBy(spigotVersionText);
+                if (behind == -1)
+                {
+                    Console.WriteLine($"Spigot version '{spigotVersionText}' is not tracked, disregarding check.");
+                    return "";
+                }
+                if (behind == 0)
+                {
+                    isGood = true;
+                    return " Current build";
+                }
+                else
+                {
+                    return $"Outdated build, behind by {behind}";
+                }
             }
             else
             {
@@ -300,6 +319,11 @@ namespace DenizenBot.UtilityProcessors
             }
             return "";
         }
+
+        /// <summary>
+        /// A matcher for hex characters: 0123456789abcdef.
+        /// </summary>
+        public static AsciiMatcher HEX_ASCII_MATCHER = new AsciiMatcher("0123456789abcdef");
 
         /// <summary>
         /// Checks the linked server version against the current known server version.

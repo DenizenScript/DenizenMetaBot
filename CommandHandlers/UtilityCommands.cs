@@ -148,17 +148,18 @@ namespace DenizenBot.CommandHandlers
                 SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (single word input?).");
                 return;
             }
-            if (projectName.ToLowerFast() == "paper")
+            string nameLower = projectName.ToLowerFast();
+            if (nameLower == "paper" || nameLower == "spigot")
             {
                 string output = LogChecker.ServerVersionStatusOutput(combined, out bool isGood);
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    SendErrorMessageReply(message, "Bad Input", "Input text looks like a Paper version, but doesn't fit the expected Paper server version format. Should start with 'Paper version git-Paper-...'");
+                    SendErrorMessageReply(message, "Bad Input", $"Input text looks like a {nameLower} version, but doesn't fit the expected {nameLower} server version format. Should start with '{nameLower} version git-{nameLower}-...'");
                     return;
                 }
                 if (isGood)
                 {
-                    SendGenericPositiveMessageReply(message, "Running Current Build", "That version is the current Paper build for an acceptable server version.");
+                    SendGenericPositiveMessageReply(message, "Running Current Build", $"That version is the current {nameLower} build for an acceptable server version.");
                 }
                 else
                 {
