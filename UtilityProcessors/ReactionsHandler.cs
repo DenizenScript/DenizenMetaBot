@@ -32,6 +32,7 @@ namespace DenizenBot.UtilityProcessors
         public static void AddReactable(SocketMessage originalMessage, RestUserMessage newMessage, string command)
         {
             Reactables[newMessage.Id] = new ReactableMessage() { Command = command, Message = newMessage, OriginalMessage = originalMessage, TimeCreated = DateTimeOffset.Now };
+            Console.WriteLine($"New reactable message: {newMessage.Id} with command '{command}'.");
         }
 
         /// <summary>

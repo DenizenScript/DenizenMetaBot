@@ -409,7 +409,16 @@ namespace DenizenBot
                 {
                     return Task.CompletedTask;
                 }
+                message.GetOrDownloadAsync().Wait();
+                if (message.Value.Author.Id == Client.CurrentUser.Id)
+                {
+                    return Task.CompletedTask;
+                }
                 ReactionsHandler.CheckReactables();
+                if (message.Value.Author.IsBot || message.Value.Author.IsWebhook)
+                {
+                    return Task.CompletedTask;
+                }
                 ReactionsHandler.TestReaction(message.Id, reaction);
                 return Task.CompletedTask;
             };
