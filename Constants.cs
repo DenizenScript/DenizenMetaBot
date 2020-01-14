@@ -49,5 +49,15 @@ namespace DenizenBot
         /// The base for the Jenkins CI URL.
         /// </summary>
         public const string JENKINS_URL_BASE = "https://ci.citizensnpcs.co";
+
+        /// <summary>
+        /// A checkmark "accept"/"yes" emoji, for reactions.
+        /// </summary>
+        public const string ACCEPT_EMOJI = "☑️";
+
+        /// <summary>
+        /// A Red-X "deny"/"no" emoji, for reactions.
+        /// </summary>
+        public const string DENY_EMOJI = "❌";
     }
 }

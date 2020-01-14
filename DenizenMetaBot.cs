@@ -56,9 +56,12 @@ namespace DenizenBot
         /// <summary>
         /// Bot command response handler.
         /// </summary>
-        public void Respond(SocketMessage message, bool outputUnknowns)
+        /// <param name="message">The message received.</param>
+        /// <param name="outputUnknowns">Whether to output "unknown command" messages.</param>
+        /// <param name="altContent">Alternate message content, if the message is being autosent.</param>
+        public void Respond(SocketMessage message, bool outputUnknowns, string altContent = null)
         {
-            string messageText = message.Content;
+            string messageText = altContent ?? message.Content;
             if (messageText.StartsWith(Constants.COMMAND_PREFIX))
             {
                 messageText = messageText.Substring(Constants.COMMAND_PREFIX.Length);
@@ -400,6 +403,16 @@ namespace DenizenBot
                 BotMonitor.ConnectedOnce = true;
                 return Task.CompletedTask;
             };
+            Client.ReactionAdded += (message, channel, reaction) =>
+            {
+                if (BotMonitor.ShouldStopAllLogic())
+                {
+                    return Task.CompletedTask;
+                }
+                ReactionsHandler.CheckReactables();
+                ReactionsHandler.TestReaction(message.Id, reaction);
+                return Task.CompletedTask;
+            };
             Client.MessageReceived += (message) =>
             {
                 if (BotMonitor.ShouldStopAllLogic())
@@ -410,6 +423,7 @@ namespace DenizenBot
                 {
                     return Task.CompletedTask;
                 }
+                ReactionsHandler.CheckReactables();
                 BotMonitor.LoopsSilent = 0;
                 if (message.Author.IsBot || message.Author.IsWebhook)
                 {

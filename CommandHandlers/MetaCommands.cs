@@ -204,8 +204,12 @@ namespace DenizenBot.CommandHandlers
             }
             if (matched.Count == 0)
             {
+                SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}.");
                 string closeName = altFindClosest();
-                SendErrorMessageReply(message, $"Cannot Find Searched {type.Name}", $"Unknown {type.Name.ToLowerFast()}." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                if (closeName != null)
+                {
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{closeName}`?", $"!{type.Name} {closeName}");
+                }
                 return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
             }
             else if (matched.Count > 1)
@@ -264,7 +268,7 @@ namespace DenizenBot.CommandHandlers
                 string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
                 if (closeMech != null)
                 {
-                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"!mechanism {closeMech}");
                 }
             }
         }
@@ -289,7 +293,7 @@ namespace DenizenBot.CommandHandlers
                 string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
                 if (closeCmd != null)
                 {
-                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"!command {closeCmd}");
                 }
             }
         }
@@ -457,7 +461,7 @@ namespace DenizenBot.CommandHandlers
                 string possible = StringConversionHelper.FindClosestString(Program.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
                 if (!string.IsNullOrWhiteSpace(possible))
                 {
-                    SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"!search {possible}");
                 }
             }
             if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())

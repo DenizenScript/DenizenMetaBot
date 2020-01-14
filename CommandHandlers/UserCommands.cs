@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.IO;
 using System.Linq;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Discord.Net;
 using Discord;
 using Discord.WebSocket;
+using Discord.Rest;
 using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
@@ -43,6 +44,22 @@ namespace DenizenBot.CommandHandlers
         public static void SendReply(SocketMessage message, Embed embed)
         {
             message.Channel.SendMessageAsync(embed: embed).Wait();
+        }
+
+        /// <summary>
+        /// Sends a "did you mean ...?" style reply. This adds a clickable reaction that triggers an automatic command when clicked by the user that originally did the command within a certain time limit.
+        /// </summary>
+        /// <param name="message">The message to reply to.</param>
+        /// <param name="title">The message title.</param>
+        /// <param name="description">The message description.</param>
+        /// <param name="command">The bot command to imitate if the reaction is clicked.</param>
+        public static void SendDidYouMeanReply(SocketMessage message, string title, string description, string command)
+        {
+            RestUserMessage sentMessage = message.Channel.SendMessageAsync(embed: GetGenericPositiveMessageEmbed(title, description)).Result;
+            if (sentMessage != null)
+            {
+                sentMessage.AddReactionsAsync(new IEmote[] { new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI) }).Wait();
+            }
         }
 
         /// <summary>
