@@ -68,6 +68,39 @@ namespace DenizenBot.UtilityProcessors
         public const int VERSION_ID_LOCATION = 14;
 
         /// <summary>
+        /// Gets the text of a plugin name + version, if any.
+        /// </summary>
+        /// <param name="plugin">The plugin name to search for.</param>
+        /// <returns>The plugin name + version, if any.</returns>
+        public string GetPluginText(string plugin)
+        {
+            if (!IsDenizenDebug)
+            {
+                return GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin)).After("Loading ");
+            }
+            int start = FullLogText.IndexOf("\nActive Plugins (");
+            int end = FullLogText.IndexOf("\nLoaded Worlds (");
+            string pluginLine = FullLogText.Substring(start, end - start).Replace(((char)0x01) + "2", "").Replace(((char)0x01) + "4", "");
+            int pluginNameIndex = pluginLine.IndexOf(plugin);
+            if (pluginNameIndex == -1)
+            {
+                return "";
+            }
+            int commaIndex = pluginLine.IndexOf(',', pluginNameIndex);
+            int newlineIndex = pluginLine.IndexOf('\n', pluginNameIndex);
+            int endIndex = commaIndex;
+            if (commaIndex == -1)
+            {
+                endIndex = newlineIndex;
+            }
+            else if (newlineIndex != -1)
+            {
+                endIndex = Math.Min(commaIndex, newlineIndex);
+            }
+            return pluginLine.Substring(pluginNameIndex, endIndex - pluginNameIndex);
+        }
+
+        /// <summary>
         /// Gets a string of the load message for a plugin name.
         /// </summary>
         public static string LoadMessageFor(string plugin)
@@ -173,6 +206,11 @@ namespace DenizenBot.UtilityProcessors
         public int UUIDVersion = 0;
 
         /// <summary>
+        /// Whether this looks like a Denizen debug log.
+        /// </summary>
+        public bool IsDenizenDebug = false;
+
+        /// <summary>
         /// Whether the server is likely to be offline.
         /// </summary>
         public bool LikelyOffline
@@ -214,14 +252,24 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessBasics()
         {
-            IsBungee = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Contains("bungee");
-            IsOffline = FullLogText.Contains(OFFLINE_NOTICE);
-            Console.WriteLine($"Offline={IsOffline}, Bungee={IsBungee}");
-            ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX);
-            if (string.IsNullOrWhiteSpace(ServerVersion))
+            if (IsDenizenDebug)
             {
-                ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
+                string mode = GetFromTextTilEndOfLine(FullLogText, "Mode: ");
+                IsBungee = mode.Contains("BungeeCoord");
+                IsOffline = mode.Contains("offline");
+                ServerVersion = GetFromTextTilEndOfLine(FullLogText, "CraftBukkit Version: ");
             }
+            else
+            {
+                IsBungee = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Contains("bungee");
+                IsOffline = FullLogText.Contains(OFFLINE_NOTICE);
+                ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX);
+                if (string.IsNullOrWhiteSpace(ServerVersion))
+                {
+                    ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
+                }
+            }
+            Console.WriteLine($"Offline={IsOffline}, Bungee={IsBungee}");
             Console.WriteLine($"ServerVersion={ServerVersion}");
             CheckServerVersion();
             Console.WriteLine($"ServerVersionChecked={ServerVersion}");
@@ -350,7 +398,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessUUIDCheck()
         {
-            string firstUUID = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX);
+            string firstUUID = GetFromTextTilEndOfLine(FullLogText, IsDenizenDebug ? "p@" : PLAYER_UUID_PREFIX);
             if (firstUUID.Length > UUID_LENGTH)
             {
                 string uuid = firstUUID.Substring(firstUUID.Length - UUID_LENGTH, UUID_LENGTH);
@@ -378,7 +426,7 @@ namespace DenizenBot.UtilityProcessors
         {
             foreach (string plugin in VERSION_PLUGINS)
             {
-                string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
+                string pluginLoadText = GetPluginText(plugin);
                 if (pluginLoadText.Length != 0)
                 {
                     pluginLoadText = pluginLoadText.After("Loading ");
@@ -400,7 +448,7 @@ namespace DenizenBot.UtilityProcessors
             }
             foreach (string plugin in BAD_PLUGINS)
             {
-                string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
+                string pluginLoadText = GetPluginText(plugin);
                 if (pluginLoadText.Length != 0)
                 {
                     Console.WriteLine($"Dangerous Plugin: {pluginLoadText}");
@@ -409,7 +457,7 @@ namespace DenizenBot.UtilityProcessors
             }
             foreach (string plugin in IFFY_PLUGINS)
             {
-                string pluginLoadText = GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin));
+                string pluginLoadText = GetPluginText(plugin);
                 if (pluginLoadText.Length != 0)
                 {
                     Console.WriteLine($"Iffy Plugin: {pluginLoadText}");
@@ -442,11 +490,31 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Performs a test to see if this paste is a Denizen debug log. If it is, <see cref="IsDenizenDebug"/> will be set to true.
+        /// </summary>
+        public void TestForDenizenDebug()
+        {
+            if (!FullLogText.StartsWith("Java Version: "))
+            {
+                return;
+            }
+            if (!FullLogText.Contains("\nUp-time: ") || !FullLogText.Contains("\nCraftBukkit Version: ")
+                || !FullLogText.Contains("\nDenizen Version: ") || !FullLogText.Contains("\nActive Plugins (")
+                || !FullLogText.Contains("\nLoaded Worlds (") || !FullLogText.Contains("\nOnline Players (")
+                || !FullLogText.Contains("\nOffline Players: ") || !FullLogText.Contains("\nMode: "))
+            {
+                return;
+            }
+            IsDenizenDebug = true;
+        }
+
+        /// <summary>
         /// Runs the log checker in full.
         /// </summary>
         public void Run()
         {
             Console.WriteLine("Running log check...");
+            TestForDenizenDebug();
             ProcessBasics();
             ProcessUUIDCheck();
             ProcessPluginLoads();
