@@ -98,12 +98,13 @@ namespace DenizenBot.CommandHandlers
                         foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
                         {
                             int currentDistance = 0;
-                            foreach (string nameWord in possibleName.Split(' '))
+                            string[] nameWords = possibleName.Split(' ');
+                            foreach (string searchWord in words)
                             {
                                 int lowestWordDistance = 9999;
-                                foreach (string searcHword in words)
+                                foreach (string nameWord in nameWords)
                                 {
-                                    int currentWordDistance = StringConversionHelper.GetLevenshteinDistance(searcHword, nameWord);
+                                    int currentWordDistance = StringConversionHelper.GetLevenshteinDistance(searchWord, nameWord);
                                     if (currentWordDistance < lowestWordDistance)
                                     {
                                         lowestWordDistance = currentWordDistance;
