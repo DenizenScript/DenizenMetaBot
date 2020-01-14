@@ -165,6 +165,10 @@ namespace DenizenBot.UtilityProcessors
                 {
                     result.Append(Lines[i].Replace(": ", "<&co>").Replace("#", "<&ns>")).Append("\n");
                 }
+                else if (line.EndsWith(":") && !line.StartsWith("-"))
+                {
+                    result.Append(Lines[i].Replace("*", "asterisk").Replace(".", "dot")).Append("\n");
+                }
                 else
                 {
                     result.Append(Lines[i]).Append("\n");
@@ -1208,6 +1212,7 @@ namespace DenizenBot.UtilityProcessors
         {
             ClearCommentsFromLines();
             CheckYAML();
+            LoadInjects();
             BasicLineFormatCheck();
             CheckForTabs();
             CheckForBraces();
