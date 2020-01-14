@@ -269,6 +269,7 @@ namespace DenizenBot.UtilityProcessors
             List<string> tagParts = new List<string>(tag.CountCharacter('.'));
             int firstBracket = 0;
             int start = 0;
+            bool foundABracket = false;
             for (int i = 0; i < tag.Length; i++)
             {
                 if (tag[i] == '[')
@@ -277,6 +278,7 @@ namespace DenizenBot.UtilityProcessors
                     if (brackets == 1)
                     {
                         tagParts.Add(tag.Substring(start, i - start));
+                        foundABracket = true;
                         start = i;
                         firstBracket = i;
                     }
@@ -291,6 +293,11 @@ namespace DenizenBot.UtilityProcessors
                 }
                 else if (tag[i] == '.' && brackets == 0)
                 {
+                    if (!foundABracket)
+                    {
+                        tagParts.Add(tag.Substring(start, i - start));
+                    }
+                    foundABracket = false;
                     start = i + 1;
                 }
             }
@@ -412,10 +419,14 @@ namespace DenizenBot.UtilityProcessors
             }
             string[] parts = commandText.Split(' ', 2);
             string commandName = parts[0].ToLowerFast();
+            if (commandName.StartsWith("~") || commandName.StartsWith("^"))
+            {
+                commandName = commandName.Substring(1);
+            }
             string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
             if (!Program.CurrentMeta.Commands.TryGetValue(commandName, out MetaCommand command))
             {
-                Warn(Errors, line, "Unknown command (typo? Use `!command [...]` to find a valid command).");
+                Warn(Errors, line, $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
                 return;
             }
             if (arguments.Length < command.Required)
@@ -768,7 +779,7 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 if (!usageString.Text.StartsWith($"/{nameString.Text}"))
                                 {
-                                    warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help')!");
+                                    warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
                                 }
                             }
                         }
