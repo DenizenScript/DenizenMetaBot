@@ -68,6 +68,11 @@ namespace DenizenBot.UtilityProcessors
                 return;
             }
             Console.WriteLine($"Found reaction on repliable message {messageId} with command '{message.Command}' with reaction: {reaction.Emote.Name}");
+            if (reaction.UserId != message.OriginalMessage.Author.Id)
+            {
+                Console.WriteLine($"User {reaction.User.Value.Username} ignored, as they are not the original author.");
+                return;
+            }
             if (reaction.Emote.Name == Constants.ACCEPT_EMOJI)
             {
                 Console.WriteLine("Reaction is an accept. Running.");

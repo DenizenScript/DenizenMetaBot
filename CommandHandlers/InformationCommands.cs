@@ -34,7 +34,7 @@ namespace DenizenBot.CommandHandlers
                 + "`github [project ...]` shows a GitHub link for the named project(s)\n"
                 + "`issues [project ...]` shows an issue posting link for the named project(s)\n"
                 + "`rule [rule ...]` shows the identified rule\n"
-                + "`quote [quote ...]` shows a random quote that matches the search (if any)\n";
+                + "`quote [quote]` shows a random quote that matches the search (if any)";
 
         /// <summary>
         /// Simple output string for meta commands.
@@ -52,7 +52,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public static string CmdsUtility =
                 "`logcheck <link>` gathers information from a server log paste\n"
-                + "`versioncheck <version text>` checks whether a project version is current\n";
+                + "`versioncheck <version text>` checks whether a project version is current";
 
         /// <summary>
         /// Simple output string for admin commands.
