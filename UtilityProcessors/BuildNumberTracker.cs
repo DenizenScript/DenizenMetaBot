@@ -197,7 +197,7 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="version">The version.</param>
         public static void AddPaperTracker(string version)
         {
-            BuildNumber tracker = new BuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}\\(\\.\\d+)?\\)", "Paper-" + version, "https://papermc.io/ci");
+            BuildNumber tracker = new BuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", "Paper-" + version, "https://papermc.io/ci");
             PaperBuildTrackers.Add(version, tracker);
         }
 
