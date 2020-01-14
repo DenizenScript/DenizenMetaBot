@@ -330,6 +330,7 @@ namespace DenizenBot
                 }
                 BuildNumberTracker.AddPaperTracker(version);
             }
+            BuildNumberTracker.LoadSpigotData();
         }
 
         /// <summary>
