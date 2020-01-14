@@ -1064,7 +1064,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         clist = tempList;
                     }
-                    if (spacedsections.TryGetValue(spaces, out Dictionary<LineTrackedString, object> temp))
+                    else if (spacedsections.TryGetValue(spaces, out Dictionary<LineTrackedString, object> temp))
                     {
                         currentSection = temp;
                     }
@@ -1094,6 +1094,7 @@ namespace DenizenBot.UtilityProcessors
                     if (spaces > pspaces && clist != null && !buildingSubList)
                     {
                         Warn(Warnings, i, "growing_spaces_in_script", "Spacing grew for no reason (missing a ':' on a command, or accidental over-spacing?).");
+                        Console.WriteLine($"Line {i + 1}, Spacing is {spaces}, but was {pspaces}... unexplained growth");
                     }
                     if (secwaiting != null)
                     {
@@ -1135,6 +1136,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         clist.Add(new LineTrackedString(i, cleaned.Substring("- ".Length)));
                     }
+                    pspaces = spaces;
                     continue;
                 }
                 clist = null;
