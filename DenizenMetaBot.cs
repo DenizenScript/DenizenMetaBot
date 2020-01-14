@@ -410,12 +410,16 @@ namespace DenizenBot
                     return Task.CompletedTask;
                 }
                 message.GetOrDownloadAsync().Wait();
-                if (message.Value.Author.Id == Client.CurrentUser.Id)
+                if (reaction.UserId == Client.CurrentUser.Id)
                 {
                     return Task.CompletedTask;
                 }
                 ReactionsHandler.CheckReactables();
-                if (message.Value.Author.IsBot || message.Value.Author.IsWebhook)
+                if (!reaction.User.IsSpecified)
+                {
+                    return Task.CompletedTask;
+                }
+                if (reaction.User.Value.IsBot || reaction.User.Value.IsWebhook)
                 {
                     return Task.CompletedTask;
                 }
