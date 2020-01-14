@@ -446,14 +446,18 @@ namespace DenizenBot.CommandHandlers
             fullContinue:
                 continue;
             }
-            if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
+            void backupMatchCheck()
             {
                 string possible = StringConversionHelper.FindClosestString(Program.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
-                SendErrorMessageReply(message, "Search Command Has No Results", "Input search text could not be found.");
                 if (!string.IsNullOrWhiteSpace(possible))
                 {
                     SendGenericPositiveMessageReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?");
                 }
+            }
+            if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
+            {
+                SendErrorMessageReply(message, "Search Command Has No Results", "Input search text could not be found.");
+                backupMatchCheck();
                 return;
             }
             string suffix = ".";
@@ -492,6 +496,10 @@ namespace DenizenBot.CommandHandlers
             if (partialWeakMatch.Any())
             {
                 listWrangle("Weak", "if nothing else, some chance of being related", partialWeakMatch);
+                if (!weakMatch.Any() && !partialStrongMatch.Any() && !strongMatch.Any())
+                {
+                    backupMatchCheck();
+                }
             }
         }
     }
