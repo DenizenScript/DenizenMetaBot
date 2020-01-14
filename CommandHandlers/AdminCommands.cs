@@ -13,6 +13,7 @@ using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 using DenizenBot.UtilityProcessors;
+using DenizenBot.HelperClasses;
 
 namespace DenizenBot.CommandHandlers
 {

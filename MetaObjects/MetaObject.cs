@@ -5,6 +5,7 @@ using System.Linq;
 using Discord;
 using DenizenBot;
 using FreneticUtilities.FreneticExtensions;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot.MetaObjects
 {

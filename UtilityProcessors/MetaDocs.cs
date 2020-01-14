@@ -16,7 +16,7 @@ using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 using DenizenBot.MetaObjects;
 
-namespace DenizenBot
+namespace DenizenBot.UtilityProcessors
 {
     /// <summary>
     /// Helper class to contain the full set of meta documentation, and the logic to load it in.

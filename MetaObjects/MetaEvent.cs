@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Discord;
 using FreneticUtilities.FreneticExtensions;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot.MetaObjects
 {

@@ -13,7 +13,7 @@ using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 
-namespace DenizenBot
+namespace DenizenBot.HelperClasses
 {
     /// <summary>
     /// Represents information specific to a project.

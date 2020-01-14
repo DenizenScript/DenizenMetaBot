@@ -14,6 +14,7 @@ using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticDataSyntax;
 using DenizenBot;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot
 {

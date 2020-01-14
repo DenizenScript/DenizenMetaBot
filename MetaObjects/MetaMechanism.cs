@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Discord;
 using FreneticUtilities.FreneticExtensions;
+using DenizenBot.UtilityProcessors;
 
 namespace DenizenBot.MetaObjects
 {
