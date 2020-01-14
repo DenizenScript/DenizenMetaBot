@@ -51,24 +51,45 @@ namespace DenizenBot.UtilityProcessors
         public int CodeLines = 0;
 
         /// <summary>
+        /// Represents a warning about a script.
+        /// </summary>
+        public class ScriptWarning
+        {
+            /// <summary>
+            /// A unique key for this *type* of warning.
+            /// </summary>
+            public string WarningUniqueKey;
+
+            /// <summary>
+            /// The locally customized message form.
+            /// </summary>
+            public string CustomMessageForm;
+
+            /// <summary>
+            /// The line this applies to.
+            /// </summary>
+            public int Line;
+        }
+
+        /// <summary>
         /// A list of all errors about this script.
         /// </summary>
-        public List<string> Errors = new List<string>();
+        public List<ScriptWarning> Errors = new List<ScriptWarning>();
 
         /// <summary>
         /// A list of all warnings about this script.
         /// </summary>
-        public List<string> Warnings = new List<string>();
+        public List<ScriptWarning> Warnings = new List<ScriptWarning>();
 
         /// <summary>
         /// A list of all minor warnings about this script.
         /// </summary>
-        public List<string> MinorWarnings = new List<string>();
+        public List<ScriptWarning> MinorWarnings = new List<ScriptWarning>();
 
         /// <summary>
         /// A list of informational notices about this script.
         /// </summary>
-        public List<string> Infos = new List<string>();
+        public List<ScriptWarning> Infos = new List<ScriptWarning>();
 
         /// <summary>
         /// A list of debug notices about this script, generally don't actually show to users.
@@ -97,9 +118,9 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="warnType">The warning type (the list object).</param>
         /// <param name="line">The zero-indexed line the warning is regarding.</param>
         /// <param name="message">The warning message.</param>
-        public void Warn(List<string> warnType, int line, string message)
+        public void Warn(List<ScriptWarning> warnType, int line, string key, string message)
         {
-            warnType.Add($"On line {line + 1}: {message}");
+            warnType.Add(new ScriptWarning() { Line = line, WarningUniqueKey = key, CustomMessageForm = message });
         }
 
         /// <summary>
@@ -164,7 +185,7 @@ namespace DenizenBot.UtilityProcessors
             }
             catch (Exception ex)
             {
-                Errors.Add("Invalid YAML! Error message: " + ex.Message);
+                Warn(Errors, -1, "yaml_load", "Invalid YAML! Error message: " + ex.Message);
             }
         }
 
@@ -192,11 +213,11 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (Lines[i].EndsWith(" "))
                 {
-                    Warn(MinorWarnings, i, "Stray space after end of line (possible copy/paste mixup. Enable View->Render Whitespace in VS Code).");
+                    Warn(MinorWarnings, i, "stray_space_eol", "Stray space after end of line (possible copy/paste mixup. Enable View->Render Whitespace in VS Code).");
                 }
                 else if (CleanedLines[i].Length > 0 && !CleanedLines[i].StartsWith("-") && !CleanedLines[i].Contains(":"))
                 {
-                    Warn(Warnings, i, "Useless/invalid line (possibly missing a `-` or a `:`, or just accidentally hit enter or paste).");
+                    Warn(Warnings, i, "useless_invalid_line", "Useless/invalid line (possibly missing a `-` or a `:`, or just accidentally hit enter or paste).");
                 }
             }
         }
@@ -214,7 +235,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (Lines[i].Contains("\t"))
                 {
-                    Warn(Warnings, i, "This script uses the raw tab symbol. Please switch these out for 2 or 4 spaces.");
+                    Warn(Warnings, i, "raw_tab_symbol", "This script uses the raw tab symbol. Please switch these out for 2 or 4 spaces.");
                     break;
                 }
             }
@@ -233,7 +254,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (Lines[i].EndsWith("{") || Lines[i].EndsWith("}"))
                 {
-                    Warn(Errors, i, "This script uses outdated { braced } syntax. Please update to modern 'colon:' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#colon-syntax> for more info.");
+                    Warn(Errors, i, "brace_syntax", "This script uses outdated { braced } syntax. Please update to modern 'colon:' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#colon-syntax> for more info.");
                     break;
                 }
             }
@@ -252,7 +273,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (Lines[i].Contains("%"))
                 {
-                    Warn(Errors, i, "This script uses ancient %defs%. Please update to modern '<[defname]>' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#definition-syntax> for more info.");
+                    Warn(Errors, i, "ancient_defs", "This script uses ancient %defs%. Please update to modern '<[defname]>' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#definition-syntax> for more info.");
                     break;
                 }
             }
@@ -271,7 +292,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (Lines[i].Contains("<def["))
                 {
-                    Warn(Warnings, i, "This script uses <def[old-defs]>. Please update to modern '<[defname]>' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#definition-syntax> for more info.");
+                    Warn(Warnings, i, "old_defs", "This script uses <def[old-defs]>. Please update to modern '<[defname]>' syntax. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#definition-syntax> for more info.");
                     break;
                 }
             }
@@ -320,6 +341,16 @@ namespace DenizenBot.UtilityProcessors
                     foundABracket = false;
                     start = i + 1;
                 }
+                else if (tag[i] == '|' && brackets == 0 && i + 1 < tag.Length && tag[i + 1] == '|')
+                {
+                    if (!foundABracket)
+                    {
+                        tagParts.Add(tag.Substring(start, i - start));
+                    }
+                    CheckSingleArgument(line, tag.Substring(i + 2));
+                    foundABracket = true;
+                    break;
+                }
             }
             if (!foundABracket)
             {
@@ -331,20 +362,20 @@ namespace DenizenBot.UtilityProcessors
             }
             if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]) && tagParts[0].Length > 0)
             {
-                Warn(Warnings, line, $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
+                Warn(Warnings, line, "bad_tag_base", $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
             }
             else if (tagParts[0].EndsWith("tag"))
             {
-                Warn(Warnings, line, $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
+                Warn(Warnings, line, "xtag_notation", $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
             }
             for (int i = 1; i < tagParts.Count; i++)
             {
                 if (!Program.CurrentMeta.TagParts.Contains(tagParts[i]))
                 {
-                    Warn(Warnings, line, $"Invalid tag part `{tagParts[i].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
+                    Warn(Warnings, line, "bad_tag_part", $"Invalid tag part `{tagParts[i].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
                     if (tagParts[i].EndsWith("tag"))
                     {
-                        Warn(Warnings, line, $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
+                        Warn(Warnings, line, "xtag_notation", $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
                     }
                 }
             }
@@ -416,7 +447,7 @@ namespace DenizenBot.UtilityProcessors
                                 matchList.Add(matched);
                                 if (!matched.Contains(" "))
                                 {
-                                    Warn(MinorWarnings, line, "Pointless quotes (arguments quoted but do not contain spaces).");
+                                    Warn(MinorWarnings, line, "bad_quotes", "Pointless quotes (arguments quoted but do not contain spaces).");
                                 }
                             }
                             i++;
@@ -442,7 +473,7 @@ namespace DenizenBot.UtilityProcessors
         {
             if (commandText.Contains("@"))
             {
-                Warn(Warnings, line, "This line appears to contain raw object notation. There is almost always a better way to write a line than using raw object notation. Consider the relevant object constructor tags.");
+                Warn(Warnings, line, "raw_object_notation", "This line appears to contain raw object notation. There is almost always a better way to write a line than using raw object notation. Consider the relevant object constructor tags.");
             }
             string[] parts = commandText.Split(' ', 2);
             string commandName = parts[0].ToLowerFast();
@@ -453,33 +484,33 @@ namespace DenizenBot.UtilityProcessors
             string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
             if (!Program.CurrentMeta.Commands.TryGetValue(commandName, out MetaCommand command))
             {
-                Warn(Errors, line, $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
+                Warn(Errors, line, "unknown_command", $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
                 return;
             }
             if (arguments.Length < command.Required)
             {
-                Warn(Errors, line, $"Insufficient arguments... the `{command.Name}` command requires at least {command.Required} arguments, but you only provided {arguments.Length}.");
+                Warn(Errors, line, "too_few_args", $"Insufficient arguments... the `{command.Name}` command requires at least {command.Required} arguments, but you only provided {arguments.Length}.");
             }
             if (commandName == "adjust")
             {
                 string mechanism = arguments.FirstOrDefault(s => s.Contains(":") && !s.StartsWith("def:")) ?? arguments.FirstOrDefault(s => !s.Contains("<"));
                 if (mechanism == null)
                 {
-                    Warn(Errors, line, $"Malformed adjust command. No mechanism input given.");
+                    Warn(Errors, line, "bad_adjust_no_mech", $"Malformed adjust command. No mechanism input given.");
                 }
                 else
                 {
                     mechanism = mechanism.Before(':').ToLowerFast();
                     if (!Program.CurrentMeta.Mechanisms.Values.Any(mech => mech.MechName == mechanism))
                     {
-                        Warn(Errors, line, $"Malformed adjust command. Mechanism name given is unrecognized.");
+                        Warn(Errors, line, "bad_adjust_unknown_mech", $"Malformed adjust command. Mechanism name given is unrecognized.");
                         Console.WriteLine($"Unrecognized mechanism '{mechanism}' for script check line {line}.");
                     }
                 }
             }
             else if (commandName == "queue" && arguments.Length == 1 && (arguments[0] == "stop" || arguments[0] == "clear"))
             {
-                Warn(MinorWarnings, line, "Old style 'queue clear'. Use the modern 'stop' command instead. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#stop-is-the-new-queue-clear> for more info.");
+                Warn(MinorWarnings, line, "queue_clear", "Old style 'queue clear'. Use the modern 'stop' command instead. Refer to <https://guide.denizenscript.com/guides/troubleshooting/updates-since-videos.html#stop-is-the-new-queue-clear> for more info.");
             }
             else if (commandName == "define")
             {
@@ -521,7 +552,7 @@ namespace DenizenBot.UtilityProcessors
                         string entryText = argument.Substring(entrySpot, endSpot - entrySpot).ToLowerFast();
                         if (!definitions.Contains(ENTRY_PREFIX + entryText) && !definitions.Contains("*"))
                         {
-                            Warn(Warnings, line, "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
+                            Warn(Warnings, line, "entry_to_nowhere", "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
                         }
                     }
                 }
@@ -535,7 +566,7 @@ namespace DenizenBot.UtilityProcessors
                         string defText = argument.Substring(defSpot, endSpot - defSpot).ToLowerFast();
                         if (!definitions.Contains(defText) && !definitions.Contains("*"))
                         {
-                            Warn(Warnings, line, "Definition tag points to non-existent definition (typo, or bad copypaste?).");
+                            Warn(Warnings, line, "def_of_nothing", "Definition tag points to non-existent definition (typo, or bad copypaste?).");
                         }
                     }
                 }
@@ -630,35 +661,35 @@ namespace DenizenBot.UtilityProcessors
         {
             foreach (KeyValuePair<LineTrackedString, object> scriptPair in scriptContainers)
             {
-                void warnScript(List<string> warns, int line, string warning)
+                void warnScript(List<ScriptWarning> warns, int line, string key, string warning)
                 {
-                    Warn(warns, line, $"In script `{scriptPair.Key.Text.Replace('`', '\'')}`: {warning}");
+                    Warn(warns, line, key, $"In script `{scriptPair.Key.Text.Replace('`', '\'')}`: {warning}");
                 }
                 try
                 {
                     Dictionary<LineTrackedString, object> scriptSection = (Dictionary<LineTrackedString, object>)scriptPair.Value;
                     if (!scriptSection.TryGetValue(new LineTrackedString(0, "type"), out object typeValue) || !(typeValue is LineTrackedString typeString))
                     {
-                        warnScript(Errors, scriptPair.Key.Line, "Missing 'type' key!");
+                        warnScript(Errors, scriptPair.Key.Line, "no_type_key", "Missing 'type' key!");
                         continue;
                     }
                     if (!KnownScriptTypes.TryGetValue(typeString.Text, out KnownScriptType scriptType))
                     {
-                        warnScript(Errors, typeString.Line, "Unknown script type (possibly a typo?)!");
+                        warnScript(Errors, typeString.Line, "wrong_type", "Unknown script type (possibly a typo?)!");
                         continue;
                     }
                     foreach (string key in scriptType.RequiredKeys)
                     {
                         if (!scriptSection.ContainsKey(new LineTrackedString(0, key)))
                         {
-                            warnScript(Warnings, typeString.Line, $"Missing required key `{key}` (check `!lang {typeString.Text} script containers` for format rules)!");
+                            warnScript(Warnings, typeString.Line, "missing_key_" + typeString.Text, $"Missing required key `{key}` (check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
                     foreach (string key in scriptType.LikelyBadKeys)
                     {
                         if (scriptSection.ContainsKey(new LineTrackedString(0, key)))
                         {
-                            warnScript(Warnings, typeString.Line, $"Unexpected key `{key.Replace('`', '\'')}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
+                            warnScript(Warnings, typeString.Line, "bad_key_" + typeString.Text, $"Unexpected key `{key.Replace('`', '\'')}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
                     bool matchesSet(string key, string[] keySet)
@@ -711,7 +742,7 @@ namespace DenizenBot.UtilityProcessors
                                 }
                                 else
                                 {
-                                    warnScript(Warnings, keyPair.Key.Line, $"Key `{keyName.Replace('`', '\'')}` appears to contain a script, when a data list was expected (check `!lang {typeString.Text} script containers` for format rules).");
+                                    warnScript(Warnings, keyPair.Key.Line, "script_should_be_list", $"Key `{keyName.Replace('`', '\'')}` appears to contain a script, when a data list was expected (check `!lang {typeString.Text} script containers` for format rules).");
                                 }
                             }
                         }
@@ -727,11 +758,11 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (matchesSet(keyName, scriptType.ValueKeys))
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, "list_should_be_value", $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a direct Value, but was instead a list - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected list key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, "unknown_key_" + typeString.Text, $"Unexpected list key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.CanHaveRandomScripts)
                             {
@@ -751,11 +782,11 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (matchesSet(keyName, scriptType.ListKeys) || matchesSet(keyName, scriptType.ScriptKeys))
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, "bad_key_" + typeString.Text, $"Bad key `{keyName.Replace('`', '\'')}` (was expected to be a list or script, but was instead a direct Value - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected value key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, "unknown_key_" + typeString.Text, $"Unexpected value key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else
                             {
@@ -800,7 +831,7 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (scriptType.Strict)
                             {
-                                warnScript(Warnings, keyPair.Key.Line, $"Unexpected submapping key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
+                                warnScript(Warnings, keyPair.Key.Line, "unknown_key_" + typeString.Text, $"Unexpected submapping key `{keyName.Replace('`', '\'')}` (unrecognized - check `!lang {typeString.Text} script containers` for format rules)!");
                             }
                             else
                             {
@@ -819,7 +850,7 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 if (!usageString.Text.StartsWith($"/{nameString.Text}"))
                                 {
-                                    warnScript(MinorWarnings, usageString.Line, $"Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
+                                    warnScript(MinorWarnings, usageString.Line, "command_script_usage", "Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
                                 }
                             }
                         }
@@ -833,7 +864,7 @@ namespace DenizenBot.UtilityProcessors
                                 string actionName = actionValue.Text.Substring("on ".Length);
                                 if (actionName.Contains("@"))
                                 {
-                                    Warn(Warnings, actionValue.Line, "This action line appears to contain raw object notation. Object notation is not allowed in action lines.");
+                                    Warn(Warnings, actionValue.Line, "action_object_notation", "This action line appears to contain raw object notation. Object notation is not allowed in action lines.");
                                 }
                                 if (!Program.CurrentMeta.Actions.ContainsKey(actionName))
                                 {
@@ -848,7 +879,7 @@ namespace DenizenBot.UtilityProcessors
                                     }
                                     if (!exists)
                                     {
-                                        warnScript(Warnings, actionValue.Line, $"Assignment script action listed doesn't exist. (Check `!act ...` to find proper action names)!");
+                                        warnScript(Warnings, actionValue.Line, "action_missing", $"Assignment script action listed doesn't exist. (Check `!act ...` to find proper action names)!");
                                     }
                                 }
                             }
@@ -863,7 +894,7 @@ namespace DenizenBot.UtilityProcessors
                                 string eventName = eventValue.Text.Substring("on ".Length);
                                 if (eventName.Contains("@"))
                                 {
-                                    Warn(Warnings, eventValue.Line, "This event line appears to contain raw object notation. Object notation is not allowed in event lines.");
+                                    Warn(Warnings, eventValue.Line, "event_object_notation", "This event line appears to contain raw object notation. Object notation is not allowed in event lines.");
                                 }
                                 if (!Program.CurrentMeta.Events.ContainsKey(eventName))
                                 {
@@ -878,7 +909,7 @@ namespace DenizenBot.UtilityProcessors
                                     }
                                     if (!exists)
                                     {
-                                        warnScript(Warnings, eventValue.Line, $"Script Event listed doesn't exist. (Check `!event ...` to find proper event lines)!");
+                                        warnScript(Warnings, eventValue.Line, "event_missing", $"Script Event listed doesn't exist. (Check `!event ...` to find proper event lines)!");
                                     }
                                 }
                             }
@@ -887,7 +918,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 catch (Exception ex)
                 {
-                    warnScript(Warnings, scriptPair.Key.Line, $"Internal exception (check bot debug console)!");
+                    warnScript(Warnings, scriptPair.Key.Line, "exception_internal", $"Internal exception (check bot debug console)!");
                     Console.WriteLine($"Script check exception: {ex}");
                 }
             }
@@ -983,7 +1014,7 @@ namespace DenizenBot.UtilityProcessors
                     }
                     else
                     {
-                        Warn(Warnings, i, $"Simple spacing error - shrunk unexpectedly to new space count, from {pspaces} down to {spaces}, while expecting any of: {string.Join(", ", spacedsections.Keys)}.");
+                        Warn(Warnings, i, "shrunk_spacing", $"Simple spacing error - shrunk unexpectedly to new space count, from {pspaces} down to {spaces}, while expecting any of: {string.Join(", ", spacedsections.Keys)}.");
                         pspaces = spaces;
                         continue;
                     }
@@ -1024,14 +1055,14 @@ namespace DenizenBot.UtilityProcessors
                         }
                         else
                         {
-                            Warn(Warnings, i, "Line grew when that isn't possible (spacing error?).");
+                            Warn(Warnings, i, "growing_spacing_impossible", "Line grew when that isn't possible (spacing error?).");
                             pspaces = spaces;
                             continue;
                         }
                     }
                     else if (clist == null)
                     {
-                        Warn(Warnings, i, "Line purpose unknown, attempted list entry when not building a list (likely line format error, perhaps missing or misplaced a `:` on lines above, or incorrect tabulation?).");
+                        Warn(Warnings, i, "weird_line_growth", "Line purpose unknown, attempted list entry when not building a list (likely line format error, perhaps missing or misplaced a `:` on lines above, or incorrect tabulation?).");
                         pspaces = spaces;
                         continue;
                     }
@@ -1059,19 +1090,19 @@ namespace DenizenBot.UtilityProcessors
                 }
                 else
                 {
-                    Warn(Warnings, i, "Line purpose unknown, no identifier (missing a `:` or a `-`?).");
+                    Warn(Warnings, i, "identifier_missing_line", "Line purpose unknown, no identifier (missing a `:` or a `-`?).");
                     continue;
                 }
                 if (startofline.Length == 0)
                 {
-                    Warn(Warnings, i, "key line missing contents (misplaced a `:`)?");
+                    Warn(Warnings, i, "key_line_no_content", "key line missing contents (misplaced a `:`)?");
                     continue;
                 }
                 if (spaces > pspaces)
                 {
                     if (secwaiting == null)
                     {
-                        Warn(Warnings, i, "Spacing grew for no reason (missing a ':', or accidental over-spacing?).");
+                        Warn(Warnings, i, "spacing_grew_weird", "Spacing grew for no reason (missing a ':', or accidental over-spacing?).");
                         pspaces = spaces;
                         continue;
                     }
@@ -1099,10 +1130,10 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void CollectStatisticInfos()
         {
-            Infos.Add($"(Statistics) Total structural lines: {StructureLines}");
-            Infos.Add($"(Statistics) Total live code lines: {CodeLines}");
-            Infos.Add($"(Statistics) Total comment lines: {CommentLines}");
-            Infos.Add($"(Statistics) Total blank lines: {BlankLines}");
+            Warn(Infos, -1, "stat_structural", $"(Statistics) Total structural lines: {StructureLines}");
+            Warn(Infos, -1, "stat_livecode", $"(Statistics) Total live code lines: {CodeLines}");
+            Warn(Infos, -1, "stat_comment", $"(Statistics) Total comment lines: {CommentLines}");
+            Warn(Infos, -1, "stat_blank", $"(Statistics) Total blank lines: {BlankLines}");
         }
 
         /// <summary>
@@ -1130,16 +1161,34 @@ namespace DenizenBot.UtilityProcessors
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Script Check Results").WithThumbnailUrl((Errors.Count + Warnings.Count + MinorWarnings.Count > 0) ? Constants.WARNING_ICON : Constants.INFO_ICON);
             int linesMissing = 0;
-            void embedList(List<string> list, string title)
+            int shortened = 0;
+            void embedList(List<ScriptWarning> list, string title)
             {
                 if (list.Count > 0)
                 {
+                    HashSet<string> usedKeys = new HashSet<string>();
                     StringBuilder thisListResult = new StringBuilder(list.Count * 200);
-                    foreach (string entry in list)
+                    foreach (ScriptWarning entry in list)
                     {
-                        if (thisListResult.Length + entry.Length < 1000 && embed.Length + thisListResult.Length + entry.Length < 1800)
+                        usedKeys.Add(entry.WarningUniqueKey);
+                        StringBuilder lines = new StringBuilder(50);
+                        lines.Append(entry.Line + 1);
+                        foreach (ScriptWarning subEntry in list.SkipWhile(s => s != entry).Where(s => s.WarningUniqueKey == entry.WarningUniqueKey))
                         {
-                            thisListResult.Append($"{entry}\n");
+                            shortened++;
+                            if (lines.Length < 40)
+                            {
+                                lines.Append(", ").Append(subEntry.Line + 1);
+                                if (lines.Length >= 40)
+                                {
+                                    lines.Append(", ...");
+                                }
+                            }
+                        }
+                        string message = $"On line {lines}: {entry.CustomMessageForm}";
+                        if (thisListResult.Length + message.Length < 1000 && embed.Length + thisListResult.Length + message.Length < 1800)
+                        {
+                            thisListResult.Append($"{message}\n");
                         }
                         else
                         {
@@ -1157,7 +1206,14 @@ namespace DenizenBot.UtilityProcessors
             embedList(Warnings, "Script Warnings");
             embedList(MinorWarnings, "Minor Warnings");
             embedList(Infos, "Other Script Information");
-            embed.AddField("Missing Lines", $"There are {linesMissing} lines not able to fit in this result. Fix the listed errors to see the rest.");
+            if (linesMissing > 0)
+            {
+                embed.AddField("Missing Lines", $"There are {linesMissing} lines not able to fit in this result. Fix the listed errors to see the rest.");
+            }
+            if (shortened > 0)
+            {
+                embed.AddField("Shortened Lines", $"There are {shortened} lines that were merged into other lines.");
+            }
             foreach (string debug in Debugs)
             {
                 Console.WriteLine($"Script checker debug: {debug}");
