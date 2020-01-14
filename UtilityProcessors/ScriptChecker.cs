@@ -198,8 +198,28 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (CleanedLines[i].StartsWith("- inject "))
                 {
-                    string target = CleanedLines[i].Substring("- inject ".Length).Before(" ");
-                    Injects.Add(target);
+                    string line = CleanedLines[i].Substring("- inject ".Length);
+                    if (line.Contains("locally"))
+                    {
+                        for (int x = i; x >= 0; x--)
+                        {
+                            if (CleanedLines[x].Length > 0 && CleanedLines[x].EndsWith(":") && !Lines[x].Replace("\t", "    ").StartsWith(" "))
+                            {
+                                string scriptName = CleanedLines[x].Substring(0, CleanedLines[x].Length - 1);
+                                Injects.Add(scriptName);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string target = line.Before(" ");
+                        Injects.Add(target.Before("."));
+                        if (target.Contains("<"))
+                        {
+                            Injects.Add("*");
+                        }
+                    }
                 }
             }
         }
@@ -747,8 +767,10 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 // Workaround the weird way shoot command does things
                                 definitionsKnown.UnionWith(new[] { "shot_entities", "last_entity", "location", "hit_entities" });
+                                // Default task definitions get used sometimes
+                                definitionsKnown.UnionWith(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" });
                             }
-                            if (Injects.Contains(scriptPair.Key.Text))
+                            if (Injects.Contains(scriptPair.Key.Text) || Injects.Contains("*"))
                             {
                                 definitionsKnown.Add("*");
                             }
@@ -1069,6 +1091,10 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (cleaned.StartsWith("- "))
                 {
+                    if (spaces > pspaces && clist != null && !buildingSubList)
+                    {
+                        Warn(Warnings, i, "growing_spaces_in_script", "Spacing grew for no reason (missing a ':' on a command, or accidental over-spacing?).");
+                    }
                     if (secwaiting != null)
                     {
                         if (clist == null)
