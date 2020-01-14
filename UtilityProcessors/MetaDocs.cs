@@ -125,7 +125,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// A set of all known tag bases.
         /// </summary>
-        public HashSet<string> TagBases = new HashSet<string>(512);
+        public HashSet<string> TagBases = new HashSet<string>(512) { "permission", "text", "name" };
 
         /// <summary>
         /// A set of all known tag bits.

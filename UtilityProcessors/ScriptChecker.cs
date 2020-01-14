@@ -388,6 +388,10 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="commandText">The text of the argument.</param>
         public void CheckSingleArgument(int line, string argument)
         {
+            if (argument.Length > 2 && argument.CountCharacter('<') != argument.CountCharacter('>'))
+            {
+                Warn(Warnings, line, "uneven_tags", $"Uneven number of tag marks (forgot to close a tag?).");
+            }
             int tagIndex = argument.IndexOf('<');
             while (tagIndex != -1)
             {
@@ -456,6 +460,10 @@ namespace DenizenBot.UtilityProcessors
                     }
                 }
             }
+            if (currentQuote != '\0')
+            {
+                Warn(MinorWarnings, line, "missing_quotes", "Uneven quotes (forgot to close a quote?).");
+            }
             if (start < len)
             {
                 matchList.Add(stringArgs.Substring(start));
@@ -484,7 +492,10 @@ namespace DenizenBot.UtilityProcessors
             string[] arguments = parts.Length == 1 ? new string[0] : BuildArgs(line, parts[1]);
             if (!Program.CurrentMeta.Commands.TryGetValue(commandName, out MetaCommand command))
             {
-                Warn(Errors, line, "unknown_command", $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
+                if (commandName != "case")
+                {
+                    Warn(Errors, line, "unknown_command", $"Unknown command `{commandName.Replace('`', '\'')}` (typo? Use `!command [...]` to find a valid command).");
+                }
                 return;
             }
             if (arguments.Length < command.Required)
@@ -507,6 +518,10 @@ namespace DenizenBot.UtilityProcessors
                         Console.WriteLine($"Unrecognized mechanism '{mechanism}' for script check line {line}.");
                     }
                 }
+            }
+            else if (commandName == "inject")
+            {
+                definitions.Add("*");
             }
             else if (commandName == "queue" && arguments.Length == 1 && (arguments[0] == "stop" || arguments[0] == "clear"))
             {
