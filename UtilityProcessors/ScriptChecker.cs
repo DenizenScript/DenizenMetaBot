@@ -1084,7 +1084,7 @@ namespace DenizenBot.UtilityProcessors
                     StringBuilder thisListResult = new StringBuilder(list.Count * 200);
                     foreach (string entry in list)
                     {
-                        if (embed.Length + thisListResult.Length + entry.Length < 1800)
+                        if (thisListResult.Length + entry.Length < 1000 && embed.Length + thisListResult.Length + entry.Length < 1800)
                         {
                             thisListResult.Append($"{entry}\n");
                         }
