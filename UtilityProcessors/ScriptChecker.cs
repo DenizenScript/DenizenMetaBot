@@ -273,6 +273,67 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Build args, as copied from Denizen Core -> ArgumentHelper.
+        /// </summary>
+        /// <param name="line">The line number.</param>
+        /// <param name="stringArgs">The raw arguments input.</param>
+        /// <returns>The argument array.</returns>
+        public string[] BuildArgs(int line, string stringArgs)
+        {
+            stringArgs = stringArgs.Trim().Replace('\r', ' ').Replace('\n', ' ');
+            List<string> matchList = new List<string>(stringArgs.CountCharacter(' '));
+            int start = 0;
+            int len = stringArgs.Length;
+            char currentQuote = '\0';
+            for (int i = 0; i < len; i++)
+            {
+                char c = stringArgs[i];
+                if (c == ' ' && currentQuote == '\0')
+                {
+                    if (i > start)
+                    {
+                        matchList.Add(stringArgs.Substring(start, i - start));
+                    }
+                    start = i + 1;
+                }
+                else if (c == '"' || c == '\'')
+                {
+                    if (currentQuote == '\0')
+                    {
+                        if (i - 1 < 0 || stringArgs[i - 1] == ' ')
+                        {
+                            currentQuote = c;
+                            start = i + 1;
+                        }
+                    }
+                    else if (currentQuote == c)
+                    {
+                        if (i + 1 >= len || stringArgs[i + 1] == ' ')
+                        {
+                            currentQuote = '\0';
+                            if (i >= start)
+                            {
+                                string matched = stringArgs.Substring(start, i - start);
+                                matchList.Add(matched);
+                                if (!matched.Contains(" "))
+                                {
+                                    Warn(MinorWarnings, line, "Pointless quotes (arguments quoted but do not contain spaces).");
+                                }
+                            }
+                            i++;
+                            start = i + 1;
+                        }
+                    }
+                }
+            }
+            if (start < len)
+            {
+                matchList.Add(stringArgs.Substring(start));
+            }
+            return matchList.ToArray();
+        }
+
+        /// <summary>
         /// Performs the necessary checks on a single command line.
         /// </summary>
         /// <param name="line">The line number.</param>
@@ -422,18 +483,45 @@ namespace DenizenBot.UtilityProcessors
                         {
                             continue;
                         }
-                        if (keyPair.Value is List<LineTrackedString> keyPairList)
+                        void checkAsScript(List<object> list, HashSet<string> definitionsKnown)
                         {
-                            if (matchesSet(keyName, scriptType.ListKeys))
+                            foreach (object entry in list)
                             {
-                                foreach (LineTrackedString str in keyPairList)
+                                if (entry is LineTrackedString str)
+                                {
+                                    CheckSingleCommand(str.Line, str.Text, definitionsKnown);
+                                }
+                                else if (entry is Dictionary<LineTrackedString, object> subMap)
+                                {
+                                    KeyValuePair<LineTrackedString, object> onlyEntry = subMap.First();
+                                    CheckSingleCommand(onlyEntry.Key.Line, onlyEntry.Key.Text, definitionsKnown);
+                                    checkAsScript((List<object>)onlyEntry.Value, definitionsKnown);
+                                }
+                            }
+                        }
+                        void checkBasicList(List<object> list)
+                        {
+                            foreach (object entry in list)
+                            {
+                                if (entry is LineTrackedString str)
                                 {
                                     CheckSingleArgument(str.Line, str.Text);
                                 }
+                                else
+                                {
+                                    warnScript(Warnings, keyPair.Key.Line, $"Key `{keyName}` appears to contain a script, when a data list was expected (check `!lang {typeString.Text} script containers` for format rules).");
+                                }
                             }
-                            else if (matchesSet(keyName, scriptType.ScriptKeys))
+                        }
+                        if (keyPair.Value is List<object> keyPairList)
+                        {
+                            if (matchesSet(keyName, scriptType.ScriptKeys))
                             {
-                                // TODO: Script check
+                                checkAsScript(keyPairList, new HashSet<string>());
+                            }
+                            else if (matchesSet(keyName, scriptType.ListKeys))
+                            {
+                                checkBasicList(keyPairList);
                             }
                             else if (matchesSet(keyName, scriptType.ValueKeys))
                             {
@@ -445,14 +533,11 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else if (scriptType.CanHaveRandomScripts)
                             {
-                                // TODO: Script check
+                                checkAsScript(keyPairList, new HashSet<string>());
                             }
                             else if (typeString.Text != "yaml data")
                             {
-                                foreach (LineTrackedString str in keyPairList)
-                                {
-                                    CheckSingleArgument(str.Line, str.Text);
-                                }
+                                checkBasicList(keyPairList);
                             }
 
                         }
@@ -475,13 +560,41 @@ namespace DenizenBot.UtilityProcessors
                                 CheckSingleArgument(keyPair.Key.Line, keyPairLine.Text);
                             }
                         }
-                        else // Must be a submap
+                        else if (keyPair.Value is Dictionary<LineTrackedString, object> keyPairMap)
                         {
                             string keyText = keyName + ".*";
+                            void checkSubMaps(Dictionary<LineTrackedString, object> subMap)
+                            {
+                                foreach (object subValue in subMap.Values)
+                                {
+                                    if (subValue is LineTrackedString textLine)
+                                    {
+                                        CheckSingleArgument(textLine.Line, textLine.Text);
+                                    }
+                                    else if (subValue is List<object> listKey)
+                                    {
+                                        if (scriptType.ScriptKeys.Contains(keyText) || (!scriptType.ListKeys.Contains(keyText) && scriptType.CanHaveRandomScripts))
+                                        {
+                                            checkAsScript(listKey, new HashSet<string>());
+                                        }
+                                        else
+                                        {
+                                            checkBasicList(listKey);
+                                        }
+                                    }
+                                    else if (subValue is Dictionary<LineTrackedString, object> mapWithin)
+                                    {
+                                        checkSubMaps(mapWithin);
+                                    }
+                                }
+                            }
                             if (scriptType.ValueKeys.Contains(keyText) || scriptType.ListKeys.Contains(keyText) || scriptType.ScriptKeys.Contains(keyText)
                                 || scriptType.ValueKeys.Contains("*") || scriptType.ListKeys.Contains("*") || scriptType.ScriptKeys.Contains("*"))
                             {
-                                // TODO: Check submapped stuff
+                                if (typeString.Text != "yaml data")
+                                {
+                                    checkSubMaps(keyPairMap);
+                                }
                             }
                             else if (scriptType.Strict)
                             {
@@ -489,7 +602,10 @@ namespace DenizenBot.UtilityProcessors
                             }
                             else
                             {
-                                // TODO: Check submapped stuff
+                                if (typeString.Text != "yaml data")
+                                {
+                                    checkSubMaps(keyPairMap);
+                                }
                             }
                         }
                     }
@@ -623,10 +739,12 @@ namespace DenizenBot.UtilityProcessors
         {
             Dictionary<LineTrackedString, object> rootScriptSection = new Dictionary<LineTrackedString, object>();
             Dictionary<int, Dictionary<LineTrackedString, object>> spacedsections = new Dictionary<int, Dictionary<LineTrackedString, object>>() { { 0, rootScriptSection } };
+            Dictionary<int, List<object>> spacedlists = new Dictionary<int, List<object>>();
             Dictionary<LineTrackedString, object> currentSection = rootScriptSection;
             int pspaces = 0;
             LineTrackedString secwaiting = null;
-            List<LineTrackedString> clist = null;
+            List<object> clist = null;
+            bool buildingSubList = false;
             for (int i = 0; i < Lines.Length; i++)
             {
                 string cleaned = CleanedLines[i];
@@ -645,16 +763,13 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (spaces < pspaces)
                 {
+                    if (spacedlists.TryGetValue(spaces, out List<object> tempList))
+                    {
+                        clist = tempList;
+                    }
                     if (spacedsections.TryGetValue(spaces, out Dictionary<LineTrackedString, object> temp))
                     {
                         currentSection = temp;
-                        foreach (int test in new List<int>(spacedsections.Keys))
-                        {
-                            if (test > spaces)
-                            {
-                                spacedsections.Remove(test);
-                            }
-                        }
                     }
                     else
                     {
@@ -662,25 +777,63 @@ namespace DenizenBot.UtilityProcessors
                         pspaces = spaces;
                         continue;
                     }
+                    foreach (int test in new List<int>(spacedsections.Keys))
+                    {
+                        if (test > spaces)
+                        {
+                            spacedsections.Remove(test);
+                        }
+                    }
+                    foreach (int test in new List<int>(spacedlists.Keys))
+                    {
+                        if (test > spaces)
+                        {
+                            spacedlists.Remove(test);
+                        }
+                    }
                 }
                 if (cleaned.StartsWith("- "))
                 {
-                    if (clist == null)
+                    if (secwaiting != null)
                     {
-                        if (spaces >= pspaces && secwaiting != null)
+                        if (clist == null)
                         {
-                            clist = new List<LineTrackedString>();
+                            clist = new List<object>();
+                            spacedlists[spaces] = clist;
                             currentSection[secwaiting] = clist;
                             secwaiting = null;
                         }
+                        else if (buildingSubList)
+                        {
+                            List<object> newclist = new List<object>();
+                            clist.Add(new Dictionary<LineTrackedString, object>() { { secwaiting, newclist } });
+                            secwaiting = null;
+                            buildingSubList = false;
+                            clist = newclist;
+                            spacedlists[spaces] = newclist;
+                        }
                         else
                         {
-                            Warn(Warnings, i, "Line purpose unknown, attempted list entry when not building a list (likely line format error, perhaps missing or misplaced a `:` on lines above?).");
+                            Warn(Warnings, i, "Line grew when that isn't possible (spacing error?).");
                             pspaces = spaces;
                             continue;
                         }
                     }
-                    clist.Add(new LineTrackedString(i, cleaned.Substring("- ".Length)));
+                    else if (clist == null)
+                    {
+                        Warn(Warnings, i, "Line purpose unknown, attempted list entry when not building a list (likely line format error, perhaps missing or misplaced a `:` on lines above, or incorrect tabulation?).");
+                        pspaces = spaces;
+                        continue;
+                    }
+                    if (cleaned.EndsWith(":"))
+                    {
+                        secwaiting = new LineTrackedString(i, cleaned.Substring("- ".Length, cleaned.Length - "- :".Length));
+                        buildingSubList = true;
+                    }
+                    else
+                    {
+                        clist.Add(new LineTrackedString(i, cleaned.Substring("- ".Length)));
+                    }
                     continue;
                 }
                 clist = null;
