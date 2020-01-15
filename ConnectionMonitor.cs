@@ -84,7 +84,6 @@ namespace DenizenBot
             {
                 DiscordBot.Shutdown();
             });
-            Program.CurrentBot = new DenizenMetaBot();
             Program.LaunchBotThread(new String[0]);
         }
 

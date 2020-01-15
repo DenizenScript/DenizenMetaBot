@@ -45,7 +45,6 @@ namespace DenizenBot
         {
             CurrentMeta = new MetaDocs();
             CurrentMeta.DownloadAll();
-            CurrentBot = new DenizenMetaBot();
             LaunchBotThread(args);
         }
 
@@ -54,6 +53,7 @@ namespace DenizenBot
         /// </summary>
         public static void LaunchBotThread(string[] args)
         {
+            CurrentBot = new DenizenMetaBot();
             Thread thr = new Thread(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
             thr.Start(args);
         }
