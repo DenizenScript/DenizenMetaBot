@@ -162,6 +162,15 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Clears tracker data, for re-init.
+        /// </summary>
+        public static void Clear()
+        {
+            BuildNumbers.Clear();
+            PaperBuildTrackers.Clear();
+        }
+
+        /// <summary>
         /// All currently tracked build numbers.
         /// </summary>
         public static List<BuildNumber> BuildNumbers = new List<BuildNumber>(64);
@@ -257,7 +266,7 @@ namespace DenizenBot.UtilityProcessors
         /// This is a parent commit tracing map. That is, if you input a commit short-hash, you will get back the short-hash of a version 1 newer than that version.
         /// If you trace it far enough, you will eventually reach the current commit.
         /// </summary>
-        public static Dictionary<string, string> SpigotCommitParents = new Dictionary<string, string>(1024);
+        public static Dictionary<string, string> SpigotCommitParents = new Dictionary<string, string>();
 
         /// <summary>
         /// When you input a Spigot version hash (7 characters), this will return how far behind it is.
@@ -301,20 +310,22 @@ namespace DenizenBot.UtilityProcessors
                     yaml.Load(new StringReader(json));
                     YamlMappingNode root = (YamlMappingNode)yaml.Documents[0].RootNode;
                     YamlMappingNode parentsMap = (YamlMappingNode)root.Children["parents"];
+                    Dictionary<string, string> commitParents = new Dictionary<string, string>(1024);
                     foreach (KeyValuePair<YamlNode, YamlNode> values in parentsMap.Children)
                     {
                         string key = ((YamlScalarNode)values.Key).Value;
                         YamlSequenceNode parentList = (YamlSequenceNode)values.Value;
                         string parent = ((YamlScalarNode)parentList[0]).Value;
-                        SpigotCommitParents[key] = parent;
+                        commitParents[key] = parent;
                     }
-                    foreach (string versionKey in new List<string>(SpigotCommitParents.Values))
+                    foreach (string versionKey in new List<string>(commitParents.Values))
                     {
-                        if (!SpigotCommitParents.ContainsKey(versionKey))
+                        if (!commitParents.ContainsKey(versionKey))
                         {
-                            SpigotCommitParents.Add(versionKey, CURRENT_MARKER_STRING);
+                            commitParents.Add(versionKey, CURRENT_MARKER_STRING);
                         }
                     }
+                    SpigotCommitParents = commitParents;
                 }
                 catch (Exception ex)
                 {

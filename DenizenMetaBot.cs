@@ -325,6 +325,7 @@ namespace DenizenBot
             {
                 Rules.Add(rule, rulesSection.GetString(rule));
             }
+            BuildNumberTracker.Clear();
             FDSSection buildNumbersSection = ConfigFile.GetSection("build_numbers");
             foreach (string projectName in buildNumbersSection.GetRootKeys())
             {
