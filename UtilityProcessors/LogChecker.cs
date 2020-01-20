@@ -403,11 +403,18 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessUUIDCheck()
         {
-            string prefix = IsDenizenDebug ? "p@" : PLAYER_UUID_PREFIX;
-            string firstUUID = GetFromTextTilEndOfLine(FullLogText, prefix);
-            if (firstUUID.Length > UUID_LENGTH)
+            string uuid = "";
+            if (IsDenizenDebug)
             {
-                string uuid = firstUUID.Substring(prefix.Length, UUID_LENGTH - prefix.Length);
+                uuid = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX).After(" is ");
+            }
+            else
+            {
+                uuid = GetFromTextTilEndOfLine(FullLogText, "p@").After("p@");
+            }
+            if (uuid.Length >= UUID_LENGTH)
+            {
+                uuid = uuid.Substring(0, UUID_LENGTH);
                 Console.WriteLine($"Player UUID: {uuid}");
                 if (UUID_ASCII_MATCHER.IsOnlyMatches(uuid))
                 {
