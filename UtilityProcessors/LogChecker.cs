@@ -406,11 +406,11 @@ namespace DenizenBot.UtilityProcessors
             string uuid = "";
             if (IsDenizenDebug)
             {
-                uuid = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX).After(" is ");
+                uuid = GetFromTextTilEndOfLine(FullLogText, "p@").After("p@");
             }
             else
             {
-                uuid = GetFromTextTilEndOfLine(FullLogText, "p@").After("p@");
+                uuid = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX).After(" is ");
             }
             if (uuid.Length >= UUID_LENGTH)
             {
