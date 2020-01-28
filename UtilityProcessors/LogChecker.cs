@@ -155,7 +155,7 @@ namespace DenizenBot.UtilityProcessors
                     value = value.Replace('`', '\'');
                 }
                 value = LimitStringLength(value, 450, 400);
-                builder.AddField(key, $"`{value}`", true);
+                builder.AddField(key, blockCode ? $"`{value}`" : value, true);
             }
         }
 
