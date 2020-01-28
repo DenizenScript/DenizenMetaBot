@@ -142,7 +142,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.
         /// </summary>
-        public static void AutoField(EmbedBuilder builder, string key, string value)
+        public static void AutoField(EmbedBuilder builder, string key, string value, bool blockCode = true)
         {
             if (builder.Length > 1500)
             {
@@ -150,7 +150,11 @@ namespace DenizenBot.UtilityProcessors
             }
             if (!string.IsNullOrWhiteSpace(value))
             {
-                value = LimitStringLength(value.Replace('`', '\''), 450, 400);
+                if (blockCode)
+                {
+                    value = value.Replace('`', '\'');
+                }
+                value = LimitStringLength(value, 450, 400);
                 builder.AddField(key, $"`{value}`", true);
             }
         }
@@ -403,7 +407,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessUUIDCheck()
         {
-            string uuid = "";
+            string uuid;
             if (IsDenizenDebug)
             {
                 uuid = GetFromTextTilEndOfLine(FullLogText, "p@").After("p@");
@@ -446,17 +450,22 @@ namespace DenizenBot.UtilityProcessors
                     string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText, out string versionText);
                     if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
                     {
+                        string resultText = "";
                         if (build.IsCurrent(buildNum, out int behindBy))
                         {
-                            pluginLoadText += " -- (Current build)";
+                            resultText = "Current build";
                         }
                         else
                         {
-                            pluginLoadText += $" -- (Outdated build, behind by {behindBy})";
+                            resultText = $"**Outdated build**, behind by {behindBy}";
                         }
+                        PluginVersions.Add($"`{pluginLoadText.Replace('`', '\'')}` -- ({resultText})");
+                        Console.WriteLine($"Plugin Version: {pluginLoadText} -> {resultText}");
                     }
-                    Console.WriteLine($"Plugin Version: {pluginLoadText}");
-                    PluginVersions.Add(pluginLoadText);
+                    else
+                    {
+                        PluginVersions.Add($"`{pluginLoadText.Replace('`', '\'')}`");
+                    }
                 }
             }
             foreach (string plugin in BAD_PLUGINS)
@@ -551,7 +560,7 @@ namespace DenizenBot.UtilityProcessors
                 string description = UUIDVersion == 4 ? "Online" : "Offline";
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions));
+            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), false);
             AutoField(embed, "Bad Plugin(s)", string.Join('\n', DangerousPlugins));
             AutoField(embed, "Iffy Plugin(s)", string.Join('\n', IffyPlugins));
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines));
