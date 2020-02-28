@@ -97,6 +97,10 @@ namespace DenizenBot.UtilityProcessors
             {
                 endIndex = Math.Min(commaIndex, newlineIndex);
             }
+            if (endIndex == -1)
+            {
+                endIndex = pluginLine.Length;
+            }
             return pluginLine.Substring(pluginNameIndex, endIndex - pluginNameIndex);
         }
 
