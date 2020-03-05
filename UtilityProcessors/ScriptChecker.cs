@@ -609,7 +609,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 string bukkitCommandArg = arguments[0].ToLowerFast().StartsWith("as_") ? arguments[1] : arguments[0];
                 string bukkitCommandName = bukkitCommandArg.Before(' ').ToLowerFast();
-                if (BadExecuteCommands.Contains(bukkitCommandName))
+                if (BadExecuteCommands.Contains(bukkitCommandName) || bukkitCommandName.StartsWith("minecraft:"))
                 {
                     Warn(Warnings, line, "bad_execute", "Inappropriate usage of the 'execute' command. Execute is for external plugin interop, and should never be used for vanilla commands. Use the relevant Denizen script command or mechanism instead.");
                 }
