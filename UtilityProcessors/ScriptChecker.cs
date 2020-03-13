@@ -50,7 +50,8 @@ namespace DenizenBot.UtilityProcessors
             "particle", "playsound", "recipe", "reload", "replaceitem", "say", "scoreboard", "seed", "setblock", "setmaxplayers", "setworldspawn",
             "spawnpoint", "spectate", "spreadplayers", "stopsound", "summon", "tag", "team", "teammsg", "teleport", "tell", "tellraw", "testfor",
             "testforblock", "testforblocks", "time", "title", "toggledownfall", "tp", "w", "weather", "whitelist", "worldborder", "worldbuilder", "xp",
-            "give", "take",
+            // Based on seen misuses
+            "give", "take", "gmc", "gms", "gm",
             // Obviously never run Denizen commands
             "ex", "denizen"
         };
@@ -609,7 +610,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 string bukkitCommandArg = arguments[0].ToLowerFast().StartsWith("as_") ? arguments[1] : arguments[0];
                 string bukkitCommandName = bukkitCommandArg.Before(' ').ToLowerFast();
-                if (BadExecuteCommands.Contains(bukkitCommandName) || bukkitCommandName.StartsWith("minecraft:"))
+                if (BadExecuteCommands.Contains(bukkitCommandName) || bukkitCommandName.StartsWith("minecraft:") || bukkitCommandName.StartsWith("bukkit:"))
                 {
                     Warn(Warnings, line, "bad_execute", "Inappropriate usage of the 'execute' command. Execute is for external plugin interop, and should never be used for vanilla commands. Use the relevant Denizen script command or mechanism instead.");
                 }
