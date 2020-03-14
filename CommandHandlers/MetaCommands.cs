@@ -407,6 +407,11 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
+            else
+            {
+                SendGenericPositiveMessageReply(message, "Guides", $"Read the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
+                return;
+            }
             AutoMetaCommand(Program.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
         }
 

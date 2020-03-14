@@ -316,7 +316,7 @@ namespace DenizenBot.UtilityProcessors
                 int linkEndIndex = page.IndexOf("</a>", linkIndex);
                 string linkBody = DENIZEN_GUIDE_SOURCE + page.Substring(linkIndex + link_reference_text.Length, linkEndIndex - (linkIndex + link_reference_text.Length));
                 MetaGuidePage guidePage = new MetaGuidePage();
-                guidePage.URL = DENIZEN_GUIDE_SOURCE + linkBody.BeforeAndAfter("\">", out guidePage.PageName);
+                guidePage.URL = linkBody.BeforeAndAfter("\">", out guidePage.PageName);
                 guidePage.AddTo(this);
                 linkIndex = linkEndIndex;
             }

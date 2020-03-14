@@ -85,6 +85,7 @@ namespace DenizenBot.CommandHandlers
             embed.AddField("Events", docs.Events.Count, true);
             embed.AddField("Actions", docs.Actions.Count, true);
             embed.AddField("Languages", docs.Languages.Count, true);
+            embed.AddField("Guide Pages", docs.GuidePages.Count, true);
             SendReply(message, embed.Build());
         }
     }
