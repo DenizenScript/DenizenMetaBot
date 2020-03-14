@@ -174,7 +174,7 @@ namespace DenizenBot
             RegisterCommand(metaCmds.CMD_Event, "event", "events", "evt", "evts", "e");
             RegisterCommand(metaCmds.CMD_Action, "action", "actions", "act", "acts", "a");
             RegisterCommand(metaCmds.CMD_Language, "language", "languages", "lang", "langs", "l");
-            RegisterCommand(metaCmds.CMD_Guide, "guide", "guides", "g", "beginner", "beginners", "beginnersguide");
+            RegisterCommand(metaCmds.CMD_Guide, "guide", "guides", "g", "beginner", "beginners", "beginnersguide", "guidepage", "guidespage");
             RegisterCommand(metaCmds.CMD_Search, "search", "s", "find", "f", "get", "locate", "what", "where", "how",
                 "w", "meta", "metainfo", "docs", "doc", "documentation", "documentations", "document", "documents");
             // Utility
