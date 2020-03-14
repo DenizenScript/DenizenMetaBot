@@ -398,6 +398,19 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// Guide page search user command.
+        /// </summary>
+        public void CMD_Guide(string[] cmds, SocketMessage message)
+        {
+            string secondarySearch = string.Join(" ", cmds).ToLowerFast();
+            if (cmds.Length > 0)
+            {
+                cmds[0] = secondarySearch;
+            }
+            AutoMetaCommand(Program.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
+        }
+
+        /// <summary>
         /// Meta docs total search command.
         /// </summary>
         public void CMD_Search(string[] cmds, SocketMessage message)

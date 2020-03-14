@@ -44,6 +44,11 @@ namespace DenizenBot.UtilityProcessors
         };
 
         /// <summary>
+        /// Source link for the Denizen beginner's guide.
+        /// </summary>
+        public static string DENIZEN_GUIDE_SOURCE = "https://guide.denizenscript.com/";
+
+        /// <summary>
         /// The "command" meta type.
         /// </summary>
         public static MetaType META_TYPE_COMMAND = new MetaType() { Name = "Command", WebPath = "cmds" };
@@ -74,10 +79,15 @@ namespace DenizenBot.UtilityProcessors
         public static MetaType META_TYPE_TAG = new MetaType() { Name = "Tag", WebPath = "tags" };
 
         /// <summary>
+        /// The "guide page" meta type.
+        /// </summary>
+        public static MetaType META_TYPE_GUIDEPAGE = new MetaType() { Name = "GuidePage", WebPath = null };
+
+        /// <summary>
         /// All meta types.
         /// </summary>
         public static MetaType[] META_TYPES = new MetaType[] { META_TYPE_COMMAND, META_TYPE_MECHANISM,
-            META_TYPE_EVENT, META_TYPE_ACTION, META_TYPE_LANGUAGE, META_TYPE_TAG };
+            META_TYPE_EVENT, META_TYPE_ACTION, META_TYPE_LANGUAGE, META_TYPE_TAG, META_TYPE_GUIDEPAGE };
 
         /// <summary>
         /// Getters for standard meta object types.
@@ -89,7 +99,8 @@ namespace DenizenBot.UtilityProcessors
             { "tag", () => new MetaTag() },
             { "event", () => new MetaEvent() },
             { "action", () => new MetaAction() },
-            { "language", () => new MetaLanguage() }
+            { "language", () => new MetaLanguage() },
+            { "GuidePage", () => new MetaGuidePage() }
         };
 
         /// <summary>
@@ -121,6 +132,11 @@ namespace DenizenBot.UtilityProcessors
         /// All known languages.
         /// </summary>
         public Dictionary<string, MetaLanguage> Languages = new Dictionary<string, MetaLanguage>(512);
+
+        /// <summary>
+        /// All known guide pages.
+        /// </summary>
+        public Dictionary<string, MetaGuidePage> GuidePages = new Dictionary<string, MetaGuidePage>(512);
 
         /// <summary>
         /// A set of all known tag bases.
@@ -161,6 +177,10 @@ namespace DenizenBot.UtilityProcessors
             foreach (MetaLanguage language in Languages.Values)
             {
                 yield return language;
+            }
+            foreach (MetaGuidePage guidePage in GuidePages.Values)
+            {
+                yield return guidePage;
             }
         }
 
@@ -244,6 +264,15 @@ namespace DenizenBot.UtilityProcessors
                     Console.WriteLine($"Error: {ex.ToString()}");
                 }
             }
+            try
+            {
+                ReadGuides();
+            }
+            catch (Exception ex)
+            {
+                LoadErrors.Add($"Internal exception - {ex.GetType().FullName} ... see bot console for details.");
+                Console.WriteLine($"Error: {ex.ToString()}");
+            }
             foreach (MetaObject obj in AllMetaObjects())
             {
                 try
@@ -260,6 +289,36 @@ namespace DenizenBot.UtilityProcessors
             foreach (string str in LoadErrors)
             {
                 Console.WriteLine($"Load error: {str}");
+            }
+        }
+
+        /// <summary>
+        /// Downloads guide source info.
+        /// </summary>
+        public void ReadGuides()
+        {
+            HttpClient client = new HttpClient
+            {
+                Timeout = new TimeSpan(0, 2, 0)
+            };
+            string page = client.GetStringAsync(DENIZEN_GUIDE_SOURCE).Result;
+            int contentIndex = page.IndexOf("<div class=\"section\" id=\"contents\">");
+            if (contentIndex == -1)
+            {
+                LoadErrors.Add("Guide page did not match expected format (table of contents div missing).");
+                return;
+            }
+            page = page.Substring(contentIndex);
+            int linkIndex = 0;
+            const string link_reference_text = "<a class=\"reference internal\" href=\"";
+            while ((linkIndex = page.IndexOf(link_reference_text, linkIndex)) >= 0)
+            {
+                int linkEndIndex = page.IndexOf("</a>", linkIndex);
+                string linkBody = DENIZEN_GUIDE_SOURCE + page.Substring(linkIndex + link_reference_text.Length, linkEndIndex - (linkIndex + link_reference_text.Length));
+                MetaGuidePage guidePage = new MetaGuidePage();
+                guidePage.URL = DENIZEN_GUIDE_SOURCE + linkBody.BeforeAndAfter("\">", out guidePage.PageName);
+                guidePage.AddTo(this);
+                linkIndex = linkEndIndex;
             }
         }
 
