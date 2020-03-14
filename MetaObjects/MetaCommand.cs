@@ -33,6 +33,11 @@ namespace DenizenBot.MetaObjects
         public int Required = 0;
 
         /// <summary>
+        /// How many arguments are allowed, maximum.
+        /// </summary>
+        public int Maximum = int.MaxValue;
+
+        /// <summary>
         /// The syntax guide.
         /// </summary>
         public string Syntax;
@@ -133,6 +138,13 @@ namespace DenizenBot.MetaObjects
                     return true;
                 case "required":
                     return int.TryParse(value, out Required);
+                case "maximum":
+                    bool valid = int.TryParse(value, out Maximum);
+                    if (Maximum == -1)
+                    {
+                        Maximum = int.MaxValue;
+                    }
+                    return valid;
                 case "syntax":
                     Syntax = value;
                     return true;

@@ -585,9 +585,14 @@ namespace DenizenBot.UtilityProcessors
                 }
                 return;
             }
-            if (arguments.Length < command.Required)
+            int argCount = arguments.Count(s => !s.StartsWith("save:") && !s.StartsWith("player:") && !s.StartsWith("npc:"));
+            if (argCount < command.Required)
             {
                 Warn(Errors, line, "too_few_args", $"Insufficient arguments... the `{command.Name}` command requires at least {command.Required} arguments, but you only provided {arguments.Length}.");
+            }
+            if (argCount > command.Maximum)
+            {
+                Warn(Errors, line, "too_many_args", $"Too many arguments... the `{command.Name}` command requires no more than {command.Maximum} arguments, but you provided {arguments.Length}. Did you forget 'quotes'?");
             }
             if (commandName == "adjust")
             {
