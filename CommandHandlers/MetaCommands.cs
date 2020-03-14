@@ -402,15 +402,15 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Guide(string[] cmds, SocketMessage message)
         {
+            if (cmds.Length == 0 || cmds[0].ToLowerFast() == "all")
+            {
+                SendGenericPositiveMessageReply(message, "Guides", $"Read the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
+                return;
+            }
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             if (cmds.Length > 0)
             {
                 cmds[0] = secondarySearch;
-            }
-            else
-            {
-                SendGenericPositiveMessageReply(message, "Guides", $"Read the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
-                return;
             }
             AutoMetaCommand(Program.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
         }
