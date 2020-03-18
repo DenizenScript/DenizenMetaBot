@@ -83,7 +83,24 @@ namespace DenizenBot.MetaObjects
             AutoField(builder, "Triggers", Triggers);
             AutoField(builder, "Has Player", Player);
             AutoField(builder, "Has NPC", NPC);
-            AutoField(builder, "Context", string.Join("\n", Context));
+            string subContext = string.Join("\n", Context);
+            if (subContext.Length > 1000)
+            {
+                int len = 0;
+                for (int i = 0; i < Context.Length; i++)
+                {
+                    len += Context[i].Length + 1;
+                    if (len > 1000)
+                    {
+                        AutoField(builder, "Context", string.Join("\n", new List<string>(Context).GetRange(0, i)));
+                        AutoField(builder, "(cont)", string.Join("\n", Context.Skip(i)));
+                    }
+                }
+            }
+            else
+            {
+                AutoField(builder, "Context", subContext);
+            }
             AutoField(builder, "Determine", string.Join("\n", Determinations));
             if (Cancellable)
             {

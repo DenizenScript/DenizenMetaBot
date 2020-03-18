@@ -127,6 +127,10 @@ namespace DenizenBot.MetaObjects
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
+                if (value.Length > 1024)
+                {
+                    value = value.Substring(0, 1000) + "...";
+                }
                 builder.AddField(key, EscapeForDiscord(ProcessMetaLinksForDiscord(value)), false);
             }
         }
