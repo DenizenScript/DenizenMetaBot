@@ -52,8 +52,8 @@ namespace DenizenBot.UtilityProcessors
             "testforblock", "testforblocks", "time", "title", "toggledownfall", "tp", "w", "weather", "whitelist", "worldborder", "worldbuilder", "xp",
             // Based on seen misuses
             "give", "take", "gmc", "gms", "gm",
-            // Obviously never run Denizen commands
-            "ex", "denizen"
+            // Obviously never run Denizen or Citizens commands
+            "ex", "denizen", "npc", "trait"
         };
 
         /// <summary>
@@ -941,7 +941,7 @@ namespace DenizenBot.UtilityProcessors
                             {
                                 if (!usageString.Text.StartsWith($"/{nameString.Text}"))
                                 {
-                                    warnScript(MinorWarnings, usageString.Line, "command_script_usage", "Command script usage key doesn't match the name key (the name has is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
+                                    warnScript(MinorWarnings, usageString.Line, "command_script_usage", "Command script usage key doesn't match the name key (the name is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
                                 }
                             }
                         }

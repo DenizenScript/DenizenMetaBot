@@ -265,7 +265,7 @@ namespace DenizenBot.UtilityProcessors
                 string mode = GetFromTextTilEndOfLine(FullLogText, "Mode: ");
                 IsBungee = mode.Contains("BungeeCord");
                 IsOffline = mode.Contains("offline");
-                ServerVersion = GetFromTextTilEndOfLine(FullLogText, "CraftBukkit Version: ");
+                ServerVersion = GetFromTextTilEndOfLine(FullLogText, "Server Version: ").After("Server Version: ");
             }
             else
             {
