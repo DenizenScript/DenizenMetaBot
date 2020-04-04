@@ -19,12 +19,26 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Plugins that go into the <see cref="DangerousPlugins"/> list.
         /// </summary>
-        public static string[] BAD_PLUGINS = new string[] { "SkinsRestorer", "AuthMe", "PlugMan", "LoginSecurity", "CMI", "PluginManager", "MySkin" };
+        public static string[] BAD_PLUGINS = new string[]
+        {
+            // Signs of a cracked server
+            "SkinsRestorer", "AuthMe", "LoginSecurity", "MySkin", "PinAuthentication",
+            // Server breaking reload plugins
+            "PlugMan", "PluginManager"
+        };
 
         /// <summary>
         /// Plugins that go into the <see cref="IffyPlugins"/> list.
         /// </summary>
-        public static string[] IFFY_PLUGINS = new string[] { "FeatherBoard" };
+        public static string[] IFFY_PLUGINS = new string[]
+        {
+            // Scoreboard breakers
+            "FeatherBoard", "TAB",
+            // General problem causers
+            "CMI",
+            // Plugins that shouldn't exist but market their pointlessness well
+            "CommandNPC", "CitizensCMD"
+        };
 
         /// <summary>
         /// Plugins that should show version output.
