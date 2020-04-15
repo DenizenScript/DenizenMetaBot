@@ -545,7 +545,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 return;
             }
-            if (!FullLogText.Contains("\nUp-time: ") || !FullLogText.Contains("\nCraftBukkit Version: ")
+            if (!FullLogText.Contains("\nUp-time: ") || (!FullLogText.Contains("\nServer Version: ") && !FullLogText.Contains("\nCraftBukkit Version: "))
                 || !FullLogText.Contains("\nDenizen Version: ") || !FullLogText.Contains("\nActive Plugins (")
                 || !FullLogText.Contains("\nLoaded Worlds (") || !FullLogText.Contains("\nOnline Players (")
                 || !FullLogText.Contains("\nOffline Players: ") || !FullLogText.Contains("\nMode: "))
