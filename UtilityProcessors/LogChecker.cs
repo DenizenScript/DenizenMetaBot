@@ -22,7 +22,8 @@ namespace DenizenBot.UtilityProcessors
         public static string[] BAD_PLUGINS = new string[]
         {
             // Signs of a cracked server
-            "SkinsRestorer", "AuthMe", "LoginSecurity", "MySkin", "PinAuthentication",
+            "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication",
+            "SkinsRestorer", "MySkin",
             // Server breaking reload plugins
             "PlugMan", "PluginManager"
         };
