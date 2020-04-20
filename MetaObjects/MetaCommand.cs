@@ -70,7 +70,7 @@ namespace DenizenBot.MetaObjects
         public override EmbedBuilder GetEmbed()
         {
             EmbedBuilder builder = base.GetEmbed();
-            AutoField(builder, "Syntax", Syntax);
+            AutoField(builder, "Syntax", $"`{Syntax}`");
             AutoField(builder, "Short Description", Short);
             if (!string.IsNullOrWhiteSpace(Guide))
             {
