@@ -632,6 +632,10 @@ namespace DenizenBot.UtilityProcessors
             {
                 string defName = arguments[0].Before(":").ToLowerFast();
                 definitions.Add(defName);
+                if (defName.Contains("<"))
+                {
+                    definitions.Add("*");
+                }
             }
             else if (commandName == "foreach" || commandName == "while" || commandName == "repeat")
             {
