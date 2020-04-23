@@ -245,6 +245,10 @@ namespace DenizenBot.UtilityProcessors
                 if (CleanedLines[i].StartsWith("- inject "))
                 {
                     string line = CleanedLines[i].Substring("- inject ".Length);
+                    if (line.EndsWith(" instantly"))
+                    {
+                        line = line.BeforeLast(" instantly");
+                    }
                     if (line.Contains("locally"))
                     {
                         for (int x = i; x >= 0; x--)
