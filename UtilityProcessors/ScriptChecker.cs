@@ -598,6 +598,13 @@ namespace DenizenBot.UtilityProcessors
             {
                 Warn(Errors, line, "too_many_args", $"Too many arguments... the `{command.Name}` command requires no more than {command.Maximum} arguments, but you provided {arguments.Length}. Did you forget 'quotes'?");
             }
+            if (commandName == "if" || commandName == "waituntil" || commandName == "while")
+            {
+                if (commandText.Contains(" == true") || commandText.Contains(" == false"))
+                {
+                    Warn(Errors, line, "truly_true", $"'== true' style checks are nonsense. Refer to <https://guide.denizenscript.com/guides/troubleshooting/common-mistakes.html#if-true-is-true-equal-to-truly-true-is-the-truth> for more info.");
+                }
+            }
             if (commandName == "adjust")
             {
                 string mechanism = arguments.FirstOrDefault(s => s.Contains(":") && !s.StartsWith("def:")) ?? arguments.FirstOrDefault(s => !s.Contains("<"));
