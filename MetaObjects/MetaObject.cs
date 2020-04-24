@@ -242,10 +242,10 @@ namespace DenizenBot.MetaObjects
                 }
                 else
                 {
-                    int endMark = tag.IndexOf('>') + 1;
+                    int endMark = tag.LastIndexOf('>') + 1;
                     if (endMark == 0)
                     {
-                        tagOut = tag + " (Invalid tag)";
+                        tagOut = tag;
                     }
                     else
                     {
