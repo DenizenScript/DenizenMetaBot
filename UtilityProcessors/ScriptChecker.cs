@@ -150,7 +150,7 @@ namespace DenizenBot.UtilityProcessors
         {
             FullOriginalScript = script;
             Lines = script.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
-            CleanedLines = Lines.Select(s => s.Trim()).ToArray();
+            CleanedLines = Lines.Select(s => s.Trim().ToLowerFast()).ToArray();
         }
 
         /// <summary>
