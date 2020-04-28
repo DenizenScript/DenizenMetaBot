@@ -204,7 +204,9 @@ namespace DenizenBot.UtilityProcessors
                 string line = CleanedLines[i];
                 if (!line.EndsWith(":") && line.StartsWith("-"))
                 {
-                    result.Append(Lines[i].Replace(": ", "<&co>").Replace("#", "<&ns>")).Append("\n");
+                    int dashIndex = line.IndexOf('-');
+                    result.Append(Lines[i].Substring(0, dashIndex + 1)).Append(" ^1^");
+                    result.Append(Lines[i].Substring(dashIndex + 1).Replace(": ", "<&co>").Replace("#", "<&ns>")).Append("\n");
                 }
                 else if (line.EndsWith(":") && !line.StartsWith("-"))
                 {
