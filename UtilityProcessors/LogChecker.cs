@@ -167,7 +167,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.
         /// </summary>
-        public static void AutoField(EmbedBuilder builder, string key, string value, bool blockCode = true)
+        public static void AutoField(EmbedBuilder builder, string key, string value, bool blockCode = true, bool inline = true)
         {
             if (builder.Length > 1500)
             {
@@ -180,7 +180,7 @@ namespace DenizenBot.UtilityProcessors
                     value = value.Replace('`', '\'');
                 }
                 value = LimitStringLength(value, 450, 400);
-                builder.AddField(key, blockCode ? $"`{value}`" : value, true);
+                builder.AddField(key, blockCode ? $"`{value}`" : value, inline);
             }
         }
 
@@ -575,7 +575,7 @@ namespace DenizenBot.UtilityProcessors
         {
             bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Count > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
-            AutoField(embed, "Server Version", ServerVersion);
+            AutoField(embed, "Server Version", ServerVersion, inline: false);
             if (IsOffline)
             {
                 AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : "Offline (bungee status unknown).");
@@ -585,10 +585,10 @@ namespace DenizenBot.UtilityProcessors
                 string description = UUIDVersion == 4 ? "Online" : "Offline";
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), false);
+            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), false, inline: false);
             AutoField(embed, "Bad Plugin(s)", string.Join('\n', DangerousPlugins));
             AutoField(embed, "Iffy Plugin(s)", string.Join('\n', IffyPlugins));
-            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines));
+            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
             return embed.Build();
         }
     }
