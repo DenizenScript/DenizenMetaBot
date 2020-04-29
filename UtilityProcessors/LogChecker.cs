@@ -410,9 +410,12 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void CheckServerVersion()
         {
-            if (string.IsNullOrWhiteSpace(ServerVersion) || (!IsDenizenDebug && !ServerVersion.StartsWith("This server is running ")))
+            ServerVersion = ServerVersion.Replace('`', '\'');
+            bool startsWithRunning = ServerVersion.StartsWith("This server is running ");
+            if (string.IsNullOrWhiteSpace(ServerVersion) || (!IsDenizenDebug && !startsWithRunning))
             {
                 Console.WriteLine("No server version, disregarding check.");
+                ServerVersion = $"`{LimitStringLength(ServerVersion, 400, 350)}`";
                 return;
             }
             string versionToCheck = ServerVersion.ToLowerFast();
@@ -421,6 +424,11 @@ namespace DenizenBot.UtilityProcessors
                 versionToCheck = versionToCheck.Replace("version:", "version");
             }
             string output = ServerVersionStatusOutput(versionToCheck, out _);
+            if (startsWithRunning)
+            {
+                ServerVersion = ServerVersion.Substring("This server is running ".Length).BeforeLast(" (Implementing API version");
+                ServerVersion = $"`{LimitStringLength(ServerVersion, 400, 350)}`";
+            }
             if (!string.IsNullOrWhiteSpace(output))
             {
                 ServerVersion += $"-- ({output})";
@@ -575,7 +583,7 @@ namespace DenizenBot.UtilityProcessors
         {
             bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Count > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
-            AutoField(embed, "Server Version", ServerVersion, inline: false);
+            AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
             if (IsOffline)
             {
                 AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : "Offline (bungee status unknown).");
