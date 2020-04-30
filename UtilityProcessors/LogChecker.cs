@@ -360,7 +360,7 @@ namespace DenizenBot.UtilityProcessors
                 if (buildTracker.IsCurrent(paperVersionNumber, out int behindBy))
                 {
                     isGood = true;
-                    return " Current build";
+                    return "Current build";
                 }
                 else
                 {
@@ -384,7 +384,7 @@ namespace DenizenBot.UtilityProcessors
                 if (behind == 0)
                 {
                     isGood = true;
-                    return " Current build";
+                    return "Current build";
                 }
                 else
                 {

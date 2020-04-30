@@ -666,6 +666,10 @@ namespace DenizenBot.UtilityProcessors
             if (saveArgument != null)
             {
                 definitions.Add(ENTRY_PREFIX + saveArgument.Substring("save:".Length).ToLowerFast());
+                if (saveArgument.Contains("<"))
+                {
+                    definitions.Add(ENTRY_PREFIX + "*");
+                }
             }
             foreach (string argument in arguments)
             {
@@ -678,7 +682,7 @@ namespace DenizenBot.UtilityProcessors
                     if (endSpot != -1)
                     {
                         string entryText = argument.Substring(entrySpot, endSpot - entrySpot).ToLowerFast();
-                        if (!definitions.Contains(ENTRY_PREFIX + entryText) && !definitions.Contains("*"))
+                        if (!definitions.Contains(ENTRY_PREFIX + entryText) && !definitions.Contains(ENTRY_PREFIX + "*"))
                         {
                             Warn(Warnings, line, "entry_to_nowhere", "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
                         }
