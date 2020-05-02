@@ -24,6 +24,7 @@ namespace DenizenBot.UtilityProcessors
             // Signs of a cracked server
             "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication",
             "SkinsRestorer", "MySkin",
+            "AntiJoinBot", "AJB",
             // Server breaking reload plugins
             "PlugMan", "PluginManager"
         };
@@ -34,11 +35,11 @@ namespace DenizenBot.UtilityProcessors
         public static string[] IFFY_PLUGINS = new string[]
         {
             // Scoreboard breakers
-            "FeatherBoard", "TAB",
+            "FeatherBoard", "TAB", "AnimatedNames", "MVdWPlaceholderAPI",
             // General problem causers
             "CMI",
             // Plugins that shouldn't exist but market their pointlessness well
-            "CommandNPC", "CitizensCMD"
+            "CommandNPC", "CitizensCMD", "BungeeNPC"
         };
 
         /// <summary>
