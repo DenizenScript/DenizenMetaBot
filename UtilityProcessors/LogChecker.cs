@@ -39,7 +39,7 @@ namespace DenizenBot.UtilityProcessors
             // General problem causers
             "CMI",
             // Plugins that shouldn't exist but market their pointlessness well
-            "CommandNPC", "CitizensCMD", "BungeeNPC"
+            "CommandNPC", "CitizensCMD", "BungeeNPC", "CitizensText"
         };
 
         /// <summary>

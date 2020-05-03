@@ -457,9 +457,14 @@ namespace DenizenBot.UtilityProcessors
         /// Performs the necessary checks on a single argument.
         /// </summary>
         /// <param name="line">The line number.</param>
-        /// <param name="commandText">The text of the argument.</param>
-        public void CheckSingleArgument(int line, string argument)
+        /// <param name="argument">The text of the argument.</param>
+        /// <param name="isCommand">Whether this is an argument to a command.</param>
+        public void CheckSingleArgument(int line, string argument, bool isCommand = false)
         {
+            if (argument.Contains("@") && !isCommand)
+            {
+                Warn(Warnings, line, "raw_object_notation", "This line appears to contain raw object notation. There is almost always a better way to write a line than using raw object notation. Consider the relevant object constructor tags.");
+            }
             string argNoArrows = argument.Replace("<-", "arrow_left").Replace("->", "arrow_right");
             if (argument.Length > 2 && argNoArrows.CountCharacter('<') != argNoArrows.CountCharacter('>'))
             {
@@ -673,7 +678,7 @@ namespace DenizenBot.UtilityProcessors
             }
             foreach (string argument in arguments)
             {
-                CheckSingleArgument(line, argument);
+                CheckSingleArgument(line, argument, true);
                 int entrySpot = argument.IndexOf("<entry[");
                 if (entrySpot != -1)
                 {
