@@ -45,7 +45,9 @@ namespace DenizenBot.CommandHandlers
                 + "`tag [name]` to search tags\n"
                 + "`event [name]` to search world script events\n"
                 + "`action [name]` to search NPC assignment actions\n"
-                + "`language [name]` to search language docs";
+                + "`language [name]` to search language docs\n"
+                + "`guide [name]` to search the beginner's guide pages\n"
+                + "`search [keyword]` to search all meta docs";
 
         /// <summary>
         /// Simple output string for utility commands.
