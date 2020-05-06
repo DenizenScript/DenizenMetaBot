@@ -15,12 +15,24 @@ namespace DenizenBot.MetaObjects
     {
         public override MetaType Type => MetaDocs.META_TYPE_MECHANISM;
 
-        public override string Name => $"{MechObject}.{MechName}";
+        public override string Name => FullName;
 
         public override void AddTo(MetaDocs docs)
         {
             docs.Mechanisms.Add(CleanName, this);
         }
+
+        public override IEnumerable<string> MultiNames => NameForms;
+
+        /// <summary>
+        /// Both forms of the mech name (the full name, and the partial name).
+        /// </summary>
+        public string[] NameForms = new string[0];
+
+        /// <summary>
+        /// The full mechanism name (Object.Name).
+        /// </summary>
+        public string FullName;
 
         /// <summary>
         /// The object the mechanism applies to.
@@ -82,6 +94,9 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
+            FullName = $"{MechObject}.{MechName}";
+            NameForms = new string[] { FullName, MechName };
+            HasMultipleNames = true;
             Require(docs, MechObject, MechName, Input, Description);
             PostCheckTags(docs, Tags);
             PostCheckLinkableText(docs, Description);
