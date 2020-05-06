@@ -16,31 +16,6 @@ namespace DenizenBot.UtilityProcessors
     /// </summary>
     public class LogChecker
     {
-        /// <summary>
-        /// Plugins that go into the <see cref="DangerousPlugins"/> list.
-        /// </summary>
-        public static string[] BAD_PLUGINS = new string[]
-        {
-            // Signs of a cracked server
-            "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication",
-            "SkinsRestorer", "MySkin",
-            "AntiJoinBot", "AJB",
-            // Server breaking reload plugins
-            "PlugMan", "PluginManager"
-        };
-
-        /// <summary>
-        /// Plugins that go into the <see cref="IffyPlugins"/> list.
-        /// </summary>
-        public static string[] IFFY_PLUGINS = new string[]
-        {
-            // Scoreboard breakers
-            "FeatherBoard", "TAB", "AnimatedNames", "MVdWPlaceholderAPI",
-            // General problem causers
-            "CMI",
-            // Plugins that shouldn't exist but market their pointlessness well
-            "CommandNPC", "CitizensCMD", "BungeeNPC", "CitizensText"
-        };
 
         /// <summary>
         /// Plugins that should show version output.
@@ -88,6 +63,51 @@ namespace DenizenBot.UtilityProcessors
         /// The version ID is always at index 14 of a UUID.
         /// </summary>
         public const int VERSION_ID_LOCATION = 14;
+
+        /// <summary>
+        /// Plugins that are suspicious (like ones that relate to cracked servers).
+        /// Map of plugin names to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Plugins that might cause problems.
+        /// Map of plugin names to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> MESSY_PLUGINS = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Plugins that should be tracked but aren't a problem.
+        /// Map of plugin names to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> MONITORED_PLUGINS = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Adds a plugin by name to the list of special plugins to track and report.
+        /// </summary>
+        /// <param name="set">The set of plugins to add to.</param>
+        /// <param name="message">The message to include, if any.</param>
+        /// <param name="names">The name(s) of plugins to track.</param>
+        public static void AddReportedPlugin(Dictionary<string, string> set, string message, params string[] names)
+        {
+            foreach (string name in names)
+            {
+                set.Add(name, message);
+            }
+        }
+
+        static LogChecker()
+        {
+            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication");
+            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB");
+            AddReportedPlugin(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
+            AddReportedPlugin(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
+            AddReportedPlugin(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
+            AddReportedPlugin(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
+            AddReportedPlugin(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
+            AddReportedPlugin(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
+            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPC_Police");
+        }
 
         /// <summary>
         /// Gets the text of a plugin name + version, if any.
@@ -166,11 +186,21 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
+        /// Escapes text for Discord output within a code block.
+        /// </summary>
+        /// <param name="text">The text to escape.</param>
+        /// <returns>The escaped text.</returns>
+        public static string Escape(string text)
+        {
+            return text.Replace('`', '\'');
+        }
+
+        /// <summary>
         /// Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.
         /// </summary>
         public static void AutoField(EmbedBuilder builder, string key, string value, bool blockCode = true, bool inline = true)
         {
-            if (builder.Length > 1500)
+            if (builder.Length + Math.Min(value.Length, 450) + key.Length > 1800)
             {
                 return;
             }
@@ -178,7 +208,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (blockCode)
                 {
-                    value = value.Replace('`', '\'');
+                    value = Escape(value);
                 }
                 value = LimitStringLength(value, 450, 400);
                 builder.AddField(key, blockCode ? $"`{value}`" : value, inline);
@@ -203,17 +233,22 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Any potentially problematic plugins found in the log.
         /// </summary>
-        public List<string> DangerousPlugins = new List<string>();
+        public string DangerousPlugins = "";
 
         /// <summary>
         /// Any sometimes-conflictive plugins found in the log.
         /// </summary>
-        public List<string> IffyPlugins = new List<string>();
+        public string IffyPlugins = "";
+
+        /// <summary>
+        /// Any other relevant plugins found in the log.
+        /// </summary>
+        public string OtherPlugins = "";
 
         /// <summary>
         /// Plugins whose versions will be listed.
         /// </summary>
-        public List<string> PluginVersions = new List<string>();
+        public string PluginVersions = "";
 
         /// <summary>
         /// Lines of note, usually ones that indicate a bad sign.
@@ -480,7 +515,6 @@ namespace DenizenBot.UtilityProcessors
                 string pluginLoadText = GetPluginText(plugin);
                 if (pluginLoadText.Length != 0)
                 {
-                    pluginLoadText = pluginLoadText.After("Loading ");
                     string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText, out string versionText);
                     if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
                     {
@@ -493,31 +527,50 @@ namespace DenizenBot.UtilityProcessors
                         {
                             resultText = $"**Outdated build**, behind by {behindBy}";
                         }
-                        PluginVersions.Add($"`{pluginLoadText.Replace('`', '\'')}` -- ({resultText})");
+                        PluginVersions += $"`{pluginLoadText.Replace('`', '\'')}` -- ({resultText})\n";
                         Console.WriteLine($"Plugin Version: {pluginLoadText} -> {resultText}");
                     }
                     else
                     {
-                        PluginVersions.Add($"`{pluginLoadText.Replace('`', '\'')}`");
+                        PluginVersions += $"`{pluginLoadText.Replace('`', '\'')}`\n";
                     }
                 }
             }
-            foreach (string plugin in BAD_PLUGINS)
+            ProcessPluginSet(SUSPICIOUS_PLUGINS, ref DangerousPlugins, "Dangerous/Suspicious/Bad");
+            ProcessPluginSet(MESSY_PLUGINS, ref IffyPlugins, "Iffy/Messy");
+            ProcessPluginSet(MONITORED_PLUGINS, ref OtherPlugins, "Monitored/Noteworthy");
+        }
+
+        /// <summary>
+        /// Processes a set of monitored plugins, adding them to the output string if found in the log.
+        /// </summary>
+        /// <param name="pluginSet">The plugins to track.</param>
+        /// <param name="listOutput">The output string to append to.</param>
+        /// <param name="type">The category of plugin being checked for.</param>
+        public void ProcessPluginSet(Dictionary<string, string> pluginSet, ref string listOutput, string type)
+        {
+            string lastmessage = "";
+            foreach ((string plugin, string notice) in pluginSet)
             {
                 string pluginLoadText = GetPluginText(plugin);
                 if (pluginLoadText.Length != 0)
                 {
-                    Console.WriteLine($"Dangerous Plugin: {pluginLoadText}");
-                    DangerousPlugins.Add(pluginLoadText);
-                }
-            }
-            foreach (string plugin in IFFY_PLUGINS)
-            {
-                string pluginLoadText = GetPluginText(plugin);
-                if (pluginLoadText.Length != 0)
-                {
-                    Console.WriteLine($"Iffy Plugin: {pluginLoadText}");
-                    IffyPlugins.Add(pluginLoadText);
+                    Console.WriteLine($"{type} Plugin: {pluginLoadText}");
+                    string message = "";
+                    if (lastmessage != notice)
+                    {
+                        message = notice;
+                        lastmessage = message;
+                    }
+                    string toOutput = $"`{pluginLoadText}` {message}\n";
+                    if (listOutput.Length + toOutput.Length < 430)
+                    {
+                        listOutput += toOutput;
+                    }
+                    else if (listOutput.Length + plugin.Length < 430)
+                    {
+                        listOutput += $"`{plugin}`\n";
+                    }
                 }
             }
         }
@@ -582,7 +635,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public Embed GetResult()
         {
-            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Count > 0);
+            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Length > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
             AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
             if (IsOffline)
@@ -594,9 +647,10 @@ namespace DenizenBot.UtilityProcessors
                 string description = UUIDVersion == 4 ? "Online" : "Offline";
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), false, inline: false);
-            AutoField(embed, "Bad Plugin(s)", string.Join('\n', DangerousPlugins));
-            AutoField(embed, "Iffy Plugin(s)", string.Join('\n', IffyPlugins));
+            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
+            AutoField(embed, "Bad Plugin(s)", DangerousPlugins, blockCode: false);
+            AutoField(embed, "Iffy Plugin(s)", IffyPlugins, blockCode: false);
+            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
             return embed.Build();
         }
