@@ -31,7 +31,10 @@ namespace DenizenBot.UtilityProcessors
             // reloads
             "issued server command: /reload", "issued server command: /rl",
             // hosts that break stuff
-            "minehut" };
+            "minehut", "aternos",
+            // Exception messages
+            "Caused by: "
+        };
 
         /// <summary>
         /// The text that comes before the server version report.
@@ -106,7 +109,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedPlugin(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
             AddReportedPlugin(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
             AddReportedPlugin(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
-            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPC_Police");
+            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPC_Police");
         }
 
         /// <summary>
@@ -638,6 +641,7 @@ namespace DenizenBot.UtilityProcessors
             bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Length > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
             AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
+            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
             if (IsOffline)
             {
                 AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : "Offline (bungee status unknown).");
@@ -647,10 +651,9 @@ namespace DenizenBot.UtilityProcessors
                 string description = UUIDVersion == 4 ? "Online" : "Offline";
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
-            AutoField(embed, "Bad Plugin(s)", DangerousPlugins, blockCode: false);
-            AutoField(embed, "Iffy Plugin(s)", IffyPlugins, blockCode: false);
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
+            AutoField(embed, "Bad Plugin(s)", DangerousPlugins, blockCode: false, inline: false);
+            AutoField(embed, "Iffy Plugin(s)", IffyPlugins, blockCode: false, inline: false);
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
             return embed.Build();
         }
