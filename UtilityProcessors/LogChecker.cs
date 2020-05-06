@@ -33,7 +33,7 @@ namespace DenizenBot.UtilityProcessors
             // hosts that break stuff
             "minehut", "aternos",
             // Exception messages
-            "Caused by: "
+            "caused by: "
         };
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedPlugin(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
             AddReportedPlugin(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
             AddReportedPlugin(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
-            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPC_Police");
+            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 
         /// <summary>
@@ -449,11 +449,16 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void CheckServerVersion()
         {
-            ServerVersion = ServerVersion.Replace('`', '\'');
-            bool startsWithRunning = ServerVersion.StartsWith("This server is running ");
-            if (string.IsNullOrWhiteSpace(ServerVersion) || (!IsDenizenDebug && !startsWithRunning))
+            if (string.IsNullOrWhiteSpace(ServerVersion))
             {
                 Console.WriteLine("No server version, disregarding check.");
+                return;
+            }
+            ServerVersion = ServerVersion.Replace('`', '\'');
+            bool startsWithRunning = ServerVersion.StartsWith("This server is running ");
+            if (!IsDenizenDebug && !startsWithRunning)
+            {
+                Console.WriteLine("Invalid server version, disregarding check.");
                 ServerVersion = $"`{LimitStringLength(ServerVersion, 400, 350)}`";
                 return;
             }
