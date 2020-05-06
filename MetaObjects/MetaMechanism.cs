@@ -19,6 +19,9 @@ namespace DenizenBot.MetaObjects
 
         public override void AddTo(MetaDocs docs)
         {
+            FullName = $"{MechObject}.{MechName}";
+            NameForms = new string[] { FullName, MechName };
+            HasMultipleNames = true;
             docs.Mechanisms.Add(CleanName, this);
         }
 
@@ -94,9 +97,6 @@ namespace DenizenBot.MetaObjects
 
         public override void PostCheck(MetaDocs docs)
         {
-            FullName = $"{MechObject}.{MechName}";
-            NameForms = new string[] { FullName, MechName };
-            HasMultipleNames = true;
             Require(docs, MechObject, MechName, Input, Description);
             PostCheckTags(docs, Tags);
             PostCheckLinkableText(docs, Description);
