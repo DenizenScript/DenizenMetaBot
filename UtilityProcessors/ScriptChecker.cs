@@ -963,7 +963,7 @@ namespace DenizenBot.UtilityProcessors
                         {
                             if (usageValue is LineTrackedString usageString && nameValue is LineTrackedString nameString)
                             {
-                                if (!usageString.Text.StartsWith($"/{nameString.Text}"))
+                                if (!usageString.Text.StartsWith($"/{nameString.Text} ") && usageString.Text != $"/{nameString.Text}")
                                 {
                                     warnScript(MinorWarnings, usageString.Line, "command_script_usage", "Command script usage key doesn't match the name key (the name is the actual thing you need to type in-game, the usage is for '/help' - refer to `!lang command script containers`)!");
                                 }

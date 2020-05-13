@@ -101,7 +101,7 @@ namespace DenizenBot.UtilityProcessors
 
         static LogChecker()
         {
-            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication");
+            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin");
             AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB");
             AddReportedPlugin(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedPlugin(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
