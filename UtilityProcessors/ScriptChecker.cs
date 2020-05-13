@@ -485,12 +485,12 @@ namespace DenizenBot.UtilityProcessors
                     }
                     if (argNoArrows[i] == '>')
                     {
+                        bracks--;
                         if (bracks == 0)
                         {
                             endIndex = i;
                             break;
                         }
-                        bracks--;
                     }
                 }
                 if (endIndex == -1)
