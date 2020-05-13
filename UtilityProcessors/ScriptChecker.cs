@@ -428,15 +428,16 @@ namespace DenizenBot.UtilityProcessors
             {
                 tagParts.Add(tag.Substring(start, tag.Length - start));
             }
-            if (tagParts[0] == "entry" || tagParts[0] == "context")
+            string tagName = tagParts[0].ToLowerFast();
+            if (tagName == "entry" || tagName == "context")
             {
                 return;
             }
-            if (!Program.CurrentMeta.TagBases.Contains(tagParts[0]) && tagParts[0].Length > 0)
+            if (!Program.CurrentMeta.TagBases.Contains(tagName) && tagName.Length > 0)
             {
-                Warn(Warnings, line, "bad_tag_base", $"Invalid tag base `{tagParts[0].Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
+                Warn(Warnings, line, "bad_tag_base", $"Invalid tag base `{tagName.Replace('`', '\'')}` (check `!tag ...` to find valid tags).");
             }
-            else if (tagParts[0].EndsWith("tag"))
+            else if (tagName.EndsWith("tag"))
             {
                 Warn(Warnings, line, "xtag_notation", $"'XTag' notation is for documentation purposes, and is not to be used literally in a script. (replace the 'XTag' text with a valid real tagbase that returns a tag of that type).");
             }
