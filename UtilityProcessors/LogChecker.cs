@@ -27,7 +27,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public static string[] DANGER_TEXT = new string[] {
             // cracked plugins
-            "cracked by", "crack by", "cracked version", "blackspigot",
+            "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc",
             // reloads
             "issued server command: /reload", "issued server command: /rl",
             // hosts that break stuff
