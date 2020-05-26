@@ -397,6 +397,11 @@ namespace DenizenBot.UtilityProcessors
                     Console.WriteLine($"Paper version {paperVersionNumber} is not tracked, disregarding check.");
                     return "";
                 }
+                if (buildTracker.Value == 0)
+                {
+                    isGood = true;
+                    return "(Version tracker error)";
+                }
                 if (buildTracker.IsCurrent(paperVersionNumber, out int behindBy))
                 {
                     isGood = true;
@@ -527,7 +532,7 @@ namespace DenizenBot.UtilityProcessors
                     string projectName = BuildNumberTracker.SplitToNameAndVersion(pluginLoadText, out string versionText);
                     if (BuildNumberTracker.TryGetBuildFor(projectName, versionText, out BuildNumberTracker.BuildNumber build, out int buildNum))
                     {
-                        string resultText = "";
+                        string resultText;
                         if (build.IsCurrent(buildNum, out int behindBy))
                         {
                             resultText = "Current build";
