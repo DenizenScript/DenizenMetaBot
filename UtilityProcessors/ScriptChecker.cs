@@ -21,22 +21,22 @@ namespace DenizenBot.UtilityProcessors
         public static readonly Dictionary<string, KnownScriptType> KnownScriptTypes = new Dictionary<string, KnownScriptType>()
         {
             // Denizen Core
-            { "custom", new KnownScriptType(bad: new[] { "script", "actions", "events", "steps" }, valueKeys: new[] { "inherit", "*" }, scriptKeys: new[] { "tags.*", "mechanisms.*" }, strict: false, canHaveScripts: false) },
-            { "procedure", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: true) },
-            { "task", new KnownScriptType(required: new[] { "script" }, bad: new[] { "events", "actions", "steps" }, valueKeys: new[] { "definitions" }, scriptKeys: new[] { "script" }, strict: false) },
-            { "world", new KnownScriptType(required: new[] { "events" }, bad: new[] { "script", "actions", "steps" }, scriptKeys: new[] { "events.*" }, strict: false) },
-            { "yaml data", new KnownScriptType(bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, listKeys: new[] { "*" }, strict: false, canHaveScripts: false) },
+            { "custom", new KnownScriptType() { LikelyBadKeys = new[] { "script", "actions", "events", "steps" }, ValueKeys = new[] { "inherit", "*" }, ScriptKeys = new[] { "tags.*", "mechanisms.*" }, Strict = false, CanHaveRandomScripts = false } },
+            { "procedure", new KnownScriptType() { RequiredKeys = new[] { "script" }, LikelyBadKeys = new[] { "events", "actions", "steps" }, ValueKeys = new[] { "definitions" }, ScriptKeys = new[] { "script" }, Strict = true } },
+            { "task", new KnownScriptType() { RequiredKeys = new[] { "script" }, LikelyBadKeys = new[] { "events", "actions", "steps" }, ValueKeys = new[] { "definitions" }, ScriptKeys = new[] { "script" }, Strict = false } },
+            { "world", new KnownScriptType() { RequiredKeys = new[] { "events" }, LikelyBadKeys = new[] { "script", "actions", "steps" }, ScriptKeys = new[] { "events.*" }, Strict = false } },
+            { "yaml data", new KnownScriptType() { LikelyBadKeys = new[] { "script", "actions", "steps", "events" }, ValueKeys = new[] { "*" }, ListKeys = new[] { "*" }, Strict = false, CanHaveRandomScripts = false } },
             // Denizen-Bukkit
-            { "assignment", new KnownScriptType(required: new[] { "actions", "interact scripts" }, bad: new[] { "script", "steps", "events" }, valueKeys: new[] { "default constants.*", "constants.*" }, listKeys: new[] { "interact scripts" }, scriptKeys: new[] { "actions.*" }, strict: true) },
-            { "book", new KnownScriptType(required: new[] { "title", "author", "text" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "title", "author", "signed" }, listKeys: new[] { "text" }, strict: true, canHaveScripts: false) },
-            { "command", new KnownScriptType(required: new[] { "name", "description", "usage", "script" }, bad: new[] { "steps", "actions", "events" }, valueKeys: new[] { "name", "description", "usage", "permission", "permission message" }, listKeys: new[] { "aliases" }, scriptKeys: new[] { "allowed help", "tab complete", "script" }, strict: false) },
-            { "economy", new KnownScriptType(required: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has", "withdraw", "deposit" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has" }, scriptKeys: new[] { "withdraw", "deposit" }, strict: true, canHaveScripts: false) },
-            { "entity", new KnownScriptType(required: new[] { "entity_type" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "*" }, strict: false, canHaveScripts: false) },
-            { "format", new KnownScriptType(required: new[] { "format" }, bad: new[] { "script", "actions", "steps", "events" }, valueKeys: new[] { "format" }, strict: true, canHaveScripts: false) },
-            { "interact", new KnownScriptType(required: new[] { "steps" }, bad: new[] { "script", "actions", "events" }, scriptKeys: new[] { "steps.*" }, strict: true) },
-            { "inventory", new KnownScriptType(required: new[] { "inventory" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "inventory", "title", "size", "definitions.*" }, scriptKeys: new[] { "procedural items" }, listKeys: new[] { "slots" }, strict: true, canHaveScripts: false) },
-            { "item", new KnownScriptType(required: new[] { "material" }, bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "material", "mechanisms.*", "display name", "durability", "recipes.*", "no_id", "color", "book" }, listKeys: new[] { "mechanisms.*", "lore", "enchantments", "recipes.*" }, strict: false, canHaveScripts: false) },
-            { "map", new KnownScriptType(bad: new[] { "script", "steps", "actions", "events" }, valueKeys: new[] { "original", "display name", "auto update", "objects.*" }, strict: true, canHaveScripts: false) }
+            { "assignment", new KnownScriptType() { RequiredKeys = new[] { "actions", "interact scripts" }, LikelyBadKeys = new[] { "script", "steps", "events" }, ValueKeys = new[] { "default constants.*", "constants.*" }, ListKeys = new[] { "interact scripts" }, ScriptKeys = new[] { "actions.*" }, Strict = true } },
+            { "book", new KnownScriptType() { RequiredKeys = new[] { "title", "author", "text" }, LikelyBadKeys = new[] { "script", "actions", "steps", "events" }, ValueKeys = new[] { "title", "author", "signed" }, ListKeys = new[] { "text" }, Strict = true, CanHaveRandomScripts = false } },
+            { "command", new KnownScriptType() { RequiredKeys = new[] { "name", "description", "usage", "script" }, LikelyBadKeys = new[] { "steps", "actions", "events" }, ValueKeys = new[] { "name", "description", "usage", "permission", "permission message" }, ListKeys = new[] { "aliases" }, ScriptKeys = new[] { "allowed help", "tab complete", "script" }, Strict = false } },
+            { "economy", new KnownScriptType() { RequiredKeys = new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has", "withdraw", "deposit" }, LikelyBadKeys = new[] { "script", "actions", "steps", "events" }, ValueKeys = new[] { "priority", "name single", "name plural", "digits", "format", "balance", "has" }, ScriptKeys = new[] { "withdraw", "deposit" }, Strict = true, CanHaveRandomScripts = false } },
+            { "entity", new KnownScriptType() { RequiredKeys = new[] { "entity_type" }, LikelyBadKeys = new[] { "script", "actions", "steps", "events" }, ValueKeys = new[] { "*" }, Strict = false, CanHaveRandomScripts = false } },
+            { "format", new KnownScriptType() { RequiredKeys = new[] { "format" }, LikelyBadKeys = new[] { "script", "actions", "steps", "events" }, ValueKeys = new[] { "format" }, Strict = true, CanHaveRandomScripts = false } },
+            { "interact", new KnownScriptType() { RequiredKeys = new[] { "steps" }, LikelyBadKeys = new[] { "script", "actions", "events" }, ScriptKeys = new[] { "steps.*" }, Strict = true } },
+            { "inventory", new KnownScriptType() { RequiredKeys = new[] { "inventory" }, LikelyBadKeys = new[] { "script", "steps", "actions", "events" }, ValueKeys = new[] { "inventory", "title", "size", "definitions.*" }, ScriptKeys = new[] { "procedural items" }, ListKeys = new[] { "slots" }, Strict = true, CanHaveRandomScripts = false } },
+            { "item", new KnownScriptType() { RequiredKeys = new[] { "material" }, LikelyBadKeys = new[] { "script", "steps", "actions", "events" }, ValueKeys = new[] { "material", "mechanisms.*", "display name", "durability", "recipes.*", "no_id", "color", "book" }, ListKeys = new[] { "mechanisms.*", "lore", "enchantments", "recipes.*" }, Strict = false, CanHaveRandomScripts = false } },
+            { "map", new KnownScriptType() { LikelyBadKeys = new[] { "script", "steps", "actions", "events" }, ValueKeys = new[] { "original", "display name", "auto update", "objects.*" }, Strict = true, CanHaveRandomScripts = false } }
         };
 
         /// <summary>
@@ -752,20 +752,6 @@ namespace DenizenBot.UtilityProcessors
             /// Whether this type can have random extra scripts attached.
             /// </summary>
             public bool CanHaveRandomScripts = true;
-
-            /// <summary>
-            /// Constructs the <see cref="KnownScriptType"/> instance.
-            /// </summary>
-            public KnownScriptType(string[] required = null, string[] bad = null, string[] valueKeys = null, string[] listKeys = null, string[] scriptKeys = null, bool strict = false, bool canHaveScripts = true)
-            {
-                RequiredKeys = required ?? RequiredKeys;
-                LikelyBadKeys = bad ?? LikelyBadKeys;
-                ValueKeys = valueKeys ?? ValueKeys;
-                ListKeys = listKeys ?? ListKeys;
-                ScriptKeys = scriptKeys ?? ScriptKeys;
-                Strict = strict;
-                CanHaveRandomScripts = canHaveScripts;
-            }
         }
 
         /// <summary>
