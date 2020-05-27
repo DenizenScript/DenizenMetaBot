@@ -252,7 +252,7 @@ namespace DenizenBot.UtilityProcessors
             }
             if (name.EndsWith(":"))
             {
-                name = name.Substring(0, name.Length - 1);
+                name = name[0..^1];
             }
             return name;
         }

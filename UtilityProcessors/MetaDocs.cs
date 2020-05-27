@@ -261,7 +261,7 @@ namespace DenizenBot.UtilityProcessors
                 catch (Exception ex)
                 {
                     LoadErrors.Add($"Internal exception - {ex.GetType().FullName} ... see bot console for details.");
-                    Console.WriteLine($"Error: {ex.ToString()}");
+                    Console.WriteLine($"Error: {ex}");
                 }
             }
             try
@@ -271,7 +271,7 @@ namespace DenizenBot.UtilityProcessors
             catch (Exception ex)
             {
                 LoadErrors.Add($"Internal exception - {ex.GetType().FullName} ... see bot console for details.");
-                Console.WriteLine($"Error: {ex.ToString()}");
+                Console.WriteLine($"Error: {ex}");
             }
             foreach (MetaObject obj in AllMetaObjects())
             {
@@ -283,7 +283,7 @@ namespace DenizenBot.UtilityProcessors
                 catch (Exception ex)
                 {
                     LoadErrors.Add($"Internal exception while checking {obj.Type.Name} '{obj.Name}' - {ex.GetType().FullName} ... see bot console for details.");
-                    Console.WriteLine($"Error with {obj.Type.Name} '{obj.Name}': {ex.ToString()}");
+                    Console.WriteLine($"Error with {obj.Type.Name} '{obj.Name}': {ex}");
                 }
             }
             foreach (string str in LoadErrors)
@@ -314,7 +314,7 @@ namespace DenizenBot.UtilityProcessors
             while ((linkIndex = page.IndexOf(link_reference_text, linkIndex)) >= 0)
             {
                 int linkEndIndex = page.IndexOf("</a>", linkIndex);
-                string linkBody = DENIZEN_GUIDE_SOURCE + page.Substring(linkIndex + link_reference_text.Length, linkEndIndex - (linkIndex + link_reference_text.Length));
+                string linkBody = DENIZEN_GUIDE_SOURCE + page[(linkIndex + link_reference_text.Length)..linkEndIndex];
                 MetaGuidePage guidePage = new MetaGuidePage();
                 guidePage.URL = linkBody.BeforeAndAfter("\">", out guidePage.PageName);
                 guidePage.AddTo(this);
@@ -362,12 +362,10 @@ namespace DenizenBot.UtilityProcessors
                 {
                     continue;
                 }
-                using (Stream entryStream = entry.Open())
-                {
-                    lines.Add(START_OF_FILE_PREFIX + entry.FullName);
-                    lines.AddRange(entryStream.AllLinesOfText().Where((s) => s.TrimStart().StartsWith("// ")).Select((s) => s.Trim().Substring("// ".Length).Replace("\r", "")));
-                    lines.Add(END_OF_FILE_MARK);
-                }
+                using Stream entryStream = entry.Open();
+                lines.Add(START_OF_FILE_PREFIX + entry.FullName);
+                lines.AddRange(entryStream.AllLinesOfText().Where((s) => s.TrimStart().StartsWith("// ")).Select((s) => s.Trim().Substring("// ".Length).Replace("\r", "")));
+                lines.Add(END_OF_FILE_MARK);
             }
             return lines.ToArray();
         }
@@ -460,7 +458,7 @@ namespace DenizenBot.UtilityProcessors
                             }
                             continue;
                         }
-                        curKey = line.Substring(1, space - 1);
+                        curKey = line[1..space];
                         curValue = line.Substring(space + 1);
                     }
                     else

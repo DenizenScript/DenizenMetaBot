@@ -468,7 +468,7 @@ namespace DenizenBot
                         {
                             throw;
                         }
-                        Console.WriteLine($"Error handling command: {ex.ToString()}");
+                        Console.WriteLine($"Error handling command: {ex}");
                     }
                 }
                 return Task.CompletedTask;

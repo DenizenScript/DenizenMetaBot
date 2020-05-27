@@ -189,7 +189,7 @@ namespace DenizenBot.MetaObjects
             StringBuilder output = new StringBuilder(linkedtext.Length);
             while (nextLinkIndex >= 0)
             {
-                output.Append(linkedtext.Substring(lastStartIndex, nextLinkIndex - lastStartIndex));
+                output.Append(linkedtext[lastStartIndex..nextLinkIndex]);
                 int endIndex = FindClosingTagMark(linkedtext, nextLinkIndex + 1);
                 if (endIndex < 0)
                 {
@@ -197,7 +197,7 @@ namespace DenizenBot.MetaObjects
                     break;
                 }
                 int startOfMetaCommand = nextLinkIndex + "<@link ".Length;
-                string metaCommand = linkedtext.Substring(startOfMetaCommand, endIndex - startOfMetaCommand);
+                string metaCommand = linkedtext[startOfMetaCommand..endIndex];
                 if (metaCommand.StartsWith("url"))
                 {
                     string url = metaCommand.Substring("url ".Length);
@@ -336,7 +336,7 @@ namespace DenizenBot.MetaObjects
                     return;
                 }
                 int startOfMetaCommand = nextLinkIndex + "<@link ".Length;
-                string metaCommand = linkedtext.Substring(startOfMetaCommand, endIndex - startOfMetaCommand);
+                string metaCommand = linkedtext[startOfMetaCommand..endIndex];
                 if (!metaCommand.StartsWith("url"))
                 {
                     int firstSpace = metaCommand.IndexOf(' ');

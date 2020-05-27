@@ -126,7 +126,7 @@ namespace DenizenBot.UtilityProcessors
             }
             int start = FullLogText.IndexOf("\nActive Plugins (");
             int end = FullLogText.IndexOf("\nLoaded Worlds (");
-            string pluginLine = FullLogText.Substring(start, end - start).Replace(((char)0x01) + "2", "").Replace(((char)0x01) + "4", "");
+            string pluginLine = FullLogText[start..end].Replace(((char)0x01) + "2", "").Replace(((char)0x01) + "4", "");
             int pluginNameIndex = pluginLine.IndexOf(plugin);
             if (pluginNameIndex == -1)
             {
@@ -147,7 +147,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 endIndex = pluginLine.Length;
             }
-            return pluginLine.Substring(pluginNameIndex, endIndex - pluginNameIndex);
+            return pluginLine[pluginNameIndex..endIndex];
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 endIndex = fullLog.Length;
             }
-            return fullLog.Substring(index, endIndex - index);
+            return fullLog[index..endIndex];
         }
 
         /// <summary>
@@ -605,7 +605,7 @@ namespace DenizenBot.UtilityProcessors
                     {
                         lineEnd = FullLogText.Length;
                     }
-                    string dangerousLine = FullLogText.Substring(lineStart, lineEnd - lineStart);
+                    string dangerousLine = FullLogText[lineStart..lineEnd];
                     Console.WriteLine($"Dangerous Text: {dangerousLine}");
                     OtherNoteworthyLines.Add(dangerousLine);
                 }

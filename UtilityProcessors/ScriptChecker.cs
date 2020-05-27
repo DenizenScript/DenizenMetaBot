@@ -253,7 +253,7 @@ namespace DenizenBot.UtilityProcessors
                         {
                             if (CleanedLines[x].Length > 0 && CleanedLines[x].EndsWith(":") && !Lines[x].Replace("\t", "    ").StartsWith(" "))
                             {
-                                string scriptName = CleanedLines[x].Substring(0, CleanedLines[x].Length - 1);
+                                string scriptName = CleanedLines[x][0..^1];
                                 Injects.Add(scriptName);
                                 Console.WriteLine($"ScriptChecker: Inject locally became {scriptName}");
                                 break;
@@ -390,7 +390,7 @@ namespace DenizenBot.UtilityProcessors
                     brackets++;
                     if (brackets == 1)
                     {
-                        tagParts.Add(tag.Substring(start, i - start));
+                        tagParts.Add(tag[start..i]);
                         foundABracket = true;
                         start = i;
                         firstBracket = i;
@@ -408,7 +408,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     if (!foundABracket)
                     {
-                        tagParts.Add(tag.Substring(start, i - start));
+                        tagParts.Add(tag[start..i]);
                     }
                     foundABracket = false;
                     start = i + 1;
@@ -417,7 +417,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     if (!foundABracket)
                     {
-                        tagParts.Add(tag.Substring(start, i - start));
+                        tagParts.Add(tag[start..i]);
                     }
                     CheckSingleArgument(line, tag.Substring(i + 2));
                     foundABracket = true;
@@ -426,7 +426,7 @@ namespace DenizenBot.UtilityProcessors
             }
             if (!foundABracket)
             {
-                tagParts.Add(tag.Substring(start, tag.Length - start));
+                tagParts.Add(tag[start..]);
             }
             string tagName = tagParts[0].ToLowerFast();
             if (tagName == "entry" || tagName == "context")
@@ -523,7 +523,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     if (i > start)
                     {
-                        matchList.Add(stringArgs.Substring(start, i - start));
+                        matchList.Add(stringArgs[start..i]);
                     }
                     start = i + 1;
                 }
@@ -544,7 +544,7 @@ namespace DenizenBot.UtilityProcessors
                             currentQuote = '\0';
                             if (i >= start)
                             {
-                                string matched = stringArgs.Substring(start, i - start);
+                                string matched = stringArgs[start..i];
                                 matchList.Add(matched);
                                 if (!matched.Contains(" "))
                                 {
@@ -687,7 +687,7 @@ namespace DenizenBot.UtilityProcessors
                     int endSpot = argument.IndexOf("]", entrySpot);
                     if (endSpot != -1)
                     {
-                        string entryText = argument.Substring(entrySpot, endSpot - entrySpot).ToLowerFast();
+                        string entryText = argument[entrySpot..endSpot].ToLowerFast();
                         if (!definitions.Contains(ENTRY_PREFIX + entryText) && !definitions.Contains(ENTRY_PREFIX + "*"))
                         {
                             Warn(Warnings, line, "entry_to_nowhere", "entry[...] tag points to non-existent save entry (typo, or bad copypaste?).");
@@ -701,7 +701,7 @@ namespace DenizenBot.UtilityProcessors
                     int endSpot = argument.IndexOf("]", defSpot);
                     if (endSpot != -1)
                     {
-                        string defText = argument.Substring(defSpot, endSpot - defSpot).ToLowerFast();
+                        string defText = argument[defSpot..endSpot].ToLowerFast();
                         if (!definitions.Contains(defText) && !definitions.Contains("*"))
                         {
                             Warn(Warnings, line, "def_of_nothing", "Definition tag points to non-existent definition (typo, or bad copypaste?).");
@@ -792,7 +792,7 @@ namespace DenizenBot.UtilityProcessors
                             warnScript(Warnings, typeString.Line, "bad_key_" + typeString.Text, $"Unexpected key `{key.Replace('`', '\'')}` (probably doesn't belong in this script type - check `!lang {typeString.Text} script containers` for format rules)!");
                         }
                     }
-                    bool matchesSet(string key, string[] keySet)
+                    static bool matchesSet(string key, string[] keySet)
                     {
                         return keySet.Contains(key) || keySet.Contains($"{key}.*") || keySet.Contains("*");
                     }
@@ -1055,7 +1055,7 @@ namespace DenizenBot.UtilityProcessors
             /// </summary>
             public override int GetHashCode()
             {
-                return Text.GetHashCode();
+                return HashCode.Combine(Text);
             }
 
             /// <summary>
@@ -1190,7 +1190,7 @@ namespace DenizenBot.UtilityProcessors
                 string endofline = "";
                 if (cleaned.EndsWith(":"))
                 {
-                    startofline = cleaned.Substring(0, cleaned.Length - 1);
+                    startofline = cleaned[0..^1];
                 }
                 else if (cleaned.Contains(": "))
                 {
