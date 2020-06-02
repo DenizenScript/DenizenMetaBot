@@ -57,6 +57,22 @@ namespace DenizenBot.UtilityProcessors
         };
 
         /// <summary>
+        /// A non-complete set of Denizen commands that can end with a colon and contain arguments, for checking certain syntax errors.
+        /// </summary>
+        public static HashSet<string> CommandsWithColonsAndArguments = new HashSet<string>()
+        {
+            "if", "else", "foreach", "while", "repeat", "choose", "case"
+        };
+
+        /// <summary>
+        /// A non-complete set of Denizen commands that can end with a colon and do not have to contain any arguments, for checking certain syntax errors.
+        /// </summary>
+        public static HashSet<string> CommandsWithColonsButNoArguments = new HashSet<string>()
+        {
+            "else", "default", "random"
+        };
+
+        /// <summary>
         /// The full original script text.
         /// </summary>
         public string FullOriginalScript;
@@ -1205,6 +1221,11 @@ namespace DenizenBot.UtilityProcessors
                 {
                     Warn(Warnings, i, "key_line_no_content", "key line missing contents (misplaced a `:`)?");
                     continue;
+                }
+                string[] inputArgs = startofline.SplitFast(' ');
+                if ((inputArgs.Length == 1 ? CommandsWithColonsButNoArguments : CommandsWithColonsAndArguments).Contains(inputArgs[0].ToLowerFast()))
+                {
+                    Warn(Warnings, i, "key_line_looks_like_command", "Line appears to be intended as command, but forgot a '-'?");
                 }
                 if (spaces > pspaces)
                 {
