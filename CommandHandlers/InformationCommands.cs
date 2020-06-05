@@ -101,7 +101,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Update command", "Please specify which project(s) you want the update link for.");
+                    SendErrorMessageReply(message, "Unknown input for Update command", "Please specify which project(s) you want the update link for, like `{Constants.COMMAND_PREFIX}update denizen`.");
                     return;
                 }
                 foreach (ProjectDetails proj in details.Updates)
@@ -135,7 +135,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for GitHub command", "Please specify which project(s) you want the GitHub link for.");
+                    SendErrorMessageReply(message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{Constants.COMMAND_PREFIX}github denizen`.");
                     return;
                 }
                 SendReply(message, details.Updates[0].GetGithubEmbed());
@@ -166,7 +166,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Issues command", "Please specify which project(s) you want the Issues link for.");
+                    SendErrorMessageReply(message, "Unknown input for Issues command", "Please specify which project(s) you want the Issues link for, like `{Constants.COMMAND_PREFIX}issues denizen`.");
                     return;
                 }
                 SendReply(message, details.Updates[0].GetIssuesEmbed());
@@ -206,7 +206,7 @@ namespace DenizenBot.CommandHandlers
             foreach (string searchRaw in cmds)
             {
                 string commandSearch = searchRaw.ToLowerFast().Trim();
-                if (commandSearch == "list")
+                if (commandSearch == "list" || commandSearch == "all")
                 {
                     string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
                     SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
