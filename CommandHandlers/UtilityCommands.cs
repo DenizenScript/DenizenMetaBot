@@ -2,19 +2,14 @@ using System;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
-using Discord.Net;
 using Discord;
-using Discord.WebSocket;
 using FreneticUtilities.FreneticExtensions;
-using FreneticUtilities.FreneticDataSyntax;
 using FreneticUtilities.FreneticToolkit;
 using DenizenBot.UtilityProcessors;
-using DenizenBot.HelperClasses;
+using DiscordBotBase.CommandHandlers;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -48,7 +43,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// For a web-link command like '!logcheck', gets the data from the paste link.
         /// </summary>
-        public string GetWebLinkDataForCommand(string inputUrl, SocketMessage message)
+        public string GetWebLinkDataForCommand(string inputUrl, IUserMessage message)
         {
             string rawUrl;
             if (inputUrl.StartsWith(PASTEBIN_URL_BASE))
@@ -105,7 +100,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command to check for common issues in server logs.
         /// </summary>
-        public void CMD_LogCheck(string[] cmds, SocketMessage message)
+        public void CMD_LogCheck(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
@@ -125,7 +120,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command to check the updatedness of a version string.
         /// </summary>
-        public void CMD_VersionCheck(string[] cmds, SocketMessage message)
+        public void CMD_VersionCheck(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
@@ -187,7 +182,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command to check for common issues in script pastes.
         /// </summary>
-        public void CMD_ScriptCheck(string[] cmds, SocketMessage message)
+        public void CMD_ScriptCheck(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {

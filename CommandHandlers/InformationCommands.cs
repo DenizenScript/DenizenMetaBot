@@ -2,19 +2,14 @@ using System;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord.Net;
 using Discord;
 using Discord.WebSocket;
-using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
-using FreneticUtilities.FreneticDataSyntax;
 using FreneticUtilities.FreneticToolkit;
-using DenizenBot.UtilityProcessors;
 using DenizenBot.HelperClasses;
+using DiscordBotBase.CommandHandlers;
+using DiscordBotBase;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -67,16 +62,16 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to get help (shows a list of valid bot commands).
         /// </summary>
-        public void CMD_Help(string[] cmds, SocketMessage message)
+        public void CMD_Help(string[] cmds, IUserMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
             embed.AddField("**Available Informational Commands:**", CmdsInfo);
             embed.AddField("**Available Utility Commands:**", CmdsUtility);
-            if (Bot.MetaCommandsAllowed(message.Channel))
+            if (DenizenMetaBot.MetaCommandsAllowed(message.Channel))
             {
                 embed.AddField("**Available Meta Docs Commands:**", CmdsMeta);
             }
-            if (Bot.IsBotCommander(message.Author as SocketGuildUser))
+            if (DenizenMetaBot.IsBotCommander(message.Author as SocketGuildUser))
             {
                 embed.AddField("**Available Admin Commands:**", CmdsAdmin);
             }
@@ -86,20 +81,20 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to say 'hello' and get a source link.
         /// </summary>
-        public void CMD_Hello(string[] cmds, SocketMessage message)
+        public void CMD_Hello(string[] cmds, IUserMessage message)
         {
-            SendReply(message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(Constants.DENIZEN_LOGO).WithUrl(Constants.SOURCE_CODE_URL)
-                .WithDescription($"Hi! I'm a bot! Find my source code at {Constants.SOURCE_CODE_URL}").Build());
+            SendReply(message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO).WithUrl(DenizenMetaBotConstants.SOURCE_CODE_URL)
+                .WithDescription($"Hi! I'm a bot! Find my source code at {DenizenMetaBotConstants.SOURCE_CODE_URL}").Build());
         }
 
         /// <summary>
         /// User command to see information on how to update projects.
         /// </summary>
-        public void CMD_Update(string[] cmds, SocketMessage message)
+        public void CMD_Update(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
-                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     SendErrorMessageReply(message, "Unknown input for Update command", "Please specify which project(s) you want the update link for, like `{Constants.COMMAND_PREFIX}update denizen`.");
                     return;
@@ -113,13 +108,13 @@ namespace DenizenBot.CommandHandlers
             foreach (string projectName in cmds)
             {
                 string projectNameLower = projectName.ToLowerFast();
-                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
+                if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
                     SendReply(message, detail.GetUpdateEmbed());
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for Update command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
@@ -129,13 +124,13 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to see a link to the GitHub.
         /// </summary>
-        public void CMD_GitHub(string[] cmds, SocketMessage message)
+        public void CMD_GitHub(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
-                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{Constants.COMMAND_PREFIX}github denizen`.");
+                    SendErrorMessageReply(message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}github denizen`.");
                     return;
                 }
                 SendReply(message, details.Updates[0].GetGithubEmbed());
@@ -144,13 +139,13 @@ namespace DenizenBot.CommandHandlers
             foreach (string projectName in cmds)
             {
                 string projectNameLower = projectName.ToLowerFast();
-                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
+                if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
                     SendReply(message, detail.GetGithubEmbed());
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for GitHub command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
@@ -160,11 +155,11 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to see a link to the GitHub.
         /// </summary>
-        public void CMD_Issues(string[] cmds, SocketMessage message)
+        public void CMD_Issues(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
-                if (!Bot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     SendErrorMessageReply(message, "Unknown input for Issues command", "Please specify which project(s) you want the Issues link for, like `{Constants.COMMAND_PREFIX}issues denizen`.");
                     return;
@@ -175,13 +170,13 @@ namespace DenizenBot.CommandHandlers
             foreach (string projectName in cmds)
             {
                 string projectNameLower = projectName.ToLowerFast();
-                if (Bot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
+                if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
                     SendReply(message, detail.GetIssuesEmbed());
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.ProjectToDetails.Keys, projectName, 20);
+                    string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
                     SendErrorMessageReply(message, "Unknown project name for Issues command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
@@ -191,7 +186,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to get some predefined informational output.
         /// </summary>
-        public void CMD_Info(string[] cmds, SocketMessage message)
+        public void CMD_Info(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
@@ -208,10 +203,10 @@ namespace DenizenBot.CommandHandlers
                 string commandSearch = searchRaw.ToLowerFast().Trim();
                 if (commandSearch == "list" || commandSearch == "all")
                 {
-                    string fullList = "`" + string.Join("`, `", Bot.InformationalDataNames) + "`";
+                    string fullList = "`" + string.Join("`, `", DenizenMetaBot.InformationalDataNames) + "`";
                     SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
                 }
-                else if (Bot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+                else if (DenizenMetaBot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
                 {
                     infoOutput = infoOutput.Trim();
                     if (infoOutput.StartsWith("NO_BOX:"))
@@ -226,7 +221,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    string closeName = StringConversionHelper.FindClosestString(Bot.InformationalData.Keys, commandSearch, 20);
+                    string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.InformationalData.Keys, commandSearch, 20);
                     SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
             }
@@ -235,7 +230,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to display a rule.
         /// </summary>
-        public void CMD_Rule(string[] cmds, SocketMessage message)
+        public void CMD_Rule(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0)
             {
@@ -249,7 +244,7 @@ namespace DenizenBot.CommandHandlers
             foreach (string searchRaw in cmds)
             {
                 string ruleSearch = searchRaw.ToLowerFast().Trim();
-                if (Bot.Rules.TryGetValue(ruleSearch, out string ruleText))
+                if (DenizenMetaBot.Rules.TryGetValue(ruleSearch, out string ruleText))
                 {
                     ruleText = ruleText.Trim();
                     SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithDescription(ruleText).Build());
@@ -271,9 +266,9 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to display a quote.
         /// </summary>
-        public void CMD_Quote(string[] cmds, SocketMessage message)
+        public void CMD_Quote(string[] cmds, IUserMessage message)
         {
-            if (Bot.Quotes.Length == 0)
+            if (DenizenMetaBot.Quotes.Length == 0)
             {
                 SendErrorMessageReply(message, "Quotes Unavailable", "This bot currently has no quotes configured.");
                 return;
@@ -290,14 +285,14 @@ namespace DenizenBot.CommandHandlers
             {
                 QuotesSeen[quoteId] = now;
                 //SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.SPEECH_BUBBLE_ICON).WithTitle($"Quote #{quoteId + 1}").WithDescription($"```xml\n{Bot.Quotes[quoteId]}\n```").Build());
-                message.Channel.SendMessageAsync($"+> Quote **{quoteId + 1}**:\n```xml\n{Bot.Quotes[quoteId]}\n```").Wait();
+                message.Channel.SendMessageAsync($"+> Quote **{quoteId + 1}**:\n```xml\n{DenizenMetaBot.Quotes[quoteId]}\n```").Wait();
             }
             if (cmds.Length == 0)
             {
                 int qid = 0;
                 for (int i = 0; i < 15; i++)
                 {
-                    qid = _Random.Next(Bot.Quotes.Length);
+                    qid = _Random.Next(DenizenMetaBot.Quotes.Length);
                     if (!QuotesSeen.ContainsKey(qid))
                     {
                         break;
@@ -312,18 +307,18 @@ namespace DenizenBot.CommandHandlers
                 {
                     id = 1;
                 }
-                else if (id > Bot.Quotes.Length)
+                else if (id > DenizenMetaBot.Quotes.Length)
                 {
-                    id = Bot.Quotes.Length;
+                    id = DenizenMetaBot.Quotes.Length;
                 }
                 sendQuote(id - 1);
                 return;
             }
             List<int> matchedQuoteIDs = new List<int>(32);
             string rawInputLow = string.Join(" ", cmds).ToLowerInvariant();
-            for (int i = 0; i < Bot.Quotes.Length; i++)
+            for (int i = 0; i < DenizenMetaBot.Quotes.Length; i++)
             {
-                if (Bot.QuotesLower[i].Contains(rawInputLow))
+                if (DenizenMetaBot.QuotesLower[i].Contains(rawInputLow))
                 {
                     matchedQuoteIDs.Add(i);
                 }

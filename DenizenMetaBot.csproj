@@ -19,10 +19,13 @@
     <PackageReference Include="YamlDotNet" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="mcmonkeyDiscordBotBase\*.*" />
+    <Compile Remove="mcmonkeyDiscordBotBase\**\*.*" />
     <Compile Remove="FreneticUtilities\*.*" />
     <Compile Remove="FreneticUtilities\**\*.*" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="mcmonkeyDiscordBotBase\mcmonkeyDiscordBotBase.csproj" />
     <ProjectReference Include="FreneticUtilities\FreneticUtilities\FreneticUtilities.csproj" />
   </ItemGroup>
 </Project>

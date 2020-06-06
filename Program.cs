@@ -24,11 +24,6 @@ namespace DenizenBot
     public class Program
     {
         /// <summary>
-        /// The current bot object (the instance will change if the bot is restarted).
-        /// </summary>
-        public static DenizenMetaBot CurrentBot = null;
-
-        /// <summary>
         /// The current meta documentation (the instance which change if meta is reloaded).
         /// </summary>
         public static MetaDocs CurrentMeta = null;
@@ -53,7 +48,6 @@ namespace DenizenBot
         /// </summary>
         public static void LaunchBotThread(string[] args)
         {
-            CurrentBot = new DenizenMetaBot();
             Thread thr = new Thread(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
             thr.Start(args);
         }
@@ -65,7 +59,7 @@ namespace DenizenBot
         {
             try
             {
-                CurrentBot.InitAndRun(obj as string[]);
+                new DenizenMetaBot().InitAndRun(obj as string[]);
             }
             catch (Exception ex)
             {

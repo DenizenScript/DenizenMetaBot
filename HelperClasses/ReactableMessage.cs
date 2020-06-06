@@ -4,6 +4,7 @@ using System.Text;
 using Discord;
 using Discord.WebSocket;
 using Discord.Rest;
+using DiscordBotBase;
 
 namespace DenizenBot.HelperClasses
 {
@@ -37,7 +38,7 @@ namespace DenizenBot.HelperClasses
         /// </summary>
         public void RemoveReactions()
         {
-            Message.RemoveReactionsAsync(Program.CurrentBot.Client.CurrentUser, new IEmote[] { new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI) }).Wait();
+            Message.RemoveReactionsAsync(DiscordBotBaseHelper.CurrentBot.Client.CurrentUser, new IEmote[] { new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI) }).Wait();
         }
     }
 }

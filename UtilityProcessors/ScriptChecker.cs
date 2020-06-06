@@ -7,6 +7,7 @@ using Discord;
 using YamlDotNet.RepresentationModel;
 using FreneticUtilities.FreneticExtensions;
 using DenizenBot.MetaObjects;
+using DiscordBotBase;
 
 namespace DenizenBot.UtilityProcessors
 {

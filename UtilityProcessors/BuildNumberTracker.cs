@@ -52,8 +52,8 @@ namespace DenizenBot.UtilityProcessors
             /// <param name="projectName">The name of the project.</param>
             /// <param name="regexText">The regex matcher text.</param>
             /// <param name="jenkinsJobName">The jenkins job name.</param>
-            /// <param name="jenkinsUrlBase">The jenkins URL base path, if not the default <see cref="Constants.JENKINS_URL_BASE"/>.</param>
-            public BuildNumber(string projectName, string regexText, string jenkinsJobName, string jenkinsUrlBase = Constants.JENKINS_URL_BASE)
+            /// <param name="jenkinsUrlBase">The jenkins URL base path, if not the default <see cref="DenizenMetaBotConstants.JENKINS_URL_BASE"/>.</param>
+            public BuildNumber(string projectName, string regexText, string jenkinsJobName, string jenkinsUrlBase = DenizenMetaBotConstants.JENKINS_URL_BASE)
             {
                 Name = projectName;
                 Matcher = new Regex(regexText, RegexOptions.Compiled);

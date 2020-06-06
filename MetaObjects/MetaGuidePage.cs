@@ -34,7 +34,7 @@ namespace DenizenBot.MetaObjects
 
         public override EmbedBuilder GetEmbed()
         {
-            EmbedBuilder builder = base.GetEmbed().WithUrl(URL).WithThumbnailUrl(Constants.DENIZEN_LOGO);
+            EmbedBuilder builder = base.GetEmbed().WithUrl(URL).WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO);
             builder.Description = $"Read the guide page '**{PageName}**' at: {URL}";
             return builder;
         }

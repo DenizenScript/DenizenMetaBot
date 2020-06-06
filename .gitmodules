@@ -1,3 +1,6 @@
 [submodule "FreneticUtilities"]
 	path = FreneticUtilities
 	url = https://github.com/FreneticLLC/FreneticUtilities
+[submodule "mcmonkeyDiscordBotBase"]
+	path = mcmonkeyDiscordBotBase
+	url = ./mcmonkeyDiscordBotBase

@@ -8,7 +8,7 @@ namespace DenizenBot
     /// Constants (links, image urls, etc).
     /// Either absolute constants, or config-loaded pseudo-constants.
     /// </summary>
-    public static class Constants
+    public static class DenizenMetaBotConstants
     {
         /// <summary>
         /// The base for the meta docs URL.
@@ -26,38 +26,13 @@ namespace DenizenBot
         public const string SOURCE_CODE_URL = "https://github.com/DenizenScript/DenizenMetaBot";
 
         /// <summary>
-        /// A warning emoji image URL.
-        /// </summary>
-        public const string WARNING_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/26a0.png";
-
-        /// <summary>
         /// The Denizen logo.
         /// </summary>
         public const string DENIZEN_LOGO = "https://i.alexgoodwin.media/i/for_real_usage/ec5694.png";
 
         /// <summary>
-        /// Generic reusable "information" icon.
-        /// </summary>
-        public const string INFO_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2139.png";
-
-        /// <summary>
-        /// Generic reusable "speech bubble" icon.
-        /// </summary>
-        public const string SPEECH_BUBBLE_ICON = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f4ac.png";
-
-        /// <summary>
         /// The base for the Jenkins CI URL.
         /// </summary>
         public const string JENKINS_URL_BASE = "https://ci.citizensnpcs.co";
-
-        /// <summary>
-        /// A checkmark "accept"/"yes" emoji, for reactions.
-        /// </summary>
-        public const string ACCEPT_EMOJI = "☑️";
-
-        /// <summary>
-        /// A Red-X "deny"/"no" emoji, for reactions.
-        /// </summary>
-        public const string DENY_EMOJI = "❌";
     }
 }

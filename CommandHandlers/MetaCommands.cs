@@ -2,20 +2,14 @@ using System;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord.Net;
 using Discord;
 using Discord.WebSocket;
-using System.Diagnostics;
 using FreneticUtilities.FreneticExtensions;
-using FreneticUtilities.FreneticDataSyntax;
 using FreneticUtilities.FreneticToolkit;
 using DenizenBot.MetaObjects;
 using DenizenBot.UtilityProcessors;
-using DenizenBot.HelperClasses;
+using DiscordBotBase.CommandHandlers;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -29,9 +23,9 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         /// <param name="message">The message being replied to.</param>
         /// <returns>True if they are denied.</returns>
-        public bool CheckMetaDenied(SocketMessage message)
+        public bool CheckMetaDenied(IUserMessage message)
         {
-            if (!Bot.MetaCommandsAllowed(message.Channel))
+            if (!DenizenMetaBot.MetaCommandsAllowed(message.Channel))
             {
                 SendErrorMessageReply(message, "Command Not Allowed Here",
                     "Meta documentation commands are not allowed in this channel. Please switch to a bot spam channel, or a Denizen channel.");
@@ -53,7 +47,7 @@ namespace DenizenBot.CommandHandlers
         /// <param name="altSingleOutput">An alternate method of processing the single-item-result.</param>
         /// <param name="altFindClosest">Alternate method to find the closest result.</param>
         /// <returns>How close of an answer was gotten (0 = perfect, -1 = no match needed, 1000 = none).</returns>
-        public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, SocketMessage message,
+        public int AutoMetaCommand<T>(Dictionary<string, T> docs, MetaType type, string[] cmds, IUserMessage message,
             List<string> secondarySearches = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null,
             Func<string> altFindClosest = null, Func<List<T>, List<T>> altMatchOrderer = null) where T: MetaObject
         {
@@ -70,7 +64,7 @@ namespace DenizenBot.CommandHandlers
             string search = cmds[0].ToLowerFast();
             if (search == "all")
             {
-                SendGenericPositiveMessageReply(message, $"All {type.Name}s", $"Find all {type.Name}s at {Constants.DOCS_URL_BASE}{type.WebPath}/");
+                SendGenericPositiveMessageReply(message, $"All {type.Name}s", $"Find all {type.Name}s at {DenizenMetaBotConstants.DOCS_URL_BASE}{type.WebPath}/");
                 return -1;
             }
             if (altSingleOutput == null)
@@ -208,7 +202,7 @@ namespace DenizenBot.CommandHandlers
                 string closeName = altFindClosest();
                 if (closeName != null)
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{closeName}`?", $"{Constants.COMMAND_PREFIX}{type.Name} {closeName}");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{closeName}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}{type.Name} {closeName}");
                 }
                 return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
             }
@@ -237,7 +231,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command meta docs user command.
         /// </summary>
-        public void CMD_Command(string[] cmds, SocketMessage message)
+        public void CMD_Command(string[] cmds, IUserMessage message)
         {
             void singleReply(MetaCommand cmd)
             {
@@ -268,7 +262,7 @@ namespace DenizenBot.CommandHandlers
                 string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
                 if (closeMech != null)
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"{Constants.COMMAND_PREFIX}mechanism {closeMech}");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}mechanism {closeMech}");
                 }
             }
         }
@@ -276,7 +270,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Mechanism meta docs user command.
         /// </summary>
-        public void CMD_Mechanism(string[] cmds, SocketMessage message)
+        public void CMD_Mechanism(string[] cmds, IUserMessage message)
         {
             List<string> secondarySearches = new List<string>();
             if (cmds.Length > 0)
@@ -293,7 +287,7 @@ namespace DenizenBot.CommandHandlers
                 string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
                 if (closeCmd != null)
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"{Constants.COMMAND_PREFIX}command {closeCmd}");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}command {closeCmd}");
                 }
             }
         }
@@ -301,7 +295,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Tag meta docs user command.
         /// </summary>
-        public void CMD_Tag(string[] cmds, SocketMessage message)
+        public void CMD_Tag(string[] cmds, IUserMessage message)
         {
             List<string> secondarySearches = new List<string>();
             if (cmds.Length > 0)
@@ -358,7 +352,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Event meta docs user command.
         /// </summary>
-        public void CMD_Event(string[] cmds, SocketMessage message)
+        public void CMD_Event(string[] cmds, IUserMessage message)
         {
             string onSearch = string.Join(" ", cmds).ToLowerFast();
             string secondarySearch = onSearch.StartsWith("on ") ? onSearch.Substring("on ".Length) : onSearch;
@@ -373,7 +367,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Action meta docs user command.
         /// </summary>
-        public void CMD_Action(string[] cmds, SocketMessage message)
+        public void CMD_Action(string[] cmds, IUserMessage message)
         {
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             secondarySearch = secondarySearch.StartsWith("on ") ? secondarySearch.Substring("on ".Length) : secondarySearch;
@@ -387,7 +381,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Language meta docs user command.
         /// </summary>
-        public void CMD_Language(string[] cmds, SocketMessage message)
+        public void CMD_Language(string[] cmds, IUserMessage message)
         {
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             if (cmds.Length > 0)
@@ -400,7 +394,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Guide page search user command.
         /// </summary>
-        public void CMD_Guide(string[] cmds, SocketMessage message)
+        public void CMD_Guide(string[] cmds, IUserMessage message)
         {
             if (cmds.Length == 0 || cmds[0].ToLowerFast() == "all")
             {
@@ -418,7 +412,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Meta docs total search command.
         /// </summary>
-        public void CMD_Search(string[] cmds, SocketMessage message)
+        public void CMD_Search(string[] cmds, IUserMessage message)
         {
             if (CheckMetaDenied(message))
             {
@@ -479,7 +473,7 @@ namespace DenizenBot.CommandHandlers
                 string possible = StringConversionHelper.FindClosestString(Program.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
                 if (!string.IsNullOrWhiteSpace(possible))
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{Constants.COMMAND_PREFIX}search {possible}");
+                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}search {possible}");
                 }
             }
             if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
@@ -498,7 +492,7 @@ namespace DenizenBot.CommandHandlers
                     objs = objs.GetRange(0, 20);
                     suffix = ", ...";
                 }
-                string listText = string.Join("`, `", objs.Select((obj) => $"{Constants.COMMAND_PREFIX}{obj.Type.Name} {obj.CleanName}"));
+                string listText = string.Join("`, `", objs.Select((obj) => $"{DenizenMetaBotConstants.COMMAND_PREFIX}{obj.Type.Name} {obj.CleanName}"));
                 SendGenericPositiveMessageReply(message, $"{typeShort} Search Results", $"{typeShort} ({typeLong}) search results: `{listText}`{suffix}");
             }
             if (strongMatch.Any())
