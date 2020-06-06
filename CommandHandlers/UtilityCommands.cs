@@ -10,6 +10,8 @@ using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticToolkit;
 using DenizenBot.UtilityProcessors;
 using DiscordBotBase.CommandHandlers;
+using DiscordBotBase;
+using SharpDenizenTools.ScriptAnalysis;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -179,6 +181,83 @@ namespace DenizenBot.CommandHandlers
             return;
         }
 
+
+        /// <summary>
+        /// Gets the result Discord embed for the script check.
+        /// </summary>
+        /// <returns>The embed to send.</returns>
+        public Embed GetResult(ScriptChecker checker)
+        {
+            int totalWarns = checker.Errors.Count + checker.Warnings.Count + checker.MinorWarnings.Count;
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Script Check Results").WithThumbnailUrl((totalWarns > 0) ? Constants.WARNING_ICON : Constants.INFO_ICON);
+            int linesMissing = 0;
+            int shortened = 0;
+            void embedList(List<ScriptChecker.ScriptWarning> list, string title)
+            {
+                if (list.Count > 0)
+                {
+                    HashSet<string> usedKeys = new HashSet<string>();
+                    StringBuilder thisListResult = new StringBuilder(list.Count * 200);
+                    foreach (ScriptChecker.ScriptWarning entry in list)
+                    {
+                        if (usedKeys.Contains(entry.WarningUniqueKey))
+                        {
+                            continue;
+                        }
+                        usedKeys.Add(entry.WarningUniqueKey);
+                        StringBuilder lines = new StringBuilder(50);
+                        if (entry.Line != -1)
+                        {
+                            lines.Append(entry.Line + 1);
+                        }
+                        foreach (ScriptChecker.ScriptWarning subEntry in list.SkipWhile(s => s != entry).Skip(1).Where(s => s.WarningUniqueKey == entry.WarningUniqueKey))
+                        {
+                            shortened++;
+                            if (lines.Length < 40)
+                            {
+                                lines.Append(", ").Append(subEntry.Line + 1);
+                                if (lines.Length >= 40)
+                                {
+                                    lines.Append(", ...");
+                                }
+                            }
+                        }
+                        string message = $"On line {lines}: {entry.CustomMessageForm}";
+                        if (thisListResult.Length + message.Length < 1000 && embed.Length + thisListResult.Length + message.Length < 1800)
+                        {
+                            thisListResult.Append($"{message}\n");
+                        }
+                        else
+                        {
+                            linesMissing++;
+                        }
+                    }
+                    if (thisListResult.Length > 0)
+                    {
+                        embed.AddField(title, thisListResult.ToString());
+                    }
+                    Console.WriteLine($"Script Checker {title}: {string.Join('\n', list.Select(s => $"{s.Line + 1}: {s.CustomMessageForm}"))}");
+                }
+            }
+            embedList(checker.Errors, "Encountered Critical Errors");
+            embedList(checker.Warnings, "Script Warnings");
+            embedList(checker.MinorWarnings, "Minor Warnings");
+            embedList(checker.Infos, "Other Script Information");
+            if (linesMissing > 0)
+            {
+                embed.AddField("Missing Lines", $"There are {linesMissing} lines not able to fit in this result. Fix the listed errors to see the rest.");
+            }
+            if (shortened > 0)
+            {
+                embed.AddField("Shortened Lines", $"There are {shortened} lines that were merged into other lines.");
+            }
+            foreach (string debug in checker.Debugs)
+            {
+                Console.WriteLine($"Script checker debug: {debug}");
+            }
+            return embed.Build();
+        }
+
         /// <summary>
         /// Command to check for common issues in script pastes.
         /// </summary>
@@ -196,7 +275,7 @@ namespace DenizenBot.CommandHandlers
             }
             ScriptChecker checker = new ScriptChecker(data);
             checker.Run();
-            SendReply(message, checker.GetResult());
+            SendReply(message, GetResult(checker));
         }
     }
 }

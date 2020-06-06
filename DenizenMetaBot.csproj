@@ -14,18 +14,21 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.1.1" />
-    <PackageReference Include="YamlDotNet" Version="8.0.0" />
+    <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="mcmonkeyDiscordBotBase\*.*" />
     <Compile Remove="mcmonkeyDiscordBotBase\**\*.*" />
     <Compile Remove="FreneticUtilities\*.*" />
     <Compile Remove="FreneticUtilities\**\*.*" />
+    <Compile Remove="SharpDenizenTools\*.*" />
+    <Compile Remove="SharpDenizenTools\**\*.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="mcmonkeyDiscordBotBase\mcmonkeyDiscordBotBase.csproj" />
     <ProjectReference Include="FreneticUtilities\FreneticUtilities\FreneticUtilities.csproj" />
+    <ProjectReference Include="SharpDenizenTools\SharpDenizenTools\SharpDenizenTools.csproj" />
   </ItemGroup>
 </Project>

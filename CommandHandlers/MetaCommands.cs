@@ -7,9 +7,10 @@ using Discord;
 using Discord.WebSocket;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticToolkit;
-using DenizenBot.MetaObjects;
 using DenizenBot.UtilityProcessors;
 using DiscordBotBase.CommandHandlers;
+using SharpDenizenTools.MetaHandlers;
+using SharpDenizenTools.MetaObjects;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -240,11 +241,11 @@ namespace DenizenBot.CommandHandlers
                     string outputType = cmds[1].ToLowerFast();
                     if (outputType.StartsWith("u"))
                     {
-                        SendReply(message, cmd.GetUsagesEmbed().Build());
+                        SendReply(message, cmd.GetCommandUsagesEmbed().Build());
                     }
                     else if (outputType.StartsWith("t"))
                     {
-                        SendReply(message, cmd.GetTagsEmbed().Build());
+                        SendReply(message, cmd.GetCommandTagsEmbed().Build());
                     }
                     else
                     {
@@ -256,10 +257,10 @@ namespace DenizenBot.CommandHandlers
                     SendReply(message, cmd.GetEmbed().Build());
                 }
             }
-            int closeness = AutoMetaCommand(Program.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message, altSingleOutput: singleReply);
+            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message, altSingleOutput: singleReply);
             if (closeness > 0)
             {
-                string closeMech = StringConversionHelper.FindClosestString(Program.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
+                string closeMech = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
                 if (closeMech != null)
                 {
                     SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}mechanism {closeMech}");
@@ -281,10 +282,10 @@ namespace DenizenBot.CommandHandlers
                     secondarySearches.Add(cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex));
                 }
             }
-            int closeness = AutoMetaCommand(Program.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearches);
+            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearches);
             if (closeness > 0)
             {
-                string closeCmd = StringConversionHelper.FindClosestString(Program.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
+                string closeCmd = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
                 if (closeCmd != null)
                 {
                     SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}command {closeCmd}");
@@ -334,7 +335,7 @@ namespace DenizenBot.CommandHandlers
             {
                 int lowestDistance = 20;
                 string lowestStr = null;
-                foreach (MetaTag tag in Program.CurrentMeta.Tags.Values)
+                foreach (MetaTag tag in MetaDocs.CurrentMeta.Tags.Values)
                 {
                     int currentDistance = getDistanceTo(tag);
                     if (currentDistance < lowestDistance)
@@ -345,7 +346,7 @@ namespace DenizenBot.CommandHandlers
                 }
                 return lowestStr;
             }
-            AutoMetaCommand(Program.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearches, altFindClosest: findClosestTag,
+            AutoMetaCommand(MetaDocs.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearches, altFindClosest: findClosestTag,
                 altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
         }
 
@@ -361,7 +362,7 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(Program.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
         }
 
         /// <summary>
@@ -375,7 +376,7 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(Program.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, message);
         }
 
         /// <summary>
@@ -388,7 +389,7 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(Program.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, message);
         }
 
         /// <summary>
@@ -406,7 +407,7 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(Program.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
         }
 
         /// <summary>
@@ -432,7 +433,7 @@ namespace DenizenBot.CommandHandlers
             List<MetaObject> partialStrongMatch = new List<MetaObject>();
             List<MetaObject> weakMatch = new List<MetaObject>();
             List<MetaObject> partialWeakMatch = new List<MetaObject>();
-            foreach (MetaObject obj in Program.CurrentMeta.AllMetaObjects())
+            foreach (MetaObject obj in MetaDocs.CurrentMeta.AllMetaObjects())
             {
                 if (obj.CleanName.Contains(fullSearch))
                 {
@@ -470,7 +471,7 @@ namespace DenizenBot.CommandHandlers
             }
             void backupMatchCheck()
             {
-                string possible = StringConversionHelper.FindClosestString(Program.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
+                string possible = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
                 if (!string.IsNullOrWhiteSpace(possible))
                 {
                     SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}search {possible}");

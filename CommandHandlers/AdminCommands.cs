@@ -7,6 +7,7 @@ using Discord;
 using Discord.WebSocket;
 using DenizenBot.UtilityProcessors;
 using DiscordBotBase.CommandHandlers;
+using SharpDenizenTools.MetaHandlers;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -31,7 +32,7 @@ namespace DenizenBot.CommandHandlers
             BuildNumberTracker.UpdateAll();
             MetaDocs docs = new MetaDocs();
             docs.DownloadAll();
-            Program.CurrentMeta = docs;
+            MetaDocs.CurrentMeta = docs;
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Reload Complete").WithDescription("Documentation reloaded successfully.");
             if (docs.LoadErrors.Count > 0)
             {

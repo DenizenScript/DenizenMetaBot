@@ -2,19 +2,10 @@ using System;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Net.Http;
-using Discord.Net;
-using Discord;
-using Discord.WebSocket;
-using System.Diagnostics;
-using FreneticUtilities.FreneticExtensions;
-using FreneticUtilities.FreneticDataSyntax;
-using DenizenBot;
-using DenizenBot.UtilityProcessors;
+using SharpDenizenTools.MetaHandlers;
 
 namespace DenizenBot
 {
@@ -23,11 +14,6 @@ namespace DenizenBot
     /// </summary>
     public class Program
     {
-        /// <summary>
-        /// The current meta documentation (the instance which change if meta is reloaded).
-        /// </summary>
-        public static MetaDocs CurrentMeta = null;
-
         /// <summary>
         /// Reusable HTTP(S) web client.
         /// </summary>
@@ -38,8 +24,8 @@ namespace DenizenBot
         /// </summary>
         static void Main(string[] args)
         {
-            CurrentMeta = new MetaDocs();
-            CurrentMeta.DownloadAll();
+            MetaDocs.CurrentMeta = new MetaDocs();
+            MetaDocs.CurrentMeta.DownloadAll();
             LaunchBotThread(args);
         }
 
