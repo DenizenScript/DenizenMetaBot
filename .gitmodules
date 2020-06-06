@@ -3,4 +3,4 @@
 	url = https://github.com/FreneticLLC/FreneticUtilities
 [submodule "mcmonkeyDiscordBotBase"]
 	path = mcmonkeyDiscordBotBase
-	url = ./mcmonkeyDiscordBotBase
+	url = https://github.com/mcmonkeyprojects/mcmonkeyDiscordBotBase
