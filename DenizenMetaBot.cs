@@ -231,9 +231,7 @@ namespace DenizenBot
         {
             DiscordBotBaseHelper.StartBotHandler(args, new DiscordBotConfig()
             {
-                CommandPrefix = null,
-                CacheSize = 1024,
-                EnsureCaching = true,
+                CommandPrefix = DenizenMetaBotConstants.COMMAND_PREFIX,
                 Initialize = (bot) =>
                 {
                     PopulateFromConfig(bot.ConfigFile);
