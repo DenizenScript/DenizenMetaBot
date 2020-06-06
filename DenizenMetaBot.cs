@@ -146,6 +146,12 @@ namespace DenizenBot
         public void PopulateFromConfig(FDSSection configFile)
         {
             ValidChannels.Clear();
+            InformationalData.Clear();
+            InformationalDataNames.Clear();
+            ChannelToDetails.Clear();
+            ProjectToDetails.Clear();
+            Rules.Clear();
+            AcceptableServerVersions.Clear();
             DenizenMetaBotConstants.DOCS_URL_BASE = configFile.GetString("url_base");
             DenizenMetaBotConstants.COMMAND_PREFIX = configFile.GetString("command_prefix");
             foreach (string channel in configFile.GetStringList("valid_channels"))

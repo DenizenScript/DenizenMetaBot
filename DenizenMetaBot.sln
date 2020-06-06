@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DenizenMetaBot", "DenizenMetaBot.csproj", "{1DB47D6A-4225-4F36-E559-2C6292442953}"
+Project("{9A19103F-1A27-4668-BE54-9A1E7A4F7556}") = "DenizenMetaBot", "DenizenMetaBot.csproj", "{1DB47D6A-4225-4F36-E559-2C6292442953}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDenizenTools", "SharpDenizenTools\SharpDenizenTools\SharpDenizenTools.csproj", "{3DB47D69-4228-4F22-1763-152292496865}"
+Project("{9A19103F-16F7-4668-1E54-9D1E7A4F7556}") = "SharpDenizenTools", "SharpDenizenTools\SharpDenizenTools\SharpDenizenTools.csproj", "{3DB47D69-4228-4F22-1763-152292496865}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mcmonkeyDiscordBotBase", "mcmonkeyDiscordBotBase\mcmonkeyDiscordBotBase.csproj", "{1DB47D6A-4225-4F36-3559-2C6292442953}"
+Project("{9A19103F-16F7-4728-BE54-9A1E7A4F7556}") = "mcmonkeyDiscordBotBase", "mcmonkeyDiscordBotBase\mcmonkeyDiscordBotBase.csproj", "{1DB47D6A-4225-4F36-3559-2C6292442953}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreneticUtilities", "FreneticUtilities\FreneticUtilities\FreneticUtilities.csproj", "{1DB47D6A-4225-4F25-8559-2C6292496953}"
 EndProject
