@@ -96,7 +96,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Update command", "Please specify which project(s) you want the update link for, like `{Constants.COMMAND_PREFIX}update denizen`.");
+                    SendErrorMessageReply(message, "Unknown input for Update command", $"Please specify which project(s) you want the update link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}update denizen`.");
                     return;
                 }
                 foreach (ProjectDetails proj in details.Updates)
@@ -161,7 +161,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Issues command", "Please specify which project(s) you want the Issues link for, like `{Constants.COMMAND_PREFIX}issues denizen`.");
+                    SendErrorMessageReply(message, "Unknown input for Issues command", $"Please specify which project(s) you want the Issues link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}issues denizen`.");
                     return;
                 }
                 SendReply(message, details.Updates[0].GetIssuesEmbed());
