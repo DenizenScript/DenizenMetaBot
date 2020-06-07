@@ -275,28 +275,28 @@ namespace DenizenBot.UtilityProcessors
                 {
                     AutoField(builder, "Cancellable", "True - this adds `<context.cancelled>` and determines `cancelled` + `cancelled:false`.");
                 }
-                else if (obj is MetaGuidePage guidePage)
-                {
-                    builder = builder.WithUrl(guidePage.URL).WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO);
-                    builder.Description = $"Read the guide page '**{guidePage.PageName}**' at: {guidePage.URL}";
-                }
-                else if (obj is MetaLanguage language)
-                {
-                    builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(language.Description.Length > 900 ? language.Description.Substring(0, 800) + "..." : language.Description));
-                }
-                else if (obj is MetaMechanism mechanism)
-                {
-                    builder = builder.WithTitle(mechanism.MechObject + " mechanism: " + mechanism.MechName);
-                    AutoField(builder, "Input", mechanism.Input);
-                    AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
-                    builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description));
-                }
-                else if (obj is MetaTag tag)
-                {
-                    AutoField(builder, "Returns", tag.Returns);
-                    AutoField(builder, "Mechanism", tag.Mechanism);
-                    builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description));
-                }
+            }
+            else if (obj is MetaGuidePage guidePage)
+            {
+                builder = builder.WithUrl(guidePage.URL).WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO);
+                builder.Description = $"Read the guide page '**{guidePage.PageName}**' at: {guidePage.URL}";
+            }
+            else if (obj is MetaLanguage language)
+            {
+                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(language.Description.Length > 900 ? language.Description.Substring(0, 800) + "..." : language.Description));
+            }
+            else if (obj is MetaMechanism mechanism)
+            {
+                builder = builder.WithTitle(mechanism.MechObject + " mechanism: " + mechanism.MechName);
+                AutoField(builder, "Input", mechanism.Input);
+                AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
+                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description));
+            }
+            else if (obj is MetaTag tag)
+            {
+                AutoField(builder, "Returns", tag.Returns);
+                AutoField(builder, "Mechanism", tag.Mechanism);
+                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description));
             }
             return builder;
         }
