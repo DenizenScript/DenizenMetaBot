@@ -152,75 +152,96 @@ namespace DenizenBot
             ProjectToDetails.Clear();
             Rules.Clear();
             AcceptableServerVersions.Clear();
+            BuildNumberTracker.Clear();
             DenizenMetaBotConstants.DOCS_URL_BASE = configFile.GetString("url_base");
             DenizenMetaBotConstants.COMMAND_PREFIX = configFile.GetString("command_prefix");
-            foreach (string channel in configFile.GetStringList("valid_channels"))
+            if (configFile.HasKey("valid_channels"))
             {
-                ValidChannels.Add(ulong.Parse(channel.Trim()));
-            }
-            FDSSection infoSection = configFile.GetSection("info_replies");
-            foreach (string key in infoSection.GetRootKeys())
-            {
-                string infoValue = infoSection.GetRootData(key).AsString;
-                string[] keysSplit = key.SplitFast(',');
-                InformationalDataNames.Add(keysSplit[0]);
-                foreach (string name in keysSplit)
+                foreach (string channel in configFile.GetStringList("valid_channels"))
                 {
-                    InformationalData[name.Trim()] = infoValue;
+                    ValidChannels.Add(ulong.Parse(channel.Trim()));
                 }
             }
-            FDSSection projectDetailsSection = configFile.GetSection("project_details");
-            foreach (string key in projectDetailsSection.GetRootKeys())
+            if (configFile.HasKey("info_replies"))
             {
-                FDSSection detailsSection = projectDetailsSection.GetSection(key);
-                ProjectDetails detail = new ProjectDetails
+                FDSSection infoSection = configFile.GetSection("info_replies");
+                foreach (string key in infoSection.GetRootKeys())
                 {
-                    Name = key,
-                    Icon = detailsSection.GetString("icon", ""),
-                    GitHub = detailsSection.GetString("github", ""),
-                    UpdateMessage = detailsSection.GetString("update", "")
-                };
-                ProjectToDetails.Add(key.ToLowerFast(), detail);
-            }
-            FDSSection channelDetailsSection = configFile.GetSection("channel_details");
-            foreach (string key in channelDetailsSection.GetRootKeys())
-            {
-                FDSSection detailsSection = channelDetailsSection.GetSection(key);
-                ChannelDetails detail = new ChannelDetails();
-                List<ProjectDetails> projects = new List<ProjectDetails>();
-                foreach (string projName in detailsSection.GetString("updates", "").Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                {
-                    projects.Add(ProjectToDetails[projName]);
+                    string infoValue = infoSection.GetRootData(key).AsString;
+                    string[] keysSplit = key.SplitFast(',');
+                    InformationalDataNames.Add(keysSplit[0]);
+                    foreach (string name in keysSplit)
+                    {
+                        InformationalData[name.Trim()] = infoValue;
+                    }
                 }
-                detail.Updates = projects.ToArray();
-                detail.Docs = detailsSection.GetBool("docs", false).Value;
-                ChannelToDetails.Add(ulong.Parse(key), detail);
             }
-            FDSSection rulesSection = configFile.GetSection("rules");
-            foreach (string rule in rulesSection.GetRootKeys())
+            if (configFile.HasKey("project_details"))
             {
-                Rules.Add(rule, rulesSection.GetString(rule));
-            }
-            BuildNumberTracker.Clear();
-            FDSSection buildNumbersSection = configFile.GetSection("build_numbers");
-            foreach (string projectName in buildNumbersSection.GetRootKeys())
-            {
-                FDSSection project = buildNumbersSection.GetSection(projectName);
-                BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"));
-            }
-            AcceptableServerVersions = configFile.GetStringList("acceptable_server_versions");
-            foreach (string version in AcceptableServerVersions)
-            {
-                double versionNumber = double.Parse(version);
-                if (LowestServerVersion <= 0.01 || versionNumber < LowestServerVersion)
+                FDSSection projectDetailsSection = configFile.GetSection("project_details");
+                foreach (string key in projectDetailsSection.GetRootKeys())
                 {
-                    LowestServerVersion = versionNumber;
+                    FDSSection detailsSection = projectDetailsSection.GetSection(key);
+                    ProjectDetails detail = new ProjectDetails
+                    {
+                        Name = key,
+                        Icon = detailsSection.GetString("icon", ""),
+                        GitHub = detailsSection.GetString("github", ""),
+                        UpdateMessage = detailsSection.GetString("update", "")
+                    };
+                    ProjectToDetails.Add(key.ToLowerFast(), detail);
                 }
-                if (versionNumber > HighestServerVersion)
+            }
+            if (configFile.HasKey("channel_details"))
+            {
+                FDSSection channelDetailsSection = configFile.GetSection("channel_details");
+                foreach (string key in channelDetailsSection.GetRootKeys())
                 {
-                    HighestServerVersion = versionNumber;
+                    FDSSection detailsSection = channelDetailsSection.GetSection(key);
+                    ChannelDetails detail = new ChannelDetails();
+                    List<ProjectDetails> projects = new List<ProjectDetails>();
+                    foreach (string projName in detailsSection.GetString("updates", "").Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        projects.Add(ProjectToDetails[projName]);
+                    }
+                    detail.Updates = projects.ToArray();
+                    detail.Docs = detailsSection.GetBool("docs", false).Value;
+                    ChannelToDetails.Add(ulong.Parse(key), detail);
                 }
-                BuildNumberTracker.AddPaperTracker(version);
+            }
+            if (configFile.HasKey("rules"))
+            {
+                FDSSection rulesSection = configFile.GetSection("rules");
+                foreach (string rule in rulesSection.GetRootKeys())
+                {
+                    Rules.Add(rule, rulesSection.GetString(rule));
+                }
+            }
+            if (configFile.HasKey("build_numbers"))
+            {
+                FDSSection buildNumbersSection = configFile.GetSection("build_numbers");
+                foreach (string projectName in buildNumbersSection.GetRootKeys())
+                {
+                    FDSSection project = buildNumbersSection.GetSection(projectName);
+                    BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"));
+                }
+            }
+            if (configFile.HasKey("acceptable_server_versions"))
+            {
+                AcceptableServerVersions = configFile.GetStringList("acceptable_server_versions");
+                foreach (string version in AcceptableServerVersions)
+                {
+                    double versionNumber = double.Parse(version);
+                    if (LowestServerVersion <= 0.01 || versionNumber < LowestServerVersion)
+                    {
+                        LowestServerVersion = versionNumber;
+                    }
+                    if (versionNumber > HighestServerVersion)
+                    {
+                        HighestServerVersion = versionNumber;
+                    }
+                    BuildNumberTracker.AddPaperTracker(version);
+                }
             }
             BuildNumberTracker.LoadSpigotData();
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))

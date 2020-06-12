@@ -23,13 +23,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public static string CmdsInfo =
                 "`help` shows help output\n"
-                + "`hello` shows a source code link\n"
-                + "`info <name ...>` shows a prewritten informational notice reply\n"
-                + "`update [project ...]` shows an update link for the named project(s)\n"
-                + "`github [project ...]` shows a GitHub link for the named project(s)\n"
-                + "`issues [project ...]` shows an issue posting link for the named project(s)\n"
-                + "`rule [rule ...]` shows the identified rule\n"
-                + "`quote [quote]` shows a random quote that matches the search (if any)";
+                + "`hello` shows a source code link\n";
 
         /// <summary>
         /// Simple output string for meta commands.
@@ -64,6 +58,25 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Help(string[] cmds, IUserMessage message)
         {
+            StringBuilder infoCmds = new StringBuilder(CmdsInfo);
+            if (!DenizenMetaBot.ProjectToDetails.IsEmpty())
+            {
+                infoCmds.Append("`update [project ...]` shows an update link for the named project(s)\n")
+                        .Append("`github [project ...]` shows a GitHub link for the named project(s)\n")
+                        .Append("`issues [project ...]` shows an issue posting link for the named project(s)\n");
+            }
+            if (!DenizenMetaBot.InformationalData.IsEmpty())
+            {
+                infoCmds.Append("`info <name ...>` shows a prewritten informational notice reply\n");
+            }
+            if (!DenizenMetaBot.Rules.IsEmpty())
+            {
+                infoCmds.Append("`rule [rule ...]` shows the identified rule\n");
+            }
+            if (!DenizenMetaBot.Quotes.IsEmpty())
+            {
+                infoCmds.Append("`quote [quote]` shows a random quote that matches the search (if any)");
+            }
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
             embed.AddField("**Available Informational Commands:**", CmdsInfo);
             embed.AddField("**Available Utility Commands:**", CmdsUtility);
@@ -92,6 +105,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Update(string[] cmds, IUserMessage message)
         {
+            if (DenizenMetaBot.ProjectToDetails.IsEmpty())
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
@@ -126,6 +143,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_GitHub(string[] cmds, IUserMessage message)
         {
+            if (DenizenMetaBot.ProjectToDetails.IsEmpty())
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
@@ -157,6 +178,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Issues(string[] cmds, IUserMessage message)
         {
+            if (DenizenMetaBot.ProjectToDetails.IsEmpty())
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
@@ -188,6 +213,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Info(string[] cmds, IUserMessage message)
         {
+            if (DenizenMetaBot.InformationalData.IsEmpty())
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 SendErrorMessageReply(message, "Command Syntax Incorrect", "`!info <info item or 'list'>`");
@@ -232,6 +261,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Rule(string[] cmds, IUserMessage message)
         {
+            if (DenizenMetaBot.Rules.IsEmpty())
+            {
+                return;
+            }
             if (cmds.Length == 0)
             {
                 cmds = new string[] { "all" };
@@ -268,9 +301,8 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Quote(string[] cmds, IUserMessage message)
         {
-            if (DenizenMetaBot.Quotes.Length == 0)
+            if (DenizenMetaBot.Quotes.IsEmpty())
             {
-                SendErrorMessageReply(message, "Quotes Unavailable", "This bot currently has no quotes configured.");
                 return;
             }
             DateTimeOffset now = DateTimeOffset.UtcNow;

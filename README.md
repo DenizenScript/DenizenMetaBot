@@ -22,8 +22,8 @@ To configure the bot:
 - Within the `config` directory, create file `token.txt` containing only the Discord bot token without newlines or anything else.
     - To create a bot token, refer to official Discord documentation. Alternately, you can follow the bot-user-creation parts of https://discord.foxbot.me/stable/guides/getting_started/first-bot.html (ignore the coding parts, just follow the first bits about creating a bot user on the Discord application system, and getting the token).
 - Optionally, within the `config` directory, create file `quotes.txt`, with a list of quotes for `!quote`, separated by double-newlines (ie, one complete blank line between each distinct quote).
-- Within the `config` directory, create file `config.fds` (a FreneticDataSyntax file) with the following options (See also the full file text sample below):
-    - `valid_channels` set to a whitelist of channels the bot responds in (blank = responds anywhere).
+- Within the `config` directory, create file `config.fds` (a FreneticDataSyntax file) with the following options (See also the full file text sample below) (most lines are optional):
+    - `valid_channels` set to a whitelist of channels the bot responds in (left out = responds anywhere).
     - `info_replies` set to a submapping of info commands and their replies, which allows comma-separated list keys. The first listed name on each line is the primary name. Type `\n` to add a line break.
     - `project_details` set to a submapping of project names to project details map, as follows:
         - `update` set to an update message for the project.
