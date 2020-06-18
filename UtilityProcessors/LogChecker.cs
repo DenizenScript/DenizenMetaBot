@@ -23,20 +23,6 @@ namespace DenizenBot.UtilityProcessors
         public static string[] VERSION_PLUGINS = new string[] { "Citizens", "Denizen", "Depenizen", "Sentinel", "dDiscordBot" };
 
         /// <summary>
-        /// Lowercase text that usually is a bad sign.
-        /// </summary>
-        public static string[] DANGER_TEXT = new string[] {
-            // cracked plugins
-            "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc",
-            // reloads
-            "issued server command: /reload", "issued server command: /rl",
-            // hosts that break stuff
-            "minehut", "aternos",
-            // Exception messages
-            "caused by: "
-        };
-
-        /// <summary>
         /// The text that comes before the server version report.
         /// </summary>
         public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version",
@@ -68,6 +54,12 @@ namespace DenizenBot.UtilityProcessors
         public const int VERSION_ID_LOCATION = 14;
 
         /// <summary>
+        /// Lowercase text that usually is a bad sign.
+        /// Map of text to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> DANGER_TEXT = new Dictionary<string, string>();
+
+        /// <summary>
         /// Plugins that are suspicious (like ones that relate to cracked servers).
         /// Map of plugin names to messages.
         /// </summary>
@@ -91,7 +83,7 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="set">The set of plugins to add to.</param>
         /// <param name="message">The message to include, if any.</param>
         /// <param name="names">The name(s) of plugins to track.</param>
-        public static void AddReportedPlugin(Dictionary<string, string> set, string message, params string[] names)
+        public static void AddReportedEntry(Dictionary<string, string> set, string message, params string[] names)
         {
             foreach (string name in names)
             {
@@ -101,16 +93,23 @@ namespace DenizenBot.UtilityProcessors
 
         static LogChecker()
         {
-            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
-            AddReportedPlugin(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot");
-            AddReportedPlugin(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
-            AddReportedPlugin(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
-            AddReportedPlugin(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
-            AddReportedPlugin(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
-            AddReportedPlugin(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
-            AddReportedPlugin(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
-            AddReportedPlugin(MESSY_PLUGINS, "Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
-            AddReportedPlugin(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
+            // Danger text
+            AddReportedEntry(DANGER_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc");
+            AddReportedEntry(DANGER_TEXT, "NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl");
+            AddReportedEntry(DANGER_TEXT, "Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
+            AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
+            AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
+            // Plugins
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot");
+            AddReportedEntry(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
+            AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
+            AddReportedEntry(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
+            AddReportedEntry(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
+            AddReportedEntry(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
+            AddReportedEntry(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
+            AddReportedEntry(MESSY_PLUGINS, "Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
+            AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 
         /// <summary>
@@ -594,10 +593,11 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessDangerText()
         {
-            foreach (string sign in DANGER_TEXT)
+            HashSet<string> messagesUsed = new HashSet<string>();
+            foreach ((string sign, string message) in DANGER_TEXT)
             {
                 int signIndex = FullLogTextLower.IndexOf(sign);
-                if (signIndex >= 0)
+                if (signIndex >= 0 && !messagesUsed.Contains(message))
                 {
                     int lineStart = FullLogText.LastIndexOf('\n', signIndex) + 1;
                     int lineEnd = FullLogText.IndexOf('\n', signIndex);
@@ -605,9 +605,10 @@ namespace DenizenBot.UtilityProcessors
                     {
                         lineEnd = FullLogText.Length;
                     }
-                    string dangerousLine = FullLogText[lineStart..lineEnd];
+                    string dangerousLine = Escape(FullLogText[lineStart..lineEnd]);
                     Console.WriteLine($"Dangerous Text: {dangerousLine}");
-                    OtherNoteworthyLines.Add(dangerousLine);
+                    OtherNoteworthyLines.Add($"`{dangerousLine}` {message}");
+                    messagesUsed.Add(message);
                 }
             }
         }
@@ -665,7 +666,7 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
             AutoField(embed, "Bad Plugin(s)", DangerousPlugins, blockCode: false, inline: false);
             AutoField(embed, "Iffy Plugin(s)", IffyPlugins, blockCode: false, inline: false);
-            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
+            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), blockCode: false, inline: false);
             return embed.Build();
         }
     }
