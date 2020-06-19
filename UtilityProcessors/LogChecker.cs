@@ -656,7 +656,7 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
             if (IsOffline)
             {
-                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? "Offline." : "Offline (bungee status unknown)."));
+                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? "Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
             }
             if (UUIDVersion != 0)
             {
