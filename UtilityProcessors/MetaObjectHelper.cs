@@ -173,8 +173,9 @@ namespace DenizenBot.UtilityProcessors
             StringBuilder tagsFieldBuilder = new StringBuilder(tags.Count() * 30);
             foreach (string tag in tags)
             {
+                string tagPreSpace = tag.BeforeAndAfter(" ", out string tagAfterSpace);
                 string tagOut;
-                if (tag.EndsWith(">"))
+                if (tagPreSpace.EndsWith(">") && string.IsNullOrWhiteSpace(tagAfterSpace))
                 {
                     tagOut = $"`{tag}`";
                     MetaTag realTag = MetaDocs.CurrentMeta.FindTag(tag);
@@ -189,7 +190,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 else
                 {
-                    int endMark = tag.LastIndexOf('>') + 1;
+                    int endMark = tagPreSpace.LastIndexOf('>') + 1;
                     if (endMark == 0)
                     {
                         tagOut = tag;
@@ -247,7 +248,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaEvent evt)
             {
-                AutoField(builder, "Other Event Lines", string.Join("\n", evt.Events.Skip(1)));
+                AutoField(builder, "Other Event Lines", "`" + string.Join("\n", evt.Events.Skip(1)) + "`");
                 AutoField(builder, "Switches", string.Join("\n", evt.Switches));
                 AutoField(builder, "Triggers", evt.Triggers);
                 AutoField(builder, "Has Player", evt.Player);
