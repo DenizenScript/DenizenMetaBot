@@ -167,10 +167,10 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         /// <param name="tags">The tags array.</param>
         /// <returns>The tags field text.</returns>
-        public static string GetTagsField(string[] tags)
+        public static string GetTagsField(IEnumerable<string> tags)
         {
             int limitLengthRemaining = 1000;
-            StringBuilder tagsFieldBuilder = new StringBuilder(tags.Length * 30);
+            StringBuilder tagsFieldBuilder = new StringBuilder(tags.Count() * 30);
             foreach (string tag in tags)
             {
                 string tagOut;
@@ -252,24 +252,7 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(builder, "Triggers", evt.Triggers);
                 AutoField(builder, "Has Player", evt.Player);
                 AutoField(builder, "Has NPC", evt.NPC);
-                string subContext = string.Join("\n", evt.Context);
-                if (subContext.Length > 1000)
-                {
-                    int len = 0;
-                    for (int i = 0; i < evt.Context.Length; i++)
-                    {
-                        len += evt.Context[i].Length + 1;
-                        if (len > 1000)
-                        {
-                            AutoField(builder, "Context", string.Join("\n", new List<string>(evt.Context).GetRange(0, i)));
-                            AutoField(builder, "(cont)", string.Join("\n", evt.Context.Skip(i)));
-                        }
-                    }
-                }
-                else
-                {
-                    AutoField(builder, "Context", subContext);
-                }
+                AutoField(builder, "Context", GetTagsField(evt.Context));
                 AutoField(builder, "Determine", string.Join("\n", evt.Determinations));
                 if (evt.Cancellable)
                 {
