@@ -101,7 +101,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
             AddReportedEntry(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "ExploitFixer", "MineCaptcha");
             AddReportedEntry(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
@@ -109,6 +109,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
             AddReportedEntry(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
             AddReportedEntry(MESSY_PLUGINS, "Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
+            AddReportedEntry(MESSY_PLUGINS, "Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 

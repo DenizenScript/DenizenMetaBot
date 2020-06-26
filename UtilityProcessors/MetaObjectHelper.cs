@@ -231,7 +231,10 @@ namespace DenizenBot.UtilityProcessors
             }
             if (obj is MetaAction action)
             {
-                AutoField(builder, "Other Action Lines", string.Join("\n", action.Actions.Skip(1)));
+                if (action.Actions.Length > 1)
+                {
+                    AutoField(builder, "Other Action Lines", "`" + string.Join("\n", action.Actions.Skip(1)) + "`");
+                }
                 AutoField(builder, "Triggers", action.Triggers);
                 AutoField(builder, "Context", string.Join("\n", action.Context));
                 AutoField(builder, "Determine", string.Join("\n", action.Determinations));
@@ -248,7 +251,10 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaEvent evt)
             {
-                AutoField(builder, "Other Event Lines", "`" + string.Join("\n", evt.Events.Skip(1)) + "`");
+                if (evt.Events.Length > 1)
+                {
+                    AutoField(builder, "Other Event Lines", "`" + string.Join("\n", evt.Events.Skip(1)) + "`");
+                }
                 AutoField(builder, "Switches", string.Join("\n", evt.Switches));
                 AutoField(builder, "Triggers", evt.Triggers);
                 AutoField(builder, "Has Player", evt.Player);
