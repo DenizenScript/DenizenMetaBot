@@ -101,7 +101,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
             AddReportedEntry(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "ExploitFixer", "MineCaptcha");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
