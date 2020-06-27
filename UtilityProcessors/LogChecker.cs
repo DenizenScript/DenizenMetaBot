@@ -100,16 +100,19 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Login authenticator plugin)", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "(Offline-fixer plugin)", "SkinsRestorer", "MySkin", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
-            AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
             AddReportedEntry(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
             AddReportedEntry(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
-            AddReportedEntry(MESSY_PLUGINS, "", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
-            AddReportedEntry(MESSY_PLUGINS, "Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
-            AddReportedEntry(MESSY_PLUGINS, "Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
+            AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "CMI");
+            AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
+            AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
+            AddReportedEntry(MESSY_PLUGINS, "- Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
+            AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
+            AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 
