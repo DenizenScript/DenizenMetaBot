@@ -24,6 +24,7 @@ namespace DenizenBot
         /// </summary>
         static void Main(string[] args)
         {
+            ReusableWebClient.DefaultRequestHeaders.UserAgent.ParseAdd("DenizenMetaBot/1.0");
             MetaDocs.CurrentMeta = new MetaDocs();
             MetaDocs.CurrentMeta.DownloadAll();
             LaunchBotThread(args);
