@@ -247,7 +247,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     AutoField(builder, "Related Guide Page", $"[{command.Guide}]({command.Guide})");
                 }
-                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description));
+                builder.AddField("Description", EscapeForDiscord(ProcessMetaLinksForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description)));
             }
             else if (obj is MetaEvent evt)
             {
