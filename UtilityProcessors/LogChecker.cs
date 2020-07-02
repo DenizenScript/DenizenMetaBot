@@ -113,6 +113,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
+            AddReportedEntry(MESSY_PLUGINS, "- PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 
