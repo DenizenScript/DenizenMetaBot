@@ -155,6 +155,7 @@ namespace DenizenBot
             BuildNumberTracker.Clear();
             DenizenMetaBotConstants.DOCS_URL_BASE = configFile.GetString("url_base");
             DenizenMetaBotConstants.COMMAND_PREFIX = configFile.GetString("command_prefix");
+            DiscordBotBaseHelper.CurrentBot.ClientConfig.CommandPrefix = DenizenMetaBotConstants.COMMAND_PREFIX;
             if (configFile.HasKey("valid_channels"))
             {
                 foreach (string channel in configFile.GetStringList("valid_channels"))
