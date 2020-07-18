@@ -114,6 +114,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
             AddReportedEntry(MESSY_PLUGINS, "- PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
+            AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police");
         }
 

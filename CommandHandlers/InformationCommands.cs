@@ -78,7 +78,7 @@ namespace DenizenBot.CommandHandlers
                 infoCmds.Append("`quote [quote]` shows a random quote that matches the search (if any)");
             }
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
-            embed.AddField("**Available Informational Commands:**", CmdsInfo);
+            embed.AddField("**Available Informational Commands:**", infoCmds);
             embed.AddField("**Available Utility Commands:**", CmdsUtility);
             if (DenizenMetaBot.MetaCommandsAllowed(message.Channel))
             {
