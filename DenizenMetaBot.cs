@@ -17,6 +17,7 @@ using DenizenBot.UtilityProcessors;
 using DenizenBot.HelperClasses;
 using DiscordBotBase;
 using DiscordBotBase.CommandHandlers;
+using SharpDenizenTools.MetaHandlers;
 
 namespace DenizenBot
 {
@@ -243,6 +244,10 @@ namespace DenizenBot
                     }
                     BuildNumberTracker.AddPaperTracker(version);
                 }
+            }
+            if (configFile.HasKey("additional_meta_sources"))
+            {
+                MetaDocs.SourcesToUse = MetaDocs.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
             }
             BuildNumberTracker.LoadSpigotData();
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))

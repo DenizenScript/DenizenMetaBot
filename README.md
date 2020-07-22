@@ -40,6 +40,7 @@ To configure the bot:
         - `jenkins_job` set to the Jenkins job name.
         `- regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
     - `acceptable_server_versions` set to a list of server MC versions (just the main version without sub-version, like "1.15", not "1.15.1") that are acceptable + tracked (older = outdated, newer = unknown).
+    - `additional_meta_sources` set to a list of additional meta source URLs (should be direct zip links, like `https://github.com/DenizenScript/Denizen/archive/dev.zip`).
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
