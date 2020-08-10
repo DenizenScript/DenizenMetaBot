@@ -540,7 +540,7 @@ namespace DenizenBot.UtilityProcessors
                         string resultText;
                         if (build.IsCurrent(buildNum, out int behindBy))
                         {
-                            resultText = "Current build";
+                            resultText = build.Value == 0 ? "Version tracker error" : "Current build";
                         }
                         else
                         {

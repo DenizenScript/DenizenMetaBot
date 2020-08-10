@@ -308,7 +308,7 @@ namespace DenizenBot.CommandHandlers
             DateTimeOffset now = DateTimeOffset.UtcNow;
             foreach (KeyValuePair<int, DateTimeOffset> recentlySeen in new Dictionary<int, DateTimeOffset>(QuotesSeen))
             {
-                if (Math.Abs(now.Subtract(recentlySeen.Value).TotalMinutes) > 5)
+                if (Math.Abs(now.Subtract(recentlySeen.Value).TotalMinutes) > 30)
                 {
                     QuotesSeen.Remove(recentlySeen.Key);
                 }
