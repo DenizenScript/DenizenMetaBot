@@ -36,6 +36,11 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// Matcher for A-Z only.
+        /// </summary>
+        public static readonly AsciiMatcher AlphabetMatcher = new AsciiMatcher(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+
+        /// <summary>
         /// Automatically processes a meta search command.
         /// </summary>
         /// <typeparam name="T">The meta object type.</typeparam>
@@ -146,6 +151,7 @@ namespace DenizenBot.CommandHandlers
             }
             List<T> matched = new List<T>();
             List<T> strongMatched = new List<T>();
+            string searchAZTrim = AlphabetMatcher.TrimToMatches(search);
             int tryProcesSingleMatch(T objVal, string objName, int min)
             {
                 if (objName.Contains(search))
@@ -169,6 +175,12 @@ namespace DenizenBot.CommandHandlers
                 if (min < 1 && secondaryMatcher != null && secondaryMatcher(objVal))
                 {
                     Console.WriteLine($"Meta-Command for '{type.Name}' found a weak match (secondaryMatcher) for search '{search}': '{objName}'");
+                    if (AlphabetMatcher.TrimToMatches(objName).Contains(searchAZTrim))
+                    {
+                        Console.WriteLine($"Escalated last match to strong.");
+                        strongMatched.Add(objVal);
+                        return 2;
+                    }
                     matched.Add(objVal);
                     return 1;
                 }
