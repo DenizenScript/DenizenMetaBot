@@ -175,7 +175,7 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The tags field text.</returns>
         public static string GetTagsField(IEnumerable<string> tags)
         {
-            int limitLengthRemaining = 1000;
+            int limitLengthRemaining = 850;
             StringBuilder tagsFieldBuilder = new StringBuilder(tags.Count() * 30);
             int count = 0;
             foreach (string tag in tags.Take(10))
