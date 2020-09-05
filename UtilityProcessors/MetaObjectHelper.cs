@@ -132,11 +132,13 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public static EmbedBuilder GetCommandUsagesEmbed(this MetaCommand command)
         {
-            EmbedBuilder builder = GetEmbed(command);
+            EmbedBuilder builder = GetEmbed(command, true);
             builder.Description = "";
             int limitLengthRemaining = 1000;
-            foreach (string usage in command.Usages)
+            int count = 0;
+            foreach (string usage in command.Usages.Take(5))
             {
+                count++;
                 string usageOut = usage;
                 string nameBar = "Sample Usage";
                 int firstNewline = usageOut.IndexOf('\n');
@@ -158,6 +160,10 @@ namespace DenizenBot.UtilityProcessors
                     break;
                 }
             }
+            if (count < command.Usages.Count)
+            {
+                AutoField(builder, "Additional Usage Examples", $"... and {command.Usages.Count - count} more.");
+            }
             return builder;
         }
 
@@ -171,8 +177,10 @@ namespace DenizenBot.UtilityProcessors
         {
             int limitLengthRemaining = 1000;
             StringBuilder tagsFieldBuilder = new StringBuilder(tags.Count() * 30);
-            foreach (string tag in tags)
+            int count = 0;
+            foreach (string tag in tags.Take(10))
             {
+                count++;
                 string tagPreSpace = tag.BeforeAndAfter(" ", out string tagAfterSpace);
                 string tagOut;
                 if (tagPreSpace.EndsWith(">") && string.IsNullOrWhiteSpace(tagAfterSpace))
@@ -211,6 +219,10 @@ namespace DenizenBot.UtilityProcessors
                     break;
                 }
             }
+            if (count < tags.Count())
+            {
+                tagsFieldBuilder.Append($"... and {tags.Count() - count} more.");
+            }
             return tagsFieldBuilder.ToString();
         }
 
@@ -218,8 +230,9 @@ namespace DenizenBot.UtilityProcessors
         /// Gets an <see cref="EmbedBuilder"/> for a <see cref="MetaObject"/> to be shown on Discord meta output.
         /// </summary>
         /// <param name="obj">The meta object to embed.</param>
+        /// <param name="hideLargeData">Whether to hide large data parts (eg command descriptions).</param>
         /// <returns>The Discord-ready embed object.</returns>
-        public static EmbedBuilder GetEmbed(this MetaObject obj)
+        public static EmbedBuilder GetEmbed(this MetaObject obj, bool hideLargeData = false)
         {
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(obj.Type.Name + ": " + obj.Name)
                 .WithUrl(DenizenMetaBotConstants.DOCS_URL_BASE + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
@@ -247,7 +260,10 @@ namespace DenizenBot.UtilityProcessors
                 {
                     AutoField(builder, "Related Guide Page", $"[{command.Guide}]({command.Guide})");
                 }
-                builder.AddField("Description", EscapeForDiscord(ProcessMetaLinksForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description)));
+                if (!hideLargeData)
+                {
+                    builder.AddField("Description", EscapeForDiscord(ProcessMetaLinksForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description)));
+                }
             }
             else if (obj is MetaEvent evt)
             {
