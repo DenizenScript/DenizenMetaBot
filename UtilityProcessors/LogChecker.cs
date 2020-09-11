@@ -336,7 +336,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else
             {
-                IsBungee = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Contains("bungee");
+                IsBungee = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "").Contains("bungee");
                 IsOffline = FullLogText.Contains(OFFLINE_NOTICE);
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX);
                 if (string.IsNullOrWhiteSpace(ServerVersion))
