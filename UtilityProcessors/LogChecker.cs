@@ -54,6 +54,12 @@ namespace DenizenBot.UtilityProcessors
         public const int VERSION_ID_LOCATION = 14;
 
         /// <summary>
+        /// Lowercase text that is suspicious (like ones that relate to cracked plugins).
+        /// Map of text to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> SUSPICIOUS_TEXT = new Dictionary<string, string>();
+
+        /// <summary>
         /// Lowercase text that usually is a bad sign.
         /// Map of text to messages.
         /// </summary>
@@ -100,7 +106,7 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text
-            AddReportedEntry(DANGER_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc");
+            AddReportedEntry(SUSPICIOUS_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc");
             AddReportedEntry(DANGER_TEXT, "NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl");
             AddReportedEntry(DANGER_TEXT, "Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
             AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
@@ -273,6 +279,11 @@ namespace DenizenBot.UtilityProcessors
         /// Plugins whose versions will be listed.
         /// </summary>
         public string PluginVersions = "";
+
+        /// <summary>
+        /// Lines that are suspicious, usually ones that indicate cracked plugins.
+        /// </summary>
+        public List<string> SuspiciousLines = new List<string>();
 
         /// <summary>
         /// Lines of note, usually ones that indicate a bad sign.
@@ -613,10 +624,10 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Looks for dangerous text sometimes found in logs.
         /// </summary>
-        public void ProcessDangerText()
+        public void ProcessDangerText(Dictionary<string, string> textMap, List<string> lineList)
         {
             HashSet<string> messagesUsed = new HashSet<string>();
-            foreach ((string sign, string message) in DANGER_TEXT)
+            foreach ((string sign, string message) in textMap)
             {
                 int signIndex = FullLogTextLower.IndexOf(sign);
                 if (signIndex >= 0 && !messagesUsed.Contains(message))
@@ -629,7 +640,7 @@ namespace DenizenBot.UtilityProcessors
                     }
                     string dangerousLine = Escape(FullLogText[lineStart..lineEnd]);
                     Console.WriteLine($"Dangerous Text: {dangerousLine}");
-                    OtherNoteworthyLines.Add($"`{dangerousLine}` {message}");
+                    lineList.Add($"`{dangerousLine}` {message}");
                     messagesUsed.Add(message);
                 }
             }
@@ -664,7 +675,8 @@ namespace DenizenBot.UtilityProcessors
             ProcessBasics();
             ProcessUUIDCheck();
             ProcessPluginLoads();
-            ProcessDangerText();
+            ProcessDangerText(DANGER_TEXT, OtherNoteworthyLines);
+            ProcessDangerText(SUSPICIOUS_TEXT, SuspiciousLines);
         }
 
         /// <summary>
@@ -672,8 +684,19 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public Embed GetResult()
         {
-            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (SuspiciousPlugins.Length > 0);
-            EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results");
+            if (UUIDVersion == 3 || (UUIDVersion == 0 && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
+            {
+                embed.ThumbnailUrl = Constants.RED_FLAG_ICON;
+            }
+            else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0))
+            {
+                embed.ThumbnailUrl = Constants.WARNING_ICON;
+            }
+            else
+            {
+                embed.ThumbnailUrl = Constants.INFO_ICON;
+            }
             AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
             if (IsOffline)
@@ -686,6 +709,7 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
+            AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), blockCode: false, inline: false);
             AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, blockCode: false, inline: false);
             AutoField(embed, "Problematic Plugin(s)", BadPlugins, blockCode: false, inline: false);
             AutoField(embed, "Possibly Relevant Plugin(s)", IffyPlugins, blockCode: false, inline: false);
