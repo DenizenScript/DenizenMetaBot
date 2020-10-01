@@ -66,7 +66,13 @@ namespace DenizenBot.UtilityProcessors
         public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = new Dictionary<string, string>();
 
         /// <summary>
-        /// Plugins that might cause problems.
+        /// Plugins that WILL cause problems.
+        /// Map of plugin names to messages.
+        /// </summary>
+        public static readonly Dictionary<string, string> BAD_PLUGINS = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Plugins that MIGHT cause problems.
         /// Map of plugin names to messages.
         /// </summary>
         public static readonly Dictionary<string, string> MESSY_PLUGINS = new Dictionary<string, string>();
@@ -104,20 +110,21 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit");
-            AddReportedEntry(MESSY_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
-            AddReportedEntry(MESSY_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
-            AddReportedEntry(MESSY_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC");
-            AddReportedEntry(MESSY_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
-            AddReportedEntry(MESSY_PLUGINS, "- To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
+            AddReportedEntry(BAD_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
+            AddReportedEntry(BAD_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
+            AddReportedEntry(BAD_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
+            AddReportedEntry(BAD_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
+            AddReportedEntry(BAD_PLUGINS, "- To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
+            AddReportedEntry(BAD_PLUGINS, "- Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
+            AddReportedEntry(BAD_PLUGINS, "- PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
+            AddReportedEntry(BAD_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
+            AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable.", "Geyser-Spigot");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
-            AddReportedEntry(MESSY_PLUGINS, "- Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
-            AddReportedEntry(MESSY_PLUGINS, "- PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
-            AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
-            AddReportedEntry(MESSY_PLUGINS, "- Bedrock clients are unsupportable.", "Geyser-Spigot");
+            AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
         }
 
@@ -245,7 +252,12 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Any potentially problematic plugins found in the log.
         /// </summary>
-        public string DangerousPlugins = "";
+        public string SuspiciousPlugins = "";
+
+        /// <summary>
+        /// Any often plugins found in the log.
+        /// </summary>
+        public string BadPlugins = "";
 
         /// <summary>
         /// Any sometimes-conflictive plugins found in the log.
@@ -558,7 +570,8 @@ namespace DenizenBot.UtilityProcessors
                     }
                 }
             }
-            ProcessPluginSet(SUSPICIOUS_PLUGINS, ref DangerousPlugins, "Dangerous/Suspicious/Bad");
+            ProcessPluginSet(SUSPICIOUS_PLUGINS, ref SuspiciousPlugins, "Dangerous/Suspicious/Bad");
+            ProcessPluginSet(BAD_PLUGINS, ref BadPlugins, "Bad");
             ProcessPluginSet(MESSY_PLUGINS, ref IffyPlugins, "Iffy/Messy");
             ProcessPluginSet(MONITORED_PLUGINS, ref OtherPlugins, "Monitored/Noteworthy");
         }
@@ -659,7 +672,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public Embed GetResult()
         {
-            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (DangerousPlugins.Length > 0);
+            bool shouldWarning = LikelyOffline || (OtherNoteworthyLines.Count > 0) || (SuspiciousPlugins.Length > 0);
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(shouldWarning ? Constants.WARNING_ICON : Constants.INFO_ICON);
             AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
@@ -673,8 +686,9 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
-            AutoField(embed, "Bad Plugin(s)", DangerousPlugins, blockCode: false, inline: false);
-            AutoField(embed, "Iffy Plugin(s)", IffyPlugins, blockCode: false, inline: false);
+            AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, blockCode: false, inline: false);
+            AutoField(embed, "Problematic Plugin(s)", BadPlugins, blockCode: false, inline: false);
+            AutoField(embed, "Possibly Relevant Plugin(s)", IffyPlugins, blockCode: false, inline: false);
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), blockCode: false, inline: false);
             return embed.Build();
         }
