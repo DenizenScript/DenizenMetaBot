@@ -106,8 +106,8 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text
-            AddReportedEntry(SUSPICIOUS_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc");
-            AddReportedEntry(DANGER_TEXT, "NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl");
+            AddReportedEntry(SUSPICIOUS_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks");
+            AddReportedEntry(DANGER_TEXT, "NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
             AddReportedEntry(DANGER_TEXT, "Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
             AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
