@@ -112,7 +112,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit");
@@ -706,7 +706,7 @@ namespace DenizenBot.UtilityProcessors
             if (UUIDVersion != 0)
             {
                 string description = UUIDVersion == 4 ? "Online" : "Offline";
-                AutoField(embed, "Detected Player UUID Version", $"UUID Version: {UUIDVersion} ({description})" );
+                AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
             AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), blockCode: false, inline: false);
