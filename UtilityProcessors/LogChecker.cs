@@ -112,7 +112,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit");
@@ -301,9 +301,9 @@ namespace DenizenBot.UtilityProcessors
         public bool IsBungee = false;
 
         /// <summary>
-        /// Visible UUID version (or 0 if none).
+        /// Visible UUID version (if anny).
         /// </summary>
-        public int UUIDVersion = 0;
+        public int? UUIDVersion = null;
 
         /// <summary>
         /// Whether this looks like a Denizen debug log.
@@ -317,13 +317,16 @@ namespace DenizenBot.UtilityProcessors
         {
             get
             {
-                if (UUIDVersion == 4)
+                if (UUIDVersion != null)
                 {
-                    return false;
-                }
-                if (UUIDVersion == 3)
-                {
-                    return true;
+                    if (UUIDVersion == 4)
+                    {
+                        return false;
+                    }
+                    if (UUIDVersion == 3 || UUIDVersion == 0)
+                    {
+                        return true;
+                    }
                 }
                 if (IsOffline && !IsBungee)
                 {
@@ -538,14 +541,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     char versCode = uuid[VERSION_ID_LOCATION];
                     Console.WriteLine($"Player UUID version: {versCode}");
-                    if (versCode == '3')
-                    {
-                        UUIDVersion = 3;
-                    }
-                    else if (versCode == '4')
-                    {
-                        UUIDVersion = 4;
-                    }
+                    UUIDVersion = (versCode - '0');
                 }
             }
         }
@@ -685,7 +681,7 @@ namespace DenizenBot.UtilityProcessors
         public Embed GetResult()
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results");
-            if (UUIDVersion == 3 || (UUIDVersion == 0 && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
+            if (UUIDVersion == 3 || UUIDVersion == 0 || (UUIDVersion == null && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
             {
                 embed.ThumbnailUrl = Constants.RED_FLAG_ICON;
             }
@@ -703,9 +699,9 @@ namespace DenizenBot.UtilityProcessors
             {
                 AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? "Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
             }
-            if (UUIDVersion != 0)
+            if (UUIDVersion != null)
             {
-                string description = UUIDVersion == 4 ? "Online" : "Offline";
+                string description = UUIDVersion == 4 ? "Online" : (UUIDVersion == 3 ? "Offline" : "Hacked or Invalid ID");
                 AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
