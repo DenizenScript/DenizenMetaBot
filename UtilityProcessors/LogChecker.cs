@@ -115,7 +115,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit", "floodgate");
             AddReportedEntry(BAD_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(BAD_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
             AddReportedEntry(BAD_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
@@ -654,7 +654,7 @@ namespace DenizenBot.UtilityProcessors
             if (!FullLogText.Contains("\nUp-time: ") || (!FullLogText.Contains("\nServer Version: ") && !FullLogText.Contains("\nCraftBukkit Version: "))
                 || !FullLogText.Contains("\nDenizen Version: ") || !FullLogText.Contains("\nActive Plugins (")
                 || !FullLogText.Contains("\nLoaded Worlds (") || !FullLogText.Contains("\nOnline Players (")
-                || !FullLogText.Contains("\nOffline Players: ") || !FullLogText.Contains("\nMode: "))
+                || !FullLogText.Contains("\nMode: "))
             {
                 return;
             }
