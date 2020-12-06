@@ -117,7 +117,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
             AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit", "floodgate");
             AddReportedEntry(BAD_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
-            AddReportedEntry(BAD_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD");
+            AddReportedEntry(BAD_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
             AddReportedEntry(BAD_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
             AddReportedEntry(BAD_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
             AddReportedEntry(BAD_PLUGINS, "- To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
