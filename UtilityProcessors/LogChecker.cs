@@ -131,6 +131,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
+            AddReportedEntry(MESSY_PLUGINS, "- FAWE has been known to break the plugin load order on many servers.", "FastAsyncWorldEdit");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
         }
 
@@ -395,7 +396,7 @@ namespace DenizenBot.UtilityProcessors
             versionInput = versionInput.ToLowerFast();
             if (versionInput.StartsWith("this server is running "))
             {
-                versionInput = versionInput.Substring("this server is running ".Length);
+                versionInput = versionInput["this server is running ".Length..];
             }
             string[] subData = versionInput.Split(' ', 4);
             if (subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
@@ -404,7 +405,7 @@ namespace DenizenBot.UtilityProcessors
                 return "";
             }
             string spigotVersionText = subData[2].Split('-', 3)[2];
-            string mcVersionText = subData[3].Substring("(mc: ".Length).Before(')');
+            string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
             string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
             if (!double.TryParse(majorMCVersion, out double versionNumb))
             {
@@ -510,7 +511,7 @@ namespace DenizenBot.UtilityProcessors
             string output = ServerVersionStatusOutput(versionToCheck, out _);
             if (startsWithRunning)
             {
-                ServerVersion = ServerVersion.Substring("This server is running ".Length).BeforeLast(" (Implementing API version");
+                ServerVersion = ServerVersion["This server is running ".Length..].BeforeLast(" (Implementing API version");
                 ServerVersion = $"`{LimitStringLength(ServerVersion, 400, 350)}`";
             }
             if (!string.IsNullOrWhiteSpace(output))
