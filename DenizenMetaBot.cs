@@ -109,10 +109,10 @@ namespace DenizenBot
         /// </summary>
         void DefaultCommands(DiscordBot bot)
         {
-            AdminCommands adminCmds = new AdminCommands();
-            MetaCommands metaCmds = new MetaCommands();
-            UtilityCommands utilCmds = new UtilityCommands();
-            CoreCommands coreCmds = new CoreCommands(IsBotCommander);
+            AdminCommands adminCmds = new AdminCommands() { Bot = bot };
+            MetaCommands metaCmds = new MetaCommands() { Bot = bot };
+            UtilityCommands utilCmds = new UtilityCommands() { Bot = bot };
+            CoreCommands coreCmds = new CoreCommands(IsBotCommander) { Bot = bot };
             // Informational
             bot.RegisterCommand(InfoCmds.CMD_Help, "help", "halp", "helps", "halps", "hel", "hal", "h");
             bot.RegisterCommand(InfoCmds.CMD_Hello, "hello", "hi", "hey", "source", "src");
