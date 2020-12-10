@@ -38,7 +38,8 @@ To configure the bot:
     - `build_numbers` set to a submapping of project names to build number tracker details.
         - `name` set to the name that appears in the `plugin.yml`.
         - `jenkins_job` set to the Jenkins job name.
-        `- regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
+        - `regex` set to a RegEx matcher, with one capturing group to capture the build number from a larger version string.
+        - `max_behind` set to an integer, representing how many builds behind one can safely be before a warning symbol should be displayed.
     - `acceptable_server_versions` set to a list of server MC versions (just the main version without sub-version, like "1.15", not "1.15.1") that are acceptable + tracked (older = outdated, newer = unknown).
     - `additional_meta_sources` set to a list of additional meta source URLs (should be direct zip links, like `https://github.com/DenizenScript/Denizen/archive/dev.zip`).
 
@@ -70,6 +71,7 @@ build_numbers:
         name: Denizen
         jenkins_job: Denizen
         regex: [\d.]+(?:-SNAPSHOT)? \(build (\d+)-REL\)
+        max_behind: 2
 acceptable_server_versions:
     - 1.15
 ```

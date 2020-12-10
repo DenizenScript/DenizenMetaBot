@@ -16,6 +16,20 @@ namespace DenizenBot.UtilityProcessors
     /// </summary>
     public class LogChecker
     {
+        /// <summary>
+        /// The emoji code for a yellow warning "!" symbol.
+        /// </summary>
+        public static string WARNING_SYMBOL = ":warning:";
+
+        /// <summary>
+        /// The emoji code for a red flag symbol.
+        /// </summary>
+        public static string RED_FLAG_SYMBOL = ":triangular_flag_on_post:";
+
+        /// <summary>
+        /// The emoji code for a green check mark symbol.
+        /// </summary>
+        public static string GREEN_CHECK_MARK_SYMBOL = ":white_check_mark:";
 
         /// <summary>
         /// Plugins that should show version output.
@@ -106,25 +120,25 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text
-            AddReportedEntry(SUSPICIOUS_TEXT, "Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks");
-            AddReportedEntry(DANGER_TEXT, "NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
-            AddReportedEntry(DANGER_TEXT, "Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
-            AddReportedEntry(DANGER_TEXT, "You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
-            AddReportedEntry(DANGER_TEXT, "Log contains error messages.", "caused by: ", "[server thread/error]: ");
+            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks");
+            AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
+            AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
+            AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
+            AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, "**(Authentication breaker)**", "floodgate-bukkit", "floodgate");
-            AddReportedEntry(BAD_PLUGINS, "- PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
-            AddReportedEntry(BAD_PLUGINS, "- NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
-            AddReportedEntry(BAD_PLUGINS, "- If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
-            AddReportedEntry(BAD_PLUGINS, "- To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
-            AddReportedEntry(BAD_PLUGINS, "- To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
-            AddReportedEntry(BAD_PLUGINS, "- Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
-            AddReportedEntry(BAD_PLUGINS, "- PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
-            AddReportedEntry(BAD_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable.", "Geyser-Spigot");
+            AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
@@ -414,7 +428,7 @@ namespace DenizenBot.UtilityProcessors
             }
             if (versionNumb < DenizenMetaBot.LowestServerVersion)
             {
-                return "Outdated MC version";
+                return $"{WARNING_SYMBOL} Outdated MC version";
             }
             if (versionNumb > DenizenMetaBot.HighestServerVersion)
             {
@@ -440,11 +454,11 @@ namespace DenizenBot.UtilityProcessors
                 if (buildTracker.IsCurrent(paperVersionNumber, out int behindBy))
                 {
                     isGood = true;
-                    return "Current build";
+                    return $"Current build {GREEN_CHECK_MARK_SYMBOL}";
                 }
                 else
                 {
-                    return $"Outdated build, behind by {behindBy}... Current build is {buildTracker.Value}";
+                    return (behindBy > 20 ? WARNING_SYMBOL + " " : "") + $"Outdated build, behind by {behindBy}... Current build is {buildTracker.Value}";
                 }
             }
             else if (subData[0] == "spigot" || subData[0] == "craftbukkit")
@@ -464,11 +478,11 @@ namespace DenizenBot.UtilityProcessors
                 if (behind == 0)
                 {
                     isGood = true;
-                    return "Current build";
+                    return $"Current build {GREEN_CHECK_MARK_SYMBOL}";
                 }
                 else
                 {
-                    return $"Outdated build, behind by {behind}";
+                    return (behind > 20 ? WARNING_SYMBOL + " " : "") + $"Outdated build, behind by {behind}";
                 }
             }
             else
@@ -563,11 +577,11 @@ namespace DenizenBot.UtilityProcessors
                         string resultText;
                         if (build.IsCurrent(buildNum, out int behindBy))
                         {
-                            resultText = build.Value == 0 ? "Version tracker error" : "Current build";
+                            resultText = build.Value == 0 ? "Version tracker error" : $"Current build {GREEN_CHECK_MARK_SYMBOL}";
                         }
                         else
                         {
-                            resultText = $"**Outdated build**, behind by {behindBy}";
+                            resultText = (behindBy > build.MaxBehind ? WARNING_SYMBOL : "") + $"**Outdated build**, behind by {behindBy}";
                         }
                         PluginVersions += $"`{pluginLoadText.Replace('`', '\'')}` -- ({resultText})\n";
                         Console.WriteLine($"Plugin Version: {pluginLoadText} -> {resultText}");
@@ -698,11 +712,11 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
             if (IsOffline)
             {
-                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? "Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
+                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
             }
             if (UUIDVersion != null)
             {
-                string description = UUIDVersion == 4 ? "Online" : (UUIDVersion == 3 ? "Offline" : "Hacked or Invalid ID");
+                string description = UUIDVersion == 4 ? $"{GREEN_CHECK_MARK_SYMBOL} Online" : (UUIDVersion == 3 ? $"{RED_FLAG_SYMBOL} Offline" : $"{RED_FLAG_SYMBOL} Hacked or Invalid ID");
                 AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);

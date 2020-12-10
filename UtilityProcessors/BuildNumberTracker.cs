@@ -77,6 +77,11 @@ namespace DenizenBot.UtilityProcessors
             public bool IsUpdating = false;
 
             /// <summary>
+            /// The maximum amount a build can be behind before it should show a warning.
+            /// </summary>
+            public int MaxBehind = 15;
+
+            /// <summary>
             /// Returns whether the project+version pair belongs to this build number tracker, and outputs the build number if so.
             /// </summary>
             /// <param name="project">The project name.</param>
@@ -198,9 +203,10 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="projectName">The name of the project.</param>
         /// <param name="regexText">The regex matcher text.</param>
         /// <param name="jenkinsJobName">The jenkins job name.</param>
-        public static void AddTracker(string name, string regex, string jenkinsJob)
+        /// <param name="maxBehind">How far behind the build is allowed to safely be.</param>
+        public static void AddTracker(string name, string regex, string jenkinsJob, int maxBehind)
         {
-            BuildNumbers.Add(new BuildNumber(name, regex, jenkinsJob));
+            BuildNumbers.Add(new BuildNumber(name, regex, jenkinsJob) { MaxBehind = maxBehind });
         }
 
         /// <summary>
@@ -248,7 +254,7 @@ namespace DenizenBot.UtilityProcessors
             string name = fullText.BeforeAndAfter(' ', out version);
             if (version.StartsWith("version "))
             {
-                version = version.Substring("version ".Length);
+                version = version["version ".Length..];
             }
             if (name.EndsWith(":"))
             {

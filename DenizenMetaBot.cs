@@ -225,7 +225,7 @@ namespace DenizenBot
                 foreach (string projectName in buildNumbersSection.GetRootKeys())
                 {
                     FDSSection project = buildNumbersSection.GetSection(projectName);
-                    BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"));
+                    BuildNumberTracker.AddTracker(project.GetString("name"), project.GetString("regex"), project.GetString("jenkins_job"), project.GetInt("max_behind", 15).Value);
                 }
             }
             if (configFile.HasKey("acceptable_server_versions"))
