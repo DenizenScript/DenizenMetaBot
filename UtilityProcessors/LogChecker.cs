@@ -712,12 +712,12 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
             if (IsOffline)
             {
-                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
+                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")), blockCode: false);
             }
             if (UUIDVersion != null)
             {
                 string description = UUIDVersion == 4 ? $"{GREEN_CHECK_MARK_SYMBOL} Online" : (UUIDVersion == 3 ? $"{RED_FLAG_SYMBOL} Offline" : $"{RED_FLAG_SYMBOL} Hacked or Invalid ID");
-                AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
+                AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})", blockCode: false);
             }
             AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
             AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), blockCode: false, inline: false);
