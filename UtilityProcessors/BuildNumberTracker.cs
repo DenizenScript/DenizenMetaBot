@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using FreneticUtilities.FreneticExtensions;
 using YamlDotNet.RepresentationModel;
+using System.Json;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -140,6 +141,9 @@ namespace DenizenBot.UtilityProcessors
             /// </summary>
             readonly static Random UpdateRandomizer = new Random();
 
+            /// <summary>
+            /// Immediately (but off-thread) update the value to current.
+            /// </summary>
             public void UpdateValue()
             {
                 IsUpdating = true;
@@ -149,13 +153,12 @@ namespace DenizenBot.UtilityProcessors
                     Thread.Sleep(millisecondsTimeout: 100 * delay);
                     try
                     {
-                        Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(JenkinsURL);
-                        downloadTask.Wait(DOWNLOAD_TIMEOUT);
-                        if (!downloadTask.IsCompleted)
+                        int newValue = DirectGrabCurrent();
+                        if (newValue == -1)
                         {
                             return;
                         }
-                        Value = int.Parse(downloadTask.Result.Trim());
+                        Value = newValue;
                     }
                     catch (Exception ex)
                     {
@@ -163,6 +166,55 @@ namespace DenizenBot.UtilityProcessors
                     }
                     IsUpdating = false;
                 });
+            }
+
+            /// <summary>
+            /// Return the current build number. -1 indicates no valid value.
+            /// </summary>
+            public virtual int DirectGrabCurrent()
+            {
+                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(JenkinsURL);
+                downloadTask.Wait(DOWNLOAD_TIMEOUT);
+                if (!downloadTask.IsCompleted)
+                {
+                    return -1;
+                }
+                return int.Parse(downloadTask.Result.Trim());
+            }
+        }
+
+        /// <summary>
+        /// Build number tracker but for Paper.
+        /// </summary>
+        public class PaperBuildNumber : BuildNumber
+        {
+            public PaperBuildNumber(string projectName, string regexText, string _version) : base(projectName, regexText, "Paper", "(Paper API)")
+            {
+                Version = _version;
+            }
+
+            /// <summary>
+            /// The webpath for the paper API build info JSON.
+            /// </summary>
+            public static string PAPER_API_PATH = "https://papermc.io/api/v2/projects/paper/version_group/{VERSION}/builds";
+
+            /// <summary>
+            /// The relevant server version, like "1.16".
+            /// </summary>
+            public string Version;
+
+            public override int DirectGrabCurrent()
+            {
+                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(PAPER_API_PATH.Replace("{VERSION}", Version));
+                downloadTask.Wait(DOWNLOAD_TIMEOUT);
+                if (!downloadTask.IsCompleted)
+                {
+                    return -1;
+                }
+                JsonValue json = JsonValue.Parse(downloadTask.Result);
+                JsonArray array = (JsonArray)json["builds"];
+                JsonValue lastBuild = array[^1];
+                return int.Parse(lastBuild["build"]);
             }
         }
 
@@ -215,7 +267,7 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="version">The version.</param>
         public static void AddPaperTracker(string version)
         {
-            BuildNumber tracker = new BuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", "Paper-" + version, "https://papermc.io/ci");
+            PaperBuildNumber tracker = new PaperBuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", version);
             PaperBuildTrackers.Add(version, tracker);
         }
 
