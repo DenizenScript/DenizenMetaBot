@@ -214,7 +214,7 @@ namespace DenizenBot.UtilityProcessors
                 JsonValue json = JsonValue.Parse(downloadTask.Result);
                 JsonArray array = (JsonArray)json["builds"];
                 JsonValue lastBuild = array[^1];
-                return int.Parse(lastBuild["build"]);
+                return (int)lastBuild["build"];
             }
         }
 
