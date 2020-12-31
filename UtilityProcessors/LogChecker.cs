@@ -413,7 +413,7 @@ namespace DenizenBot.UtilityProcessors
                 versionInput = versionInput["this server is running ".Length..];
             }
             string[] subData = versionInput.Split(' ', 4);
-            if (subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
+            if (subData.Length != 4 || subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
             {
                 Console.WriteLine("Server version doesn't match expected format, disregarding check.");
                 return "";
