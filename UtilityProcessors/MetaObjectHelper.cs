@@ -273,10 +273,17 @@ namespace DenizenBot.UtilityProcessors
                 }
                 AutoField(builder, "Switches", string.Join("\n", evt.Switches));
                 AutoField(builder, "Triggers", evt.Triggers);
-                AutoField(builder, "Has Player", evt.Player);
+                if (!string.IsNullOrWhiteSpace(evt.Player))
+                {
+                    AutoField(builder, "Has Player", evt.Player + " - this adds switches `flagged:<flag name>` + `permission:<node>`, in addition to the `<player>` link.");
+                }
                 AutoField(builder, "Has NPC", evt.NPC);
                 AutoField(builder, "Context", GetTagsField(evt.Context));
                 AutoField(builder, "Determine", string.Join("\n", evt.Determinations));
+                if (evt.HasLocation)
+                {
+                    AutoField(builder, "Has Known Location", "True - this adds switches `in:<area>` + `location_flagged:<flag name>`.");
+                }
                 if (evt.Cancellable)
                 {
                     AutoField(builder, "Cancellable", "True - this adds `<context.cancelled>` and determines `cancelled` + `cancelled:false`.");
