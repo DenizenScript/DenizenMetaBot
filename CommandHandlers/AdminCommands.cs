@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Discord;
 using Discord.WebSocket;
 using DenizenBot.UtilityProcessors;
+using DiscordBotBase;
 using DiscordBotBase.CommandHandlers;
 using SharpDenizenTools.MetaHandlers;
 
@@ -19,16 +20,16 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Bot meta reload admin command.
         /// </summary>
-        public void CMD_Reload(string[] cmds, IUserMessage message)
+        public void CMD_Reload(CommandData command)
         {
             // NOTE: This implies a one-guild bot. A multi-guild bot probably shouldn't have this "BotCommander" role-based verification.
             // But under current scale, a true-admin confirmation isn't worth the bother.
-            if (!DenizenMetaBot.IsBotCommander(message.Author as SocketGuildUser))
+            if (!DenizenMetaBot.IsBotCommander(command.Message.Author as SocketGuildUser))
             {
-                SendErrorMessageReply(message, "Authorization Failure", "Nope! That's not for you!");
+                SendErrorMessageReply(command.Message, "Authorization Failure", "Nope! That's not for you!");
                 return;
             }
-            SendGenericPositiveMessageReply(message, "Reloading", "Yes, boss. Reloading meta documentation now...");
+            SendGenericPositiveMessageReply(command.Message, "Reloading", "Yes, boss. Reloading meta documentation now...");
             BuildNumberTracker.UpdateAll();
             MetaDocs docs = new MetaDocs();
             docs.DownloadAll();
@@ -37,7 +38,7 @@ namespace DenizenBot.CommandHandlers
             if (docs.LoadErrors.Count > 0)
             {
                 List<string> errors = docs.LoadErrors.Count > 5 ? docs.LoadErrors.GetRange(0, 5) : docs.LoadErrors;
-                SendErrorMessageReply(message, "Error(s) While Reloading", string.Join("\n", errors));
+                SendErrorMessageReply(command.Message, "Error(s) While Reloading", string.Join("\n", errors));
                 embed.AddField("Errors", docs.LoadErrors.Count, true);
             }
             embed.AddField("Commands", docs.Commands.Count, true);
@@ -47,7 +48,7 @@ namespace DenizenBot.CommandHandlers
             embed.AddField("Actions", docs.Actions.Count, true);
             embed.AddField("Languages", docs.Languages.Count, true);
             embed.AddField("Guide Pages", docs.GuidePages.Count, true);
-            SendReply(message, embed.Build());
+            SendReply(command.Message, embed.Build());
         }
     }
 }

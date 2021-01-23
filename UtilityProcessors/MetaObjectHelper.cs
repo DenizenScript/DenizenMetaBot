@@ -36,7 +36,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 else if (!inCodeBlock && (c == '<' || c == '>' || c == ':' || c == '|'))
                 {
-                    output.Append("\\");
+                    output.Append('\\');
                 }
                 output.Append(c);
             }
@@ -98,7 +98,7 @@ namespace DenizenBot.UtilityProcessors
                 string metaCommand = linkedtext[startOfMetaCommand..endIndex];
                 if (metaCommand.StartsWith("url"))
                 {
-                    string url = metaCommand.Substring("url ".Length);
+                    string url = metaCommand["url ".Length..];
                     output.Append($"[{url}]({url})");
                 }
                 else
@@ -108,7 +108,7 @@ namespace DenizenBot.UtilityProcessors
                 lastStartIndex = endIndex + 1;
                 nextLinkIndex = linkedtext.IndexOf("<@link", lastStartIndex);
             }
-            output.Append(linkedtext.Substring(lastStartIndex));
+            _ = output.Append(linkedtext[lastStartIndex..]);
             return output.ToString();
         }
 
@@ -146,7 +146,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     nameBar = usageOut.Substring(0, firstNewline);
                     limitLengthRemaining -= nameBar.Length;
-                    usageOut = usageOut.Substring(firstNewline + 1);
+                    usageOut = usageOut[(firstNewline + 1)..];
                 }
                 usageOut = $"```yml\n{usageOut}\n```";
                 if (usageOut.Length > 512)
@@ -205,7 +205,7 @@ namespace DenizenBot.UtilityProcessors
                     }
                     else
                     {
-                        tagOut = $"`{tag.Substring(0, endMark)}`{tag.Substring(endMark)}";
+                        tagOut = $"`{tag.Substring(0, endMark)}`{tag[endMark..]}";
                     }
                 }
                 if (tagOut.Length > 128)
@@ -213,7 +213,7 @@ namespace DenizenBot.UtilityProcessors
                     tagOut = tagOut.Substring(0, 100) + "...";
                 }
                 limitLengthRemaining -= tagOut.Length;
-                tagsFieldBuilder.Append(tagOut).Append("\n");
+                tagsFieldBuilder.Append(tagOut).Append('\n');
                 if (limitLengthRemaining <= 0)
                 {
                     break;

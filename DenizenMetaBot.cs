@@ -92,12 +92,12 @@ namespace DenizenBot
         /// <summary>
         /// All quotes in the quotes file.
         /// </summary>
-        public static string[] Quotes = new string[0];
+        public static string[] Quotes = Array.Empty<string>();
 
         /// <summary>
         /// All quotes in the quotes file, pre-lowercased for searching.
         /// </summary>
-        public static string[] QuotesLower = new string[0];
+        public static string[] QuotesLower = Array.Empty<string>();
 
         /// <summary>
         /// The informational commands provider.
@@ -275,15 +275,15 @@ namespace DenizenBot
                         return Task.CompletedTask;
                     };
                 },
-                UnknownCommandHandler = (command, args, message) =>
+                UnknownCommandHandler = (name, command) =>
                 {
-                    if (message.MentionedUserIds.Contains(DiscordBotBaseHelper.CurrentBot.Client.CurrentUser.Id))
+                    if (command.Message.MentionedUserIds.Contains(DiscordBotBaseHelper.CurrentBot.Client.CurrentUser.Id))
                     {
-                        message.Channel.SendMessageAsync(embed: UserCommands.GetErrorMessageEmbed("Unknown Command", "Unknown command. Consider the __**help**__ command?")).Wait();
+                        command.Message.Channel.SendMessageAsync(embed: UserCommands.GetErrorMessageEmbed("Unknown Command", "Unknown command. Consider the __**help**__ command?")).Wait();
                     }
-                    else if (args.Count == 0 && InformationalData.ContainsKey(command.ToLowerFast()))
+                    else if (command.CleanedArguments.Length == 0 && InformationalData.ContainsKey(name.ToLowerFast()))
                     {
-                        InfoCmds.CMD_Info(new string[] { command.ToLowerFast() }, message);
+                        InfoCmds.CMD_Info(new CommandData() { Message = command.Message, CleanedArguments = new string[] { name.ToLowerFast() } });
                     }
                 },
                 ShouldPayAttentionToMessage = (message) =>

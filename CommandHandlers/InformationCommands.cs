@@ -56,7 +56,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to get help (shows a list of valid bot commands).
         /// </summary>
-        public void CMD_Help(string[] cmds, IUserMessage message)
+        public void CMD_Help(CommandData command)
         {
             StringBuilder infoCmds = new StringBuilder(CmdsInfo);
             if (!DenizenMetaBot.ProjectToDetails.IsEmpty())
@@ -80,59 +80,64 @@ namespace DenizenBot.CommandHandlers
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Bot Command Help");
             embed.AddField("**Available Informational Commands:**", infoCmds);
             embed.AddField("**Available Utility Commands:**", CmdsUtility);
-            if (DenizenMetaBot.MetaCommandsAllowed(message.Channel))
+            if (DenizenMetaBot.MetaCommandsAllowed(command.Message.Channel))
             {
                 embed.AddField("**Available Meta Docs Commands:**", CmdsMeta);
             }
-            if (DenizenMetaBot.IsBotCommander(message.Author as SocketGuildUser))
+            if (DenizenMetaBot.IsBotCommander(command.Message.Author as SocketGuildUser))
             {
                 embed.AddField("**Available Admin Commands:**", CmdsAdmin);
             }
-            SendReply(message, embed.Build());
+            SendReply(command.Message, embed.Build());
         }
 
         /// <summary>
         /// User command to say 'hello' and get a source link.
         /// </summary>
-        public void CMD_Hello(string[] cmds, IUserMessage message)
+        public void CMD_Hello(CommandData command)
         {
-            SendReply(message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO).WithUrl(DenizenMetaBotConstants.SOURCE_CODE_URL)
+            SendReply(command.Message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO).WithUrl(DenizenMetaBotConstants.SOURCE_CODE_URL)
                 .WithDescription($"Hi! I'm a bot! Find my source code at {DenizenMetaBotConstants.SOURCE_CODE_URL}").Build());
         }
 
         /// <summary>
         /// User command to see information on how to update projects.
         /// </summary>
-        public void CMD_Update(string[] cmds, IUserMessage message)
+        public void CMD_Update(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
             {
                 return;
             }
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Update command", $"Please specify which project(s) you want the update link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}update denizen`.");
+                    SendErrorMessageReply(command.Message, "Unknown input for Update command", $"Please specify which project(s) you want the update link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}update denizen`.");
                     return;
                 }
                 foreach (ProjectDetails proj in details.Updates)
                 {
-                    SendReply(message, proj.GetUpdateEmbed());
+                    SendReply(command.Message, proj.GetUpdateEmbed());
                 }
                 return;
             }
-            foreach (string projectName in cmds)
+            if (command.CleanedArguments.Length > 5)
+            {
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
+                return;
+            }
+            foreach (string projectName in command.CleanedArguments)
             {
                 string projectNameLower = projectName.ToLowerFast();
                 if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    SendReply(message, detail.GetUpdateEmbed());
+                    SendReply(command.Message, detail.GetUpdateEmbed());
                 }
                 else
                 {
                     string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
-                    SendErrorMessageReply(message, "Unknown project name for Update command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
+                    SendErrorMessageReply(command.Message, "Unknown project name for Update command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
             }
@@ -141,33 +146,38 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to see a link to the GitHub.
         /// </summary>
-        public void CMD_GitHub(string[] cmds, IUserMessage message)
+        public void CMD_GitHub(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
             {
                 return;
             }
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}github denizen`.");
+                    SendErrorMessageReply(command.Message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}github denizen`.");
                     return;
                 }
-                SendReply(message, details.Updates[0].GetGithubEmbed());
+                SendReply(command.Message, details.Updates[0].GetGithubEmbed());
                 return;
             }
-            foreach (string projectName in cmds)
+            if (command.CleanedArguments.Length > 5)
+            {
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
+                return;
+            }
+            foreach (string projectName in command.CleanedArguments)
             {
                 string projectNameLower = projectName.ToLowerFast();
                 if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    SendReply(message, detail.GetGithubEmbed());
+                    SendReply(command.Message, detail.GetGithubEmbed());
                 }
                 else
                 {
                     string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
-                    SendErrorMessageReply(message, "Unknown project name for GitHub command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
+                    SendErrorMessageReply(command.Message, "Unknown project name for GitHub command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
             }
@@ -176,33 +186,38 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to see a link to the GitHub.
         /// </summary>
-        public void CMD_Issues(string[] cmds, IUserMessage message)
+        public void CMD_Issues(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
             {
                 return;
             }
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
                 {
-                    SendErrorMessageReply(message, "Unknown input for Issues command", $"Please specify which project(s) you want the Issues link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}issues denizen`.");
+                    SendErrorMessageReply(command.Message, "Unknown input for Issues command", $"Please specify which project(s) you want the Issues link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}issues denizen`.");
                     return;
                 }
-                SendReply(message, details.Updates[0].GetIssuesEmbed());
+                SendReply(command.Message, details.Updates[0].GetIssuesEmbed());
                 return;
             }
-            foreach (string projectName in cmds)
+            if (command.CleanedArguments.Length > 5)
+            {
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
+                return;
+            }
+            foreach (string projectName in command.CleanedArguments)
             {
                 string projectNameLower = projectName.ToLowerFast();
                 if (DenizenMetaBot.ProjectToDetails.TryGetValue(projectNameLower, out ProjectDetails detail))
                 {
-                    SendReply(message, detail.GetIssuesEmbed());
+                    SendReply(command.Message, detail.GetIssuesEmbed());
                 }
                 else
                 {
                     string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.ProjectToDetails.Keys, projectName, 20);
-                    SendErrorMessageReply(message, "Unknown project name for Issues command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
+                    SendErrorMessageReply(command.Message, "Unknown project name for Issues command", $"Unknown project name `{projectName.Replace('`', '\'')}`."
                          + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
             }
@@ -211,47 +226,47 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to get some predefined informational output.
         /// </summary>
-        public void CMD_Info(string[] cmds, IUserMessage message)
+        public void CMD_Info(CommandData command)
         {
             if (DenizenMetaBot.InformationalData.IsEmpty())
             {
                 return;
             }
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!info <info item or 'list'>`");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!info <info item or 'list'>`");
                 return;
             }
-            if (cmds.Length > 5)
+            if (command.CleanedArguments.Length > 5)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Please request no more than 5 info items at a time.");
                 return;
             }
-            foreach (string searchRaw in cmds)
+            foreach (string searchRaw in command.CleanedArguments)
             {
                 string commandSearch = searchRaw.ToLowerFast().Trim();
                 if (commandSearch == "list" || commandSearch == "all")
                 {
                     string fullList = "`" + string.Join("`, `", DenizenMetaBot.InformationalDataNames) + "`";
-                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
+                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
                 }
                 else if (DenizenMetaBot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
                 {
                     infoOutput = infoOutput.Trim();
                     if (infoOutput.StartsWith("NO_BOX:"))
                     {
-                        infoOutput = infoOutput.Substring("NO_BOX:".Length).Trim();
-                        message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
+                        infoOutput = infoOutput["NO_BOX:".Length..].Trim();
+                        command.Message.Channel.SendMessageAsync("+++ Info `" + commandSearch + "`: " + infoOutput);
                     }
                     else
                     {
-                        SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                        SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
                     }
                 }
                 else
                 {
                     string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.InformationalData.Keys, commandSearch, 20);
-                    SendErrorMessageReply(message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                    SendErrorMessageReply(command.Message, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
                 }
             }
         }
@@ -259,19 +274,20 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to display a rule.
         /// </summary>
-        public void CMD_Rule(string[] cmds, IUserMessage message)
+        public void CMD_Rule(CommandData command)
         {
             if (DenizenMetaBot.Rules.IsEmpty())
             {
                 return;
             }
+            string[] cmds = command.CleanedArguments;
             if (cmds.Length == 0)
             {
                 cmds = new string[] { "all" };
             }
             if (cmds.Length > 5)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "Please request no more than 5 rules at a time.");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Please request no more than 5 rules at a time.");
                 return;
             }
             foreach (string searchRaw in cmds)
@@ -280,11 +296,11 @@ namespace DenizenBot.CommandHandlers
                 if (DenizenMetaBot.Rules.TryGetValue(ruleSearch, out string ruleText))
                 {
                     ruleText = ruleText.Trim();
-                    SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithDescription(ruleText).Build());
+                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithDescription(ruleText).Build());
                 }
                 else
                 {
-                    SendErrorMessageReply(message, "Cannot Display Rule", "Unknown rule ID.");
+                    SendErrorMessageReply(command.Message, "Cannot Display Rule", "Unknown rule ID.");
                 }
             }
         }
@@ -299,7 +315,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// User command to display a quote.
         /// </summary>
-        public void CMD_Quote(string[] cmds, IUserMessage message)
+        public void CMD_Quote(CommandData command)
         {
             if (DenizenMetaBot.Quotes.IsEmpty())
             {
@@ -317,9 +333,9 @@ namespace DenizenBot.CommandHandlers
             {
                 QuotesSeen[quoteId] = now;
                 //SendReply(message, new EmbedBuilder().WithThumbnailUrl(Constants.SPEECH_BUBBLE_ICON).WithTitle($"Quote #{quoteId + 1}").WithDescription($"```xml\n{Bot.Quotes[quoteId]}\n```").Build());
-                message.Channel.SendMessageAsync($"+> Quote **{quoteId + 1}**:\n```xml\n{DenizenMetaBot.Quotes[quoteId]}\n```").Wait();
+                command.Message.Channel.SendMessageAsync($"+> Quote **{quoteId + 1}**:\n```xml\n{DenizenMetaBot.Quotes[quoteId]}\n```").Wait();
             }
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
                 int qid = 0;
                 for (int i = 0; i < 15; i++)
@@ -333,7 +349,7 @@ namespace DenizenBot.CommandHandlers
                 sendQuote(qid);
                 return;
             }
-            if (cmds.Length == 1 && int.TryParse(cmds[0].Replace("#", ""), out int id))
+            if (command.CleanedArguments.Length == 1 && int.TryParse(command.CleanedArguments[0].Replace("#", ""), out int id))
             {
                 if (id < 1)
                 {
@@ -347,7 +363,7 @@ namespace DenizenBot.CommandHandlers
                 return;
             }
             List<int> matchedQuoteIDs = new List<int>(32);
-            string rawInputLow = string.Join(" ", cmds).ToLowerInvariant();
+            string rawInputLow = string.Join(" ", command.CleanedArguments).ToLowerInvariant();
             for (int i = 0; i < DenizenMetaBot.Quotes.Length; i++)
             {
                 if (DenizenMetaBot.QuotesLower[i].Contains(rawInputLow))
@@ -357,7 +373,7 @@ namespace DenizenBot.CommandHandlers
             }
             if (matchedQuoteIDs.Count == 0)
             {
-                SendErrorMessageReply(message, "Quote Unknown", "No quote found for that search text.");
+                SendErrorMessageReply(command.Message, "Quote Unknown", "No quote found for that search text.");
                 return;
             }
             int matchId = matchedQuoteIDs[0];

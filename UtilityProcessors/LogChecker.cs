@@ -137,7 +137,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
-            AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable.", "Geyser-Spigot");
+            AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser-Spigot");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");

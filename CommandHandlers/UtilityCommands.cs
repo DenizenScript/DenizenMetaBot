@@ -50,7 +50,7 @@ namespace DenizenBot.CommandHandlers
             string rawUrl;
             if (inputUrl.StartsWith(PASTEBIN_URL_BASE))
             {
-                string pastebinCode = inputUrl.Substring(PASTEBIN_URL_BASE.Length);
+                string pastebinCode = inputUrl[PASTEBIN_URL_BASE.Length..];
                 if (!PASTEBIN_CODE_VALIDATOR.IsOnlyMatches(pastebinCode))
                 {
                     SendErrorMessageReply(message, "Command Syntax Incorrect", "Pastebin URL given does not conform to expected format.");
@@ -60,7 +60,7 @@ namespace DenizenBot.CommandHandlers
             }
             else if (inputUrl.StartsWith(DENIZEN_PASTE_URL_BASE) || inputUrl.StartsWith(DENIZEN_HASTE_URL_BASE))
             {
-                string pasteCode = inputUrl.Substring(DENIZEN_HASTE_URL_BASE.Length).Before('/');
+                string pasteCode = inputUrl[DENIZEN_HASTE_URL_BASE.Length..].Before('/');
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
                     SendErrorMessageReply(message, "Command Syntax Incorrect", "Denizen haste URL given does not conform to expected format.");
@@ -102,48 +102,48 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command to check for common issues in server logs.
         /// </summary>
-        public void CMD_LogCheck(string[] cmds, IUserMessage message)
+        public void CMD_LogCheck(CommandData command)
         {
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!logcheck <link>`");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!logcheck <link>`");
                 return;
             }
-            string data = GetWebLinkDataForCommand(cmds[0], message);
+            string data = GetWebLinkDataForCommand(command.CleanedArguments[0], command.Message);
             if (data == null)
             {
                 return;
             }
             LogChecker checker = new LogChecker(data);
             checker.Run();
-            SendReply(message, checker.GetResult());
+            SendReply(command.Message, checker.GetResult());
         }
 
         /// <summary>
         /// Command to check the updatedness of a version string.
         /// </summary>
-        public void CMD_VersionCheck(string[] cmds, IUserMessage message)
+        public void CMD_VersionCheck(CommandData command)
         {
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!versioncheck <version text>`");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!versioncheck <version text>`");
                 return;
             }
-            string combined = string.Join(" ", cmds).Trim();
+            string combined = string.Join(" ", command.CleanedArguments).Trim();
             if (combined.ToLowerFast().StartsWith("loading "))
             {
-                combined = combined.Substring("loading ".Length).Trim();
+                combined = combined["loading ".Length..].Trim();
             }
             if (combined.IsEmpty())
             {
-                SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (blank input?).");
+                SendErrorMessageReply(command.Message, "Bad Input", "Input text doesn't look like a version string (blank input?).");
                 return;
             }
             string projectName = BuildNumberTracker.SplitToNameAndVersion(combined, out string versionText).Replace(":", "").Trim();
             versionText = versionText.Trim();
             if (projectName.IsEmpty() || versionText.IsEmpty())
             {
-                SendErrorMessageReply(message, "Bad Input", "Input text doesn't look like a version string (single word input?).");
+                SendErrorMessageReply(command.Message, "Bad Input", "Input text doesn't look like a version string (single word input?).");
                 return;
             }
             string nameLower = projectName.ToLowerFast();
@@ -152,16 +152,16 @@ namespace DenizenBot.CommandHandlers
                 string output = LogChecker.ServerVersionStatusOutput(combined, out bool isGood);
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    SendErrorMessageReply(message, "Bad Input", $"Input text looks like a {nameLower} version, but doesn't fit the expected {nameLower} server version format. Should start with '{nameLower} version git-{nameLower}-...'");
+                    SendErrorMessageReply(command.Message, "Bad Input", $"Input text looks like a {nameLower} version, but doesn't fit the expected {nameLower} server version format. Should start with '{nameLower} version git-{nameLower}-...'");
                     return;
                 }
                 if (isGood)
                 {
-                    SendGenericPositiveMessageReply(message, "Running Current Build", $"That version is the current {nameLower} build for an acceptable server version.");
+                    SendGenericPositiveMessageReply(command.Message, "Running Current Build", $"That version is the current {nameLower} build for an acceptable server version.");
                 }
                 else
                 {
-                    SendGenericNegativeMessageReply(message, "Build Outdated", $"{output}.");
+                    SendGenericNegativeMessageReply(command.Message, "Build Outdated", $"{output}.");
                 }
                 return;
             }
@@ -169,15 +169,15 @@ namespace DenizenBot.CommandHandlers
             {
                 if (build.IsCurrent(buildNum, out int behindBy))
                 {
-                    SendGenericPositiveMessageReply(message, "Running Current Build", $"That version is the current {build.Name} build.");
+                    SendGenericPositiveMessageReply(command.Message, "Running Current Build", $"That version is the current {build.Name} build.");
                 }
                 else
                 {
-                    SendGenericNegativeMessageReply(message, "Build Outdated", $"That version is an outdated {build.Name} build.\nThe current {build.Name} build is {build.Value}.\nYou are behind by {behindBy} builds.");
+                    SendGenericNegativeMessageReply(command.Message, "Build Outdated", $"That version is an outdated {build.Name} build.\nThe current {build.Name} build is {build.Value}.\nYou are behind by {behindBy} builds.");
                 }
                 return;
             }
-            SendErrorMessageReply(message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project (or the version text is formatted incorrectly).");
+            SendErrorMessageReply(command.Message, "Bad Input", $"Input project name (`{EscapeUserInput(projectName)}`) doesn't look like any tracked project (or the version text is formatted incorrectly).");
             return;
         }
 
@@ -261,21 +261,21 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command to check for common issues in script pastes.
         /// </summary>
-        public void CMD_ScriptCheck(string[] cmds, IUserMessage message)
+        public void CMD_ScriptCheck(CommandData command)
         {
-            if (cmds.Length == 0)
+            if (command.CleanedArguments.Length == 0)
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "`!script <link>`");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!script <link>`");
                 return;
             }
-            string data = GetWebLinkDataForCommand(cmds[0], message);
+            string data = GetWebLinkDataForCommand(command.CleanedArguments[0], command.Message);
             if (data == null)
             {
                 return;
             }
             ScriptChecker checker = new ScriptChecker(data);
             checker.Run();
-            SendReply(message, GetResult(checker));
+            SendReply(command.Message, GetResult(checker));
         }
     }
 }

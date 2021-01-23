@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticToolkit;
 using DenizenBot.UtilityProcessors;
+using DiscordBotBase;
 using DiscordBotBase.CommandHandlers;
 using SharpDenizenTools.MetaHandlers;
 using SharpDenizenTools.MetaObjects;
@@ -244,38 +245,38 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Command meta docs user command.
         /// </summary>
-        public void CMD_Command(string[] cmds, IUserMessage message)
+        public void CMD_Command(CommandData command)
         {
             void singleReply(MetaCommand cmd)
             {
-                if (cmds.Length >= 2)
+                if (command.CleanedArguments.Length >= 2)
                 {
-                    string outputType = cmds[1].ToLowerFast();
+                    string outputType = command.CleanedArguments[1].ToLowerFast();
                     if (outputType.StartsWith("u"))
                     {
-                        SendReply(message, cmd.GetCommandUsagesEmbed().Build());
+                        SendReply(command.Message, cmd.GetCommandUsagesEmbed().Build());
                     }
                     else if (outputType.StartsWith("t"))
                     {
-                        SendReply(message, cmd.GetCommandTagsEmbed().Build());
+                        SendReply(command.Message, cmd.GetCommandTagsEmbed().Build());
                     }
                     else
                     {
-                        SendErrorMessageReply(message, "Bad Command Syntax", "Second argument is unknown.\n\nUsage: `command [name] [usage/tags]`.");
+                        SendErrorMessageReply(command.Message, "Bad Command Syntax", "Second argument is unknown.\n\nUsage: `command [name] [usage/tags]`.");
                     }
                 }
                 else
                 {
-                    SendReply(message, cmd.GetEmbed().Build());
+                    SendReply(command.Message, cmd.GetEmbed().Build());
                 }
             }
-            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, cmds, message, altSingleOutput: singleReply);
+            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Commands, MetaDocs.META_TYPE_COMMAND, command.CleanedArguments, command.Message, altSingleOutput: singleReply);
             if (closeness > 0)
             {
-                string closeMech = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), cmds[0].ToLowerFast(), 10);
+                string closeMech = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Mechanisms.Keys.Select(s => s.After('.')), command.CleanedArguments[0].ToLowerFast(), 10);
                 if (closeMech != null)
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}mechanism {closeMech}");
+                    SendDidYouMeanReply(command.Message, "Possible Confusion", $"Did you mean to search for `mechanism {closeMech}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}mechanism {closeMech}");
                 }
             }
         }
@@ -283,24 +284,24 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Mechanism meta docs user command.
         /// </summary>
-        public void CMD_Mechanism(string[] cmds, IUserMessage message)
+        public void CMD_Mechanism(CommandData command)
         {
             List<string> secondarySearches = new List<string>();
-            if (cmds.Length > 0)
+            if (command.CleanedArguments.Length > 0)
             {
-                int dotIndex = cmds[0].IndexOf('.');
+                int dotIndex = command.CleanedArguments[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    secondarySearches.Add(cmds[0].Substring(0, dotIndex) + "tag" + cmds[0].Substring(dotIndex));
+                    secondarySearches.Add(command.CleanedArguments[0].Substring(0, dotIndex) + "tag" + command.CleanedArguments[0][dotIndex..]);
                 }
             }
-            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, cmds, message, secondarySearches);
+            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, command.CleanedArguments, command.Message, secondarySearches);
             if (closeness > 0)
             {
-                string closeCmd = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Commands.Keys, cmds[0].ToLowerFast(), 7);
+                string closeCmd = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.Commands.Keys, command.CleanedArguments[0].ToLowerFast(), 7);
                 if (closeCmd != null)
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}command {closeCmd}");
+                    SendDidYouMeanReply(command.Message, "Possible Confusion", $"Did you mean to search for `command {closeCmd}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}command {closeCmd}");
                 }
             }
         }
@@ -308,9 +309,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Tag meta docs user command.
         /// </summary>
-        public void CMD_Tag(string[] cmds, IUserMessage message)
+        public void CMD_Tag(CommandData command)
         {
             List<string> secondarySearches = new List<string>();
+            string[] cmds = command.CleanedArguments;
             if (cmds.Length > 0)
             {
                 cmds[0] = MetaTag.CleanTag(cmds[0]);
@@ -318,7 +320,7 @@ namespace DenizenBot.CommandHandlers
                 if (dotIndex > 0)
                 {
                     string tagBase = cmds[0].Substring(0, dotIndex);
-                    string tagSuffix = cmds[0].Substring(dotIndex);
+                    string tagSuffix = cmds[0][dotIndex..];
                     if (!tagBase.EndsWith("tag"))
                     {
                         secondarySearches.Add(tagBase + "tag" + tagSuffix);
@@ -358,60 +360,64 @@ namespace DenizenBot.CommandHandlers
                 }
                 return lowestStr;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, message, secondarySearches, altFindClosest: findClosestTag,
+            AutoMetaCommand(MetaDocs.CurrentMeta.Tags, MetaDocs.META_TYPE_TAG, cmds, command.Message, secondarySearches, altFindClosest: findClosestTag,
                 altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
         }
 
         /// <summary>
         /// Event meta docs user command.
         /// </summary>
-        public void CMD_Event(string[] cmds, IUserMessage message)
+        public void CMD_Event(CommandData command)
         {
+            string[] cmds = command.CleanedArguments;
             string onSearch = string.Join(" ", cmds).ToLowerFast();
-            string secondarySearch = onSearch.StartsWith("on ") ? onSearch.Substring("on ".Length) : onSearch;
+            string secondarySearch = onSearch.StartsWith("on ") ? onSearch["on ".Length..] : onSearch;
             onSearch = "on " + secondarySearch;
             if (cmds.Length > 0)
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
         }
 
         /// <summary>
         /// Action meta docs user command.
         /// </summary>
-        public void CMD_Action(string[] cmds, IUserMessage message)
+        public void CMD_Action(CommandData command)
         {
+            string[] cmds = command.CleanedArguments;
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
-            secondarySearch = secondarySearch.StartsWith("on ") ? secondarySearch.Substring("on ".Length) : secondarySearch;
+            secondarySearch = secondarySearch.StartsWith("on ") ? secondarySearch["on ".Length..] : secondarySearch;
             if (cmds.Length > 0)
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, command.Message);
         }
 
         /// <summary>
         /// Language meta docs user command.
         /// </summary>
-        public void CMD_Language(string[] cmds, IUserMessage message)
+        public void CMD_Language(CommandData command)
         {
+            string[] cmds = command.CleanedArguments;
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             if (cmds.Length > 0)
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, command.Message);
         }
 
         /// <summary>
         /// Guide page search user command.
         /// </summary>
-        public void CMD_Guide(string[] cmds, IUserMessage message)
+        public void CMD_Guide(CommandData command)
         {
+            string[] cmds = command.CleanedArguments;
             if (cmds.Length == 0 || cmds[0].ToLowerFast() == "all")
             {
-                SendGenericPositiveMessageReply(message, "Guides", $"Read the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
+                SendGenericPositiveMessageReply(command.Message, "Guides", $"Read the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
                 return;
             }
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
@@ -419,21 +425,22 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, message);
+            AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, command.Message);
         }
 
         /// <summary>
         /// Meta docs total search command.
         /// </summary>
-        public void CMD_Search(string[] cmds, IUserMessage message)
+        public void CMD_Search(CommandData command)
         {
-            if (CheckMetaDenied(message))
+            if (CheckMetaDenied(command.Message))
             {
                 return;
             }
+            string[] cmds = command.CleanedArguments;
             if (cmds.Length == 0)
             {
-                SendErrorMessageReply(message, "Need input for Search command", "Please specify some text to search, like `!search someobjecthere`.");
+                SendErrorMessageReply(command.Message, "Need input for Search command", "Please specify some text to search, like `!search someobjecthere`.");
                 return;
             }
             for (int i = 0; i < cmds.Length; i++)
@@ -486,12 +493,12 @@ namespace DenizenBot.CommandHandlers
                 string possible = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.AllMetaObjects().SelectMany(obj => obj.MultiNames), fullSearch, 10);
                 if (!string.IsNullOrWhiteSpace(possible))
                 {
-                    SendDidYouMeanReply(message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}search {possible}");
+                    SendDidYouMeanReply(command.Message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}search {possible}");
                 }
             }
             if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
             {
-                SendErrorMessageReply(message, "Search Command Has No Results", "Input search text could not be found.");
+                SendErrorMessageReply(command.Message, "Search Command Has No Results", "Input search text could not be found.");
                 backupMatchCheck();
                 return;
             }
@@ -506,7 +513,7 @@ namespace DenizenBot.CommandHandlers
                     suffix = ", ...";
                 }
                 string listText = string.Join("`, `", objs.Select((obj) => $"{DenizenMetaBotConstants.COMMAND_PREFIX}{obj.Type.Name} {obj.CleanName}"));
-                SendGenericPositiveMessageReply(message, $"{typeShort} Search Results", $"{typeShort} ({typeLong}) search results: `{listText}`{suffix}");
+                SendGenericPositiveMessageReply(command.Message, $"{typeShort} Search Results", $"{typeShort} ({typeLong}) search results: `{listText}`{suffix}");
             }
             if (strongMatch.Any())
             {
