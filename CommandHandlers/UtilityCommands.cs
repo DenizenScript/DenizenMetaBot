@@ -24,8 +24,9 @@ namespace DenizenBot.CommandHandlers
         /// Base URL for paste sites.
         /// </summary>
         public const string PASTEBIN_URL_BASE = "https://pastebin.com/",
-            DENIZEN_PASTE_URL_BASE = "https://one.denizenscript.com/paste/",
-            DENIZEN_HASTE_URL_BASE = "https://one.denizenscript.com/haste/";
+            OLD_DENIZEN_PASTE_URL_BASE = "https://one.denizenscript.com/paste/",
+            OLD_DENIZEN_HASTE_URL_BASE = "https://one.denizenscript.com/haste/",
+            DENIZEN_PASTE_URL_BASE = "https://paste.denizenscript.com/view/";
 
         /// <summary>
         /// ASCII validator for a pastebin ID.
@@ -58,15 +59,25 @@ namespace DenizenBot.CommandHandlers
                 }
                 rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
             }
-            else if (inputUrl.StartsWith(DENIZEN_PASTE_URL_BASE) || inputUrl.StartsWith(DENIZEN_HASTE_URL_BASE))
+            else if (inputUrl.StartsWith(OLD_DENIZEN_PASTE_URL_BASE) || inputUrl.StartsWith(OLD_DENIZEN_HASTE_URL_BASE))
             {
-                string pasteCode = inputUrl[DENIZEN_HASTE_URL_BASE.Length..].Before('/');
+                string pasteCode = inputUrl[OLD_DENIZEN_HASTE_URL_BASE.Length..].Before('/');
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
-                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Denizen haste URL given does not conform to expected format.");
+                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
                     return null;
                 }
-                rawUrl = $"{DENIZEN_HASTE_URL_BASE}{pasteCode}.txt";
+                rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
+            }
+            else if (inputUrl.ToLowerFast().StartsWith(DENIZEN_PASTE_URL_BASE))
+            {
+                string pasteCode = inputUrl[DENIZEN_PASTE_URL_BASE.Length..];
+                if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
+                {
+                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
+                    return null;
+                }
+                rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
             }
             else
             {
