@@ -146,6 +146,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
             AddReportedEntry(MESSY_PLUGINS, "- FAWE has been known to break the plugin load order on many servers.", "FastAsyncWorldEdit");
+            AddReportedEntry(MESSY_PLUGINS, "- Gringotts is known to use a 'loadbefore' directive in its plugin.yml, which is likely to break the plugin load order on servers.", "Gringotts");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
         }
 
@@ -163,7 +164,7 @@ namespace DenizenBot.UtilityProcessors
             int start = FullLogText.IndexOf("\nActive Plugins (");
             int end = FullLogText.IndexOf("\nLoaded Worlds (");
             string pluginLine = FullLogText[start..end].Replace(((char)0x01) + "2", "").Replace(((char)0x01) + "4", "");
-            int pluginNameIndex = pluginLine.IndexOf(plugin);
+            int pluginNameIndex = pluginLine.IndexOf(plugin + ":");
             if (pluginNameIndex == -1)
             {
                 return "";
