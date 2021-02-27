@@ -53,9 +53,9 @@ namespace DenizenBot.UtilityProcessors
         public const string OFFLINE_NOTICE = "**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!";
 
         /// <summary>
-        /// The prefix on the message before the startup Java version report produced by both Denizen and Sentinel.
+        /// The prefix on the message before the startup Java version report produced by a few different sources, including Denizen and Sentinel.
         /// </summary>
-        public const string DENIZEN_STARTUP_JAVA_VERSION = "Running on java version: ";
+        public const string STARTUP_JAVA_VERSION = " java version: ";
 
         /// <summary>
         /// Matcher for valid text in a player UUID.
@@ -394,7 +394,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
                 }
-                JavaVersion = GetFromTextTilEndOfLine(FullLogText, DENIZEN_STARTUP_JAVA_VERSION).After(DENIZEN_STARTUP_JAVA_VERSION);
+                JavaVersion = GetFromTextTilEndOfLine(FullLogTextLower, STARTUP_JAVA_VERSION).After(STARTUP_JAVA_VERSION);
                 if (string.IsNullOrWhiteSpace(JavaVersion))
                 {
                     if (FullLogText.Contains("Use --illegal-access=warn to enable warnings of further illegal reflective access operations"))
