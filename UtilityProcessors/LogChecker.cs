@@ -53,6 +53,11 @@ namespace DenizenBot.UtilityProcessors
         public const string OFFLINE_NOTICE = "**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!";
 
         /// <summary>
+        /// The prefix on the message before the startup Java version report produced by both Denizen and Sentinel.
+        /// </summary>
+        public const string DENIZEN_STARTUP_JAVA_VERSION = "Running on java version: ";
+
+        /// <summary>
         /// Matcher for valid text in a player UUID.
         /// </summary>
         public static AsciiMatcher UUID_ASCII_MATCHER = new AsciiMatcher("0123456789abcdef-");
@@ -239,7 +244,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.
         /// </summary>
-        public static void AutoField(EmbedBuilder builder, string key, string value, bool blockCode = true, bool inline = true)
+        public static void AutoField(EmbedBuilder builder, string key, string value, bool inline = true)
         {
             if (builder.Length + Math.Min(value.Length, 450) + key.Length > 1800)
             {
@@ -247,12 +252,8 @@ namespace DenizenBot.UtilityProcessors
             }
             if (!string.IsNullOrWhiteSpace(value))
             {
-                if (blockCode)
-                {
-                    value = Escape(value);
-                }
                 value = LimitStringLength(value, 450, 400);
-                builder.AddField(key, blockCode ? $"`{value}`" : value, inline);
+                builder.AddField(key, value, inline);
             }
         }
 
@@ -327,6 +328,11 @@ namespace DenizenBot.UtilityProcessors
         public bool IsDenizenDebug = false;
 
         /// <summary>
+        /// What Java version is running on this server (if findable).
+        /// </summary>
+        public string JavaVersion = "";
+
+        /// <summary>
         /// Whether the server is likely to be offline.
         /// </summary>
         public bool LikelyOffline
@@ -377,6 +383,7 @@ namespace DenizenBot.UtilityProcessors
                 IsBungee = mode.Contains("BungeeCord");
                 IsOffline = mode.Contains("offline");
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, "Server Version: ").After("Server Version: ");
+                JavaVersion = GetFromTextTilEndOfLine(FullLogText, "Java Version: ").After("Java Version: ");
             }
             else
             {
@@ -387,11 +394,55 @@ namespace DenizenBot.UtilityProcessors
                 {
                     ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX_BACKUP);
                 }
+                JavaVersion = GetFromTextTilEndOfLine(FullLogText, DENIZEN_STARTUP_JAVA_VERSION).After(DENIZEN_STARTUP_JAVA_VERSION);
+                if (string.IsNullOrWhiteSpace(JavaVersion))
+                {
+                    if (FullLogText.Contains("Use --illegal-access=warn to enable warnings of further illegal reflective access operations"))
+                    {
+                        JavaVersion = "11 (based on 'reflective access' message)";
+                    }
+                    else if (FullLogText.Contains("java.lang.Thread.run"))
+                    {
+                        if (FullLogText.Contains("java.lang.Thread.run(Thread.java:748) [?:1.8."))
+                        {
+                            JavaVersion = "8 (based on stack trace content)";
+                        }
+                        else if (FullLogText.Contains("java.base/java.lang.Thread.run(Thread.java:834)"))
+                        {
+                            JavaVersion = "11 (based on stack trace content)";
+                        }
+                        else if (FullLogText.Contains("java.base/java.lang.Thread.run(Thread.java:832)"))
+                        {
+                            JavaVersion = "14 or newer (based on stack trace content)";
+                        }
+                    }
+                }
             }
             Console.WriteLine($"Offline={IsOffline}, Bungee={IsBungee}");
+            Console.WriteLine($"JavaVersion={JavaVersion}");
+            ProcessJavaVersion();
+            Console.WriteLine($"JavaVersionProcessed={JavaVersion}");
             Console.WriteLine($"ServerVersion={ServerVersion}");
             CheckServerVersion();
             Console.WriteLine($"ServerVersionChecked={ServerVersion}");
+        }
+
+        /// <summary>
+        /// Processes and formats info about the Java version found in the log (if any).
+        /// </summary>
+        public void ProcessJavaVersion()
+        {
+            if (string.IsNullOrWhiteSpace(JavaVersion?.Trim()))
+            {
+                JavaVersion = "";
+                return;
+            }
+            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("11") || JavaVersion.StartsWith("1.11"))
+            {
+                JavaVersion = $"`{Escape(JavaVersion)}` {GREEN_CHECK_MARK_SYMBOL}";
+                return;
+            }
+            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java 8 and Java 11 are fully supported";
         }
 
         /// <summary>
@@ -709,23 +760,24 @@ namespace DenizenBot.UtilityProcessors
             {
                 embed.ThumbnailUrl = Constants.INFO_ICON;
             }
-            AutoField(embed, "Server Version", ServerVersion, blockCode: false, inline: false);
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), blockCode: false, inline: false);
+            AutoField(embed, "Server Version", ServerVersion, inline: false);
+            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), inline: false);
             if (IsOffline)
             {
-                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")), blockCode: false);
+                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
             }
             if (UUIDVersion != null)
             {
                 string description = UUIDVersion == 4 ? $"{GREEN_CHECK_MARK_SYMBOL} Online" : (UUIDVersion == 3 ? $"{RED_FLAG_SYMBOL} Offline" : $"{RED_FLAG_SYMBOL} Hacked or Invalid ID");
-                AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})", blockCode: false);
+                AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
-            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins, blockCode: false);
-            AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), blockCode: false, inline: false);
-            AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, blockCode: false, inline: false);
-            AutoField(embed, "Problematic Plugin(s)", BadPlugins, blockCode: false, inline: false);
-            AutoField(embed, "Possibly Relevant Plugin(s)", IffyPlugins, blockCode: false, inline: false);
-            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), blockCode: false, inline: false);
+            AutoField(embed, "Java Version", JavaVersion);
+            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins);
+            AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), inline: false);
+            AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, inline: false);
+            AutoField(embed, "Problematic Plugin(s)", BadPlugins, inline: false);
+            AutoField(embed, "Possibly Relevant Plugin(s)", IffyPlugins, inline: false);
+            AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
             return embed.Build();
         }
     }
