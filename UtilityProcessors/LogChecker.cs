@@ -131,15 +131,16 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Log contains error messages.", "caused by: ", "[server thread/error]: ");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To give an NPC a hologram, just use the built in '/npc hologram' command, you don't need a separate plugin for this anymore.", "CitizensHologram");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To use placeholders with Citizens, just use the normal commands. You don't need a separate plugin for this anymore.", "CitizensPlaceholderAPI");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser-Spigot");
@@ -149,9 +150,9 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
             AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
+            AddReportedEntry(MESSY_PLUGINS, "- 'PlayerProfiles' has been seen to cause breaking issues with Citizens.", "PlayerProfiles");
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
-            AddReportedEntry(MESSY_PLUGINS, "- FAWE has been known to break the plugin load order on many servers.", "FastAsyncWorldEdit");
-            AddReportedEntry(MESSY_PLUGINS, "- Gringotts is known to use a 'loadbefore' directive in its plugin.yml, which is likely to break the plugin load order on servers.", "Gringotts");
+            AddReportedEntry(MESSY_PLUGINS, "- This plugin has been known to break the plugin load order on many servers, due to usage of the 'loadbefore' directive in its 'plugin.yml'.", "FastAsyncWorldEdit", "SimplePets", "Enchantssquared", "Gringotts");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
         }
 
