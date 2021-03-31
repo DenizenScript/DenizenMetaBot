@@ -42,6 +42,7 @@ To configure the bot:
         - `max_behind` set to an integer, representing how many builds behind one can safely be before a warning symbol should be displayed.
     - `acceptable_server_versions` set to a list of server MC versions (just the main version without sub-version, like "1.15", not "1.15.1") that are acceptable + tracked (older = outdated, newer = unknown).
     - `additional_meta_sources` set to a list of additional meta source URLs (should be direct zip links, like `https://github.com/DenizenScript/Denizen/archive/dev.zip`).
+    - `reload_webhooks` set to an optional list of URLs to set a POST request to when reloads are triggered.
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -74,6 +75,8 @@ build_numbers:
         max_behind: 2
 acceptable_server_versions:
     - 1.15
+reload_webhooks:
+- https://example.com
 ```
 
 To start the bot up:

@@ -105,6 +105,11 @@ namespace DenizenBot
         public InformationCommands InfoCmds = new InformationCommands();
 
         /// <summary>
+        /// URLs to send a POST to when reloading.
+        /// </summary>
+        public static string[] ReloadWebooks;
+
+        /// <summary>
         /// Generates default command name->method pairs.
         /// </summary>
         void DefaultCommands(DiscordBot bot)
@@ -248,6 +253,11 @@ namespace DenizenBot
             if (configFile.HasKey("additional_meta_sources"))
             {
                 MetaDocs.SourcesToUse = MetaDocs.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
+            }
+            ReloadWebooks = Array.Empty<string>();
+            if (configFile.HasKey("reload_webhooks"))
+            {
+                ReloadWebooks = configFile.GetStringList("reload_webhooks").ToArray();
             }
             BuildNumberTracker.LoadSpigotData();
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))

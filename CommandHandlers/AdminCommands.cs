@@ -9,6 +9,7 @@ using DenizenBot.UtilityProcessors;
 using DiscordBotBase;
 using DiscordBotBase.CommandHandlers;
 using SharpDenizenTools.MetaHandlers;
+using System.Net;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -49,6 +50,24 @@ namespace DenizenBot.CommandHandlers
             embed.AddField("Languages", docs.Languages.Count, true);
             embed.AddField("Guide Pages", docs.GuidePages.Count, true);
             SendReply(command.Message, embed.Build());
+            foreach (string url in DenizenMetaBot.ReloadWebooks)
+            {
+                try
+                {
+                    ReusableWebClient.UploadString(url, "");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.Write($"Failed to ping webhook URL '{url}': {ex}");
+                }
+            }
+        }
+
+        public WebClient ReusableWebClient = new WebClient();
+
+        public AdminCommands()
+        {
+            ReusableWebClient.Headers["User-Agent"] = "DenizenMetaBot";
         }
     }
 }
