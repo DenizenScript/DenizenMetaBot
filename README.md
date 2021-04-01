@@ -53,7 +53,7 @@ valid_channels:
 - 315616018846318593
 info_replies:
     new,newb,noob,newbie: Welcome new user! Please read the rules at the bottom of the #info channel, and feel free after that to ask for help in the most relevant channel!
-url_base: https://one.denizenscript.com/denizen/
+url_base: https://meta.denizenscript.com/Docs/
 command_prefix: !
 project_details:
     Denizen:

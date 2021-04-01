@@ -13,7 +13,7 @@ namespace DenizenBot
         /// <summary>
         /// The base for the meta docs URL.
         /// </summary>
-        public static string DOCS_URL_BASE = "https://one.denizenscript.com/denizen/";
+        public static string DOCS_URL_BASE = "https://meta.denizenscript.com/Docs/";
 
         /// <summary>
         /// The prefix for non-ping-based command usage.
