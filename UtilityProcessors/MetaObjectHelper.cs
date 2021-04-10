@@ -6,6 +6,7 @@ using SharpDenizenTools.MetaObjects;
 using SharpDenizenTools.MetaHandlers;
 using Discord;
 using FreneticUtilities.FreneticExtensions;
+using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -43,6 +44,8 @@ namespace DenizenBot.UtilityProcessors
             return output.ToString();
         }
 
+        public static AsciiMatcher NeedsUrlEscape = new AsciiMatcher("<>[]|");
+
         /// <summary>
         /// Escapes a URL input string.
         /// </summary>
@@ -50,7 +53,12 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The escaped output.</returns>
         public static string UrlEscape(string input)
         {
-            return input.Replace(" ", "%20").Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D");
+            input = input.Replace(" ", "%20");
+            if (NeedsUrlEscape.ContainsAnyMatch(input))
+            {
+                input = input.Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D").Replace("|", "%7C");
+            }
+            return input;
         }
 
         /// <summary>
