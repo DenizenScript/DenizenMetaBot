@@ -417,7 +417,7 @@ namespace DenizenBot.CommandHandlers
             string[] cmds = command.CleanedArguments;
             if (cmds.Length == 0 || cmds[0].ToLowerFast() == "all")
             {
-                SendGenericPositiveMessageReply(command.Message, "Guides", $"View the Denizen Beginner's Guide at {MetaDocs.DENIZEN_GUIDE_SOURCE}");
+                SendGenericPositiveMessageReply(command.Message, "Guides", $"View the Denizen Beginner's Guide at {MetaDocsLoader.DENIZEN_GUIDE_SOURCE}");
                 return;
             }
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();

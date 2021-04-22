@@ -252,7 +252,7 @@ namespace DenizenBot
             }
             if (configFile.HasKey("additional_meta_sources"))
             {
-                MetaDocs.SourcesToUse = MetaDocs.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
+                MetaDocsLoader.SourcesToUse = MetaDocsLoader.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
             }
             ReloadWebooks = Array.Empty<string>();
             if (configFile.HasKey("reload_webhooks"))

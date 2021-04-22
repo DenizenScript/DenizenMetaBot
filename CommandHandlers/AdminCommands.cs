@@ -32,8 +32,7 @@ namespace DenizenBot.CommandHandlers
             }
             SendGenericPositiveMessageReply(command.Message, "Reloading", "Yes, boss. Reloading meta documentation now...");
             BuildNumberTracker.UpdateAll();
-            MetaDocs docs = new MetaDocs();
-            docs.DownloadAll();
+            MetaDocs docs = MetaDocsLoader.DownloadAll();
             MetaDocs.CurrentMeta = docs;
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Reload Complete").WithDescription("Documentation reloaded successfully.");
             if (docs.LoadErrors.Count > 0)

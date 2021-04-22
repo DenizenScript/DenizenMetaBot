@@ -25,8 +25,7 @@ namespace DenizenBot
         static void Main(string[] args)
         {
             ReusableWebClient.DefaultRequestHeaders.UserAgent.ParseAdd("DenizenMetaBot/1.0");
-            MetaDocs.CurrentMeta = new MetaDocs();
-            MetaDocs.CurrentMeta.DownloadAll();
+            MetaDocs.CurrentMeta = MetaDocsLoader.DownloadAll();
             LaunchBotThread(args);
         }
 
@@ -52,7 +51,7 @@ namespace DenizenBot
             {
                 Console.WriteLine("Discord crash: " + ex.ToString());
                 Thread.Sleep(10 * 1000);
-                LaunchBotThread(new string[0]);
+                LaunchBotThread(Array.Empty<string>());
             }
         }
     }
