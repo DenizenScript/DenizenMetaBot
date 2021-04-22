@@ -300,7 +300,7 @@ namespace DenizenBot.UtilityProcessors
             else if (obj is MetaGuidePage guidePage)
             {
                 builder = builder.WithUrl(guidePage.URL).WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO);
-                builder.Description = $"Read the guide page '**{guidePage.PageName}**' at: {guidePage.URL}";
+                builder.Description = $"View the guide page '**{guidePage.PageName}**' at: {guidePage.URL}";
             }
             else if (obj is MetaLanguage language)
             {

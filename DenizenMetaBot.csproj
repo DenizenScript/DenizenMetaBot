@@ -14,8 +14,6 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.2.0" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0" />
     <PackageReference Include="System.Json" Version="4.7.1" />
     <PackageReference Include="YamlDotNet" Version="9.1.4" />
   </ItemGroup>
