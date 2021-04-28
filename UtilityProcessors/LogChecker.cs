@@ -133,7 +133,7 @@ namespace DenizenBot.UtilityProcessors
             // Plugins
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
@@ -470,12 +470,13 @@ namespace DenizenBot.UtilityProcessors
                 versionInput = versionInput["this server is running ".Length..];
             }
             string[] subData = versionInput.Split(' ', 4);
-            if (subData.Length != 4 || subData[1] != "version" || !subData[2].StartsWith("git-") || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
+            if (subData.Length != 4 || subData[1] != "version" || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
             {
                 Console.WriteLine("Server version doesn't match expected format, disregarding check.");
                 return "";
             }
-            string spigotVersionText = subData[2].Split('-', 3)[2];
+            string[] versionParts = subData[2].Split('-', 3);
+            string spigotVersionText = versionParts[2];
             string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
             string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
             if (!double.TryParse(majorMCVersion, out double versionNumb))
@@ -520,6 +521,10 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (subData[0] == "spigot" || subData[0] == "craftbukkit")
             {
+                if (versionParts[1] == "bukkit")
+                {
+                    return $"Bukkit is unsupported - use Spigot or Paper {WARNING_SYMBOL}";
+                }
                 spigotVersionText = spigotVersionText.Before('-');
                 if (spigotVersionText.Length != 7 || !HEX_ASCII_MATCHER.IsOnlyMatches(spigotVersionText))
                 {
@@ -757,7 +762,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 embed.ThumbnailUrl = Constants.RED_FLAG_ICON;
             }
-            else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0))
+            else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0) || ServerVersion.Contains(WARNING_SYMBOL))
             {
                 embed.ThumbnailUrl = Constants.WARNING_ICON;
             }
