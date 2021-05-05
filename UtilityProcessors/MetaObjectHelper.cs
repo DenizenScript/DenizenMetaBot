@@ -44,7 +44,7 @@ namespace DenizenBot.UtilityProcessors
             return output.ToString();
         }
 
-        public static AsciiMatcher NeedsUrlEscape = new AsciiMatcher("<>[]|");
+        public static AsciiMatcher NeedsUrlEscape = new AsciiMatcher("<>[]|\"");
 
         /// <summary>
         /// Escapes a URL input string.
@@ -56,7 +56,7 @@ namespace DenizenBot.UtilityProcessors
             input = input.Replace(" ", "%20");
             if (NeedsUrlEscape.ContainsAnyMatch(input))
             {
-                input = input.Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D").Replace("|", "%7C");
+                input = input.Replace("<", "%3C").Replace(">", "%3E").Replace("[", "%5B").Replace("]", "%5D").Replace("|", "%7C").Replace("\"", "%22");
             }
             return input;
         }
@@ -242,8 +242,11 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The Discord-ready embed object.</returns>
         public static EmbedBuilder GetEmbed(this MetaObject obj, bool hideLargeData = false)
         {
-            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(obj.Type.Name + ": " + obj.Name)
-                .WithUrl(DenizenMetaBotConstants.DOCS_URL_BASE + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
+            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(obj.Type.Name + ": " + obj.Name);
+            if (obj is not MetaGuidePage)
+            {
+                builder = builder.WithUrl(DenizenMetaBotConstants.DOCS_URL_BASE + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
+            }
             AutoField(builder, "Required Plugins or Platforms", obj.Plugin);
             AutoField(builder, "Group", obj.Group);
             foreach (string warn in obj.Warnings)
