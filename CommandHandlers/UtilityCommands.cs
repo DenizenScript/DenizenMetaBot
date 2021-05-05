@@ -74,7 +74,7 @@ namespace DenizenBot.CommandHandlers
                 string pasteCode = inputUrl[DENIZEN_PASTE_URL_BASE.Length..];
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
-                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
+                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Denizen paste URL given does not conform to expected format.");
                     return null;
                 }
                 rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";

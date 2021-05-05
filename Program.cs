@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Net.Http;
 using SharpDenizenTools.MetaHandlers;
+using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot
 {
@@ -24,7 +25,9 @@ namespace DenizenBot
         /// </summary>
         static void Main(string[] args)
         {
+            SpecialTools.Internationalize();
             ReusableWebClient.DefaultRequestHeaders.UserAgent.ParseAdd("DenizenMetaBot/1.0");
+            MetaDocsLoader.LoadGuideData = true;
             MetaDocs.CurrentMeta = MetaDocsLoader.DownloadAll();
             LaunchBotThread(args);
         }

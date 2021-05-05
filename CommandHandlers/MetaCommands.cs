@@ -220,9 +220,12 @@ namespace DenizenBot.CommandHandlers
                 }
                 return closeName == null ? 1000 : StringConversionHelper.GetLevenshteinDistance(search, closeName);
             }
-            else if (matched.Count > 1)
+            if (matched.Count > 1)
             {
                 matched = altMatchOrderer(matched);
+            }
+            if (matched.Count > 1)
+            {
                 string suffix = ".";
                 if (matched.Count > 20)
                 {
@@ -425,7 +428,17 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, command.Message);
+            string search = cmds[0].ToLowerFast();
+            List<MetaGuidePage> altMatchOrderer(List<MetaGuidePage> list)
+            {
+                IEnumerable<MetaGuidePage> betterMatches = list.Where(page => !page.IsSubPage);
+                if (!betterMatches.IsEmpty())
+                {
+                    list = betterMatches.ToList();
+                }
+                return list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
+            }
+            AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, command.Message, altMatchOrderer: altMatchOrderer);
         }
 
         /// <summary>
