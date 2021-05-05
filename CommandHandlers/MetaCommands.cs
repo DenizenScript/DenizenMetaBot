@@ -85,7 +85,7 @@ namespace DenizenBot.CommandHandlers
                     string initialPossibleResult = StringConversionHelper.FindClosestString(docs.Keys, search, out int lowestDistance, 20);
                     Console.WriteLine($"Initial closest match to '{search}' is '{initialPossibleResult}' at distance {lowestDistance}.");
                     string lowestStr = initialPossibleResult;
-                    foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames).SelectMany(o => o.MultiNames))
+                    foreach (string possibleName in docs.Values.Where(o => o.HasMultipleNames || o.Synonyms.Any()).SelectMany(o => o.MultiNames.Concat(o.Synonyms)))
                     {
                         int currentDistance = StringConversionHelper.GetLevenshteinDistance(search, possibleName);
                         if (currentDistance < lowestDistance)
@@ -98,7 +98,7 @@ namespace DenizenBot.CommandHandlers
                     if (words.Length > 1)
                     {
                         Console.WriteLine($"Pre-multi-word closest match is '{lowestStr}' at distance {lowestDistance}.");
-                        foreach (string possibleName in docs.Values.SelectMany(o => o.MultiNames))
+                        foreach (string possibleName in docs.Values.SelectMany(o => o.MultiNames.Concat(o.Synonyms)))
                         {
                             int currentDistance = 0;
                             string[] nameWords = possibleName.Split(' ');
@@ -189,9 +189,17 @@ namespace DenizenBot.CommandHandlers
             }
             foreach (KeyValuePair<string, T> objPair in docs)
             {
+                int matchQuality = 0;
+                foreach (string name in objPair.Value.Synonyms)
+                {
+                    matchQuality = tryProcesSingleMatch(objPair.Value, name, matchQuality);
+                    if (matchQuality == 2)
+                    {
+                        break;
+                    }
+                }
                 if (objPair.Value.HasMultipleNames)
                 {
-                    int matchQuality = 0;
                     foreach (string name in objPair.Value.MultiNames)
                     {
                         matchQuality = tryProcesSingleMatch(objPair.Value, name, matchQuality);
@@ -467,14 +475,14 @@ namespace DenizenBot.CommandHandlers
             List<MetaObject> partialWeakMatch = new List<MetaObject>();
             foreach (MetaObject obj in MetaDocs.CurrentMeta.AllMetaObjects())
             {
-                if (obj.CleanName.Contains(fullSearch))
+                if (obj.CleanName.Contains(fullSearch) || obj.Synonyms.Any(s => s.Contains(fullSearch)))
                 {
                     strongMatch.Add(obj);
                     continue;
                 }
                 foreach (string word in cmds)
                 {
-                    if (obj.CleanName.Contains(word))
+                    if (obj.CleanName.Contains(word) || obj.Synonyms.Any(s => s.Contains(word)))
                     {
                         partialStrongMatch.Add(obj);
                         goto fullContinue;
