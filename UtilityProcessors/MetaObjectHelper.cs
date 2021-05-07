@@ -95,7 +95,7 @@ namespace DenizenBot.UtilityProcessors
             string beforeBlock = EscapeForDiscord(ProcessMetaLinksForDiscord(content[0..codeBlockStart]));
             string code = (content[(codeBlockStart + "<code>".Length)..codeBlockEnd]);
             string afterBlock = ProcessBlockTextForDiscord(content[(codeBlockEnd + "</code>".Length)..]);
-            return $"{beforeBlock}\n```yml\n{code}\n```\n{afterBlock}";
+            return $"{beforeBlock}```yml\n{code}\n```{afterBlock}";
         }
 
         /// <summary>
