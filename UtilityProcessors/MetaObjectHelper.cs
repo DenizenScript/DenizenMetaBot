@@ -75,8 +75,27 @@ namespace DenizenBot.UtilityProcessors
                 {
                     value = value.Substring(0, 1000) + "...";
                 }
-                builder.AddField(key, EscapeForDiscord(ProcessMetaLinksForDiscord(value)), false);
+                builder.AddField(key, ProcessBlockTextForDiscord(value), false);
             }
+        }
+
+        public static string ProcessBlockTextForDiscord(string content)
+        {
+            int codeBlockStart = content.IndexOf("<code>");
+            if (codeBlockStart == -1)
+            {
+                return EscapeForDiscord(ProcessMetaLinksForDiscord(content));
+            }
+            int codeBlockEnd = content.IndexOf("</code>", codeBlockStart);
+            if (codeBlockEnd == -1)
+            {
+                // This can happen from trimming, so ignore it.
+                return EscapeForDiscord(ProcessMetaLinksForDiscord(content));
+            }
+            string beforeBlock = EscapeForDiscord(ProcessMetaLinksForDiscord(content[0..codeBlockStart]));
+            string code = (content[(codeBlockStart + "<code>".Length)..codeBlockEnd]);
+            string afterBlock = ProcessBlockTextForDiscord(content[(codeBlockEnd + "</code>".Length)..]);
+            return $"{beforeBlock}\n```yml\n{code}\n```\n{afterBlock}";
         }
 
         /// <summary>
@@ -273,7 +292,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (!hideLargeData)
                 {
-                    builder.AddField("Description", EscapeForDiscord(ProcessMetaLinksForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description)));
+                    builder.AddField("Description", ProcessBlockTextForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description));
                 }
             }
             else if (obj is MetaEvent evt)
@@ -307,20 +326,20 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaLanguage language)
             {
-                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(language.Description.Length > 900 ? language.Description.Substring(0, 800) + "..." : language.Description));
+                builder.Description = ProcessBlockTextForDiscord(language.Description.Length > 900 ? language.Description.Substring(0, 800) + "..." : language.Description);
             }
             else if (obj is MetaMechanism mechanism)
             {
                 builder = builder.WithTitle(mechanism.MechObject + " mechanism: " + mechanism.MechName);
                 AutoField(builder, "Input", mechanism.Input);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
-                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description));
+                builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description);
             }
             else if (obj is MetaTag tag)
             {
                 AutoField(builder, "Returns", tag.Returns);
                 AutoField(builder, "Mechanism", tag.Mechanism);
-                builder.Description = EscapeForDiscord(ProcessMetaLinksForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description));
+                builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description);
             }
             return builder;
         }
