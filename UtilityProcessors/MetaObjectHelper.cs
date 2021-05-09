@@ -10,11 +10,12 @@ using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot.UtilityProcessors
 {
-    /// <summary>
-    /// Helper logic for meta objects.
-    /// </summary>
+    /// <summary>Helper logic for meta objects.</summary>
     public static class MetaObjectHelper
     {
+        /// <summary>Symbols that need escaping on Discord.</summary>
+        public static AsciiMatcher DiscordEscapableSymbols = new AsciiMatcher("<>_*:|~");
+
         /// <summary>
         /// Escapes some text for safe Discord output.
         /// </summary>
@@ -35,7 +36,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     inCodeBlock = !inCodeBlock;
                 }
-                else if (!inCodeBlock && (c == '<' || c == '>' || c == ':' || c == '|'))
+                else if (!inCodeBlock && DiscordEscapableSymbols.IsMatch(c))
                 {
                     output.Append('\\');
                 }
@@ -44,6 +45,7 @@ namespace DenizenBot.UtilityProcessors
             return output.ToString();
         }
 
+        /// <summary>Symbols that need escaping in URLs.</summary>
         public static AsciiMatcher NeedsUrlEscape = new AsciiMatcher("<>[]|\"");
 
         /// <summary>
