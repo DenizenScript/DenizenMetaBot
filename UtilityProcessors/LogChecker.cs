@@ -444,12 +444,12 @@ namespace DenizenBot.UtilityProcessors
                 JavaVersion = "";
                 return;
             }
-            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("11") || JavaVersion.StartsWith("1.11"))
+            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("11") || JavaVersion.StartsWith("1.11") || JavaVersion.StartsWith("16"))
             {
                 JavaVersion = $"`{Escape(JavaVersion)}` {GREEN_CHECK_MARK_SYMBOL}";
                 return;
             }
-            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java 8 and Java 11 are fully supported";
+            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 16, 11, and 8 are fully supported";
         }
 
         /// <summary>
