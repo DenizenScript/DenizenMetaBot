@@ -64,12 +64,12 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>
-        /// Checks the value as not null or whitespace, then adds it to the embed as an inline field.
+        /// Checks the value as not null or whitespace, then adds it to the embed as a field.
         /// </summary>
         /// <param name="builder">The embed builder.</param>
         /// <param name="key">The field key.</param>
         /// <param name="value">The field value.</param>
-        public static void AutoField(EmbedBuilder builder, string key, string value)
+        public static void AutoField(EmbedBuilder builder, string key, string value, bool inline = false)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -77,7 +77,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     value = value.Substring(0, 1000) + "...";
                 }
-                builder.AddField(key, ProcessBlockTextForDiscord(value), false);
+                builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
         }
 
@@ -268,8 +268,8 @@ namespace DenizenBot.UtilityProcessors
             {
                 builder = builder.WithUrl(DenizenMetaBotConstants.DOCS_URL_BASE + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
             }
-            AutoField(builder, "Required Plugins or Platforms", obj.Plugin);
-            AutoField(builder, "Group", obj.Group);
+            AutoField(builder, "Required Plugins or Platforms", obj.Plugin, true);
+            AutoField(builder, "Group", obj.Group, true);
             foreach (string warn in obj.Warnings)
             {
                 AutoField(builder, "**WARNING**", warn);
@@ -333,15 +333,24 @@ namespace DenizenBot.UtilityProcessors
             else if (obj is MetaMechanism mechanism)
             {
                 builder = builder.WithTitle(mechanism.MechObject + " mechanism: " + mechanism.MechName);
-                AutoField(builder, "Input", mechanism.Input);
+                AutoField(builder, "Input", mechanism.Input, true);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
                 builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description);
             }
             else if (obj is MetaTag tag)
             {
-                AutoField(builder, "Returns", tag.Returns);
-                AutoField(builder, "Mechanism", tag.Mechanism);
+                AutoField(builder, "Returns", tag.Returns, true);
+                AutoField(builder, "Mechanism", tag.Mechanism, true);
                 builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description);
+            }
+            else if (obj is MetaObjectType objectType)
+            {
+                AutoField(builder, "Prefix", objectType.Prefix, true);
+                AutoField(builder, "Base Type", objectType.BaseTypeName, true);
+                AutoField(builder, "Implements", string.Join(", ", objectType.ImplementsNames), true);
+                string format = objectType.Format.Length > 600 ? objectType.Format.Substring(0, 500) + "..." : objectType.Format;
+                AutoField(builder, "Format", format);
+                builder.Description = ProcessBlockTextForDiscord(objectType.Description.Length > 600 ? objectType.Description.Substring(0, 500) + "..." : objectType.Description);
             }
             return builder;
         }

@@ -131,6 +131,7 @@ namespace DenizenBot
             bot.RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
             bot.RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m");
             bot.RegisterCommand(metaCmds.CMD_Tag, "tag", "tags", "t");
+            bot.RegisterCommand(metaCmds.CMD_ObjectTypes, "objecttype", "objecttypes", "objtype", "objtypes", "otype", "otypes", "ot", "type", "object", "objects", "types");
             bot.RegisterCommand(metaCmds.CMD_Event, "event", "events", "evt", "evts", "e");
             bot.RegisterCommand(metaCmds.CMD_Action, "action", "actions", "act", "acts", "a");
             bot.RegisterCommand(metaCmds.CMD_Language, "language", "languages", "lang", "langs", "l");

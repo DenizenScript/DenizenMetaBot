@@ -32,6 +32,7 @@ namespace DenizenBot.CommandHandlers
                 "`command [name] [usage/tags]` to search commands\n"
                 + "`mechanism [name]` to search mechanisms\n"
                 + "`tag [name]` to search tags\n"
+                + "`objecttype [name]` to search object types\n"
                 + "`event [name]` to search world script events\n"
                 + "`action [name]` to search NPC assignment actions\n"
                 + "`language [name]` to search language docs\n"

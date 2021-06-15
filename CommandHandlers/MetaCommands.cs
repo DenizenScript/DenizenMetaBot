@@ -376,6 +376,22 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>
+        /// ObjectTypes meta docs user command.
+        /// </summary>
+        public void CMD_ObjectTypes(CommandData command)
+        {
+            int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.ObjectTypes, MetaDocs.META_TYPE_OBJECT, command.CleanedArguments, command.Message);
+            if (closeness > 0)
+            {
+                string closeCmd = StringConversionHelper.FindClosestString(MetaDocs.CurrentMeta.ObjectTypes.Keys, command.CleanedArguments[0].ToLowerFast(), 7);
+                if (closeCmd != null)
+                {
+                    SendDidYouMeanReply(command.Message, "Possible Confusion", $"Did you mean to search for `objecttype {closeCmd}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}objecttype {closeCmd}");
+                }
+            }
+        }
+
+        /// <summary>
         /// Event meta docs user command.
         /// </summary>
         public void CMD_Event(CommandData command)
