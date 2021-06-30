@@ -260,7 +260,6 @@ namespace DenizenBot
             {
                 ReloadWebooks = configFile.GetStringList("reload_webhooks").ToArray();
             }
-            BuildNumberTracker.LoadSpigotData();
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))
             {
                 Quotes = File.ReadAllText(DiscordBot.CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Replace('`', '\'').Split("\n\n", StringSplitOptions.RemoveEmptyEntries);

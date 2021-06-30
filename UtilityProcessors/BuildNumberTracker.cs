@@ -246,7 +246,6 @@ namespace DenizenBot.UtilityProcessors
             {
                 number.UpdateValue();
             }
-            LoadSpigotData();
         }
 
         /// <summary>
@@ -313,83 +312,6 @@ namespace DenizenBot.UtilityProcessors
                 name = name[0..^1];
             }
             return name;
-        }
-
-        /// <summary>
-        /// Marker string that a version is current, for <see cref="SpigotCommitParents"/>.
-        /// </summary>
-        public const string CURRENT_MARKER_STRING = "((CURRENT))";
-
-        /// <summary>
-        /// This is a parent commit tracing map. That is, if you input a commit short-hash, you will get back the short-hash of a version 1 newer than that version.
-        /// If you trace it far enough, you will eventually reach the current commit.
-        /// </summary>
-        public static Dictionary<string, string> SpigotCommitParents = new Dictionary<string, string>();
-
-        /// <summary>
-        /// When you input a Spigot version hash (7 characters), this will return how far behind it is.
-        /// Will return 0 if the version is current.
-        /// Will return -1 if the version is invalid.
-        /// </summary>
-        /// <param name="version">The Spigot version hash.</param>
-        /// <returns>How far behind it is, or -1.</returns>
-        public static int GetSpigotVersionsBehindBy(string version)
-        {
-            int count = 0;
-            while (SpigotCommitParents.TryGetValue(version, out version))
-            {
-                if (version == CURRENT_MARKER_STRING)
-                {
-                    return count;
-                }
-                count++;
-            }
-            return -1;
-        }
-
-        /// <summary>
-        /// Loads data for Spigot version tracking.
-        /// </summary>
-        public static void LoadSpigotData()
-        {
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    Thread.Sleep(new TimeSpan(hours: 0, minutes: 0, seconds: 10));
-                    Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync("https://hub.spigotmc.org/version/rest/api/latest/commits/spigot");
-                    downloadTask.Wait(BuildNumber.DOWNLOAD_TIMEOUT);
-                    if (!downloadTask.IsCompleted)
-                    {
-                        return;
-                    }
-                    string json = downloadTask.Result;
-                    YamlStream yaml = new YamlStream();
-                    yaml.Load(new StringReader(json));
-                    YamlMappingNode root = (YamlMappingNode)yaml.Documents[0].RootNode;
-                    YamlMappingNode parentsMap = (YamlMappingNode)root.Children["parents"];
-                    Dictionary<string, string> commitParents = new Dictionary<string, string>(1024);
-                    foreach (KeyValuePair<YamlNode, YamlNode> values in parentsMap.Children)
-                    {
-                        string key = ((YamlScalarNode)values.Key).Value;
-                        YamlSequenceNode parentList = (YamlSequenceNode)values.Value;
-                        string parent = ((YamlScalarNode)parentList[0]).Value;
-                        commitParents[key] = parent;
-                    }
-                    foreach (string versionKey in new List<string>(commitParents.Values))
-                    {
-                        if (!commitParents.ContainsKey(versionKey))
-                        {
-                            commitParents.Add(versionKey, CURRENT_MARKER_STRING);
-                        }
-                    }
-                    SpigotCommitParents = commitParents;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"While updating Spigot data: {ex}");
-                }
-            });
         }
     }
 }

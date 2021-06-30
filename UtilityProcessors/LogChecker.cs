@@ -534,6 +534,7 @@ namespace DenizenBot.UtilityProcessors
                     Console.WriteLine($"Spigot version '{spigotVersionText}' is wrong format, disregarding check.");
                     return "";
                 }
+                /*
                 int behind = BuildNumberTracker.GetSpigotVersionsBehindBy(spigotVersionText);
                 if (behind == -1)
                 {
@@ -548,7 +549,7 @@ namespace DenizenBot.UtilityProcessors
                 else
                 {
                     return (behind > 20 ? WARNING_SYMBOL + " " : "") + $"Outdated build, behind by {behind}";
-                }
+                }*/
             }
             else
             {
