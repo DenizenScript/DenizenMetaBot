@@ -81,7 +81,7 @@ namespace DenizenBot.CommandHandlers
                         if (data != null && data.Length > 100 && data.Length < 1024 * 1024 * 5)
                         {
                             inputUrl = AdminCommands.ReusableWebClient.UploadString("https://" + $"paste.denizenscript.com/New/{type}", $"pastetype={type}&response=micro&v=200&"
-                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}");
+                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n");
                             if (!string.IsNullOrWhiteSpace(inputUrl))
                             {
                                 SendGenericPositiveMessageReply(command.Message, "Repasted", $"Direct Discord-upload of {type} reuploaded to pastebin at <{inputUrl}>");
