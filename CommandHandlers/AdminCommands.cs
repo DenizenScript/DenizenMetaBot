@@ -63,7 +63,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        public WebClient ReusableWebClient = new WebClient();
+        public static WebClient ReusableWebClient = new WebClient();
 
         public AdminCommands()
         {

@@ -12,6 +12,7 @@ using DenizenBot.UtilityProcessors;
 using DiscordBotBase.CommandHandlers;
 using DiscordBotBase;
 using SharpDenizenTools.ScriptAnalysis;
+using System.Web;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -44,17 +45,76 @@ namespace DenizenBot.CommandHandlers
         public static TimeSpan WebLinkDownloadTimeout = new TimeSpan(hours: 0, minutes: 0, seconds: 15);
 
         /// <summary>
+        /// File extensions allowed in command attachment links.
+        /// </summary>
+        public static HashSet<string> AllowedLinkFileExtensions = new HashSet<string>() { "log", "txt", "dsc", "yml" };
+
+        /// <summary>
         /// For a web-link command like '!logcheck', gets the data from the paste link.
         /// </summary>
-        public string GetWebLinkDataForCommand(string inputUrl, IUserMessage message)
+        public string GetWebLinkDataForCommand(string cmdName, string type, CommandData command)
         {
+            string inputUrl = null;
+            try
+            {
+                if (command.CleanedArguments.Length > 0)
+                {
+                    inputUrl = command.RawArguments[0];
+                }
+                else if (command.Message.Reference is not null && command.Message.Reference.MessageId.IsSpecified)
+                {
+                    IMessage referenced = command.Message.Channel.GetMessageAsync(command.Message.Reference.MessageId.Value).Result;
+                    if (referenced != null && referenced.Attachments.Any())
+                    {
+                        IAttachment attachment = referenced.Attachments.First();
+                        if (attachment.Size < 100 || attachment.Size > 1024 * 1024 * 5)
+                        {
+                            SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has size {attachment.Size} - file must be non-empty, and less than 5 MiB.");
+                            return null;
+                        }
+                        if (!AllowedLinkFileExtensions.Contains(attachment.Filename.AfterLast('.')))
+                        {
+                            SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has unrecognized or unsupported file extension. Use `.log` for log files, and `.dsc` for Denizen scripts.");
+                            return null;
+                        }
+                        string data = Program.ReusableWebClient.GetStringAsync(attachment.Url).Result;
+                        if (data != null && data.Length > 100 && data.Length < 1024 * 1024 * 5)
+                        {
+                            inputUrl = AdminCommands.ReusableWebClient.UploadString("https://" + $"paste.denizenscript.com/New/{type}", $"pastetype={type}&response=micro&v=200&"
+                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}");
+                            if (!string.IsNullOrWhiteSpace(inputUrl))
+                            {
+                                SendGenericPositiveMessageReply(command.Message, "Repasted", $"Direct Discord-upload of {type} reuploaded to pastebin at <{inputUrl}>");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                if (ex is HttpRequestException)
+                {
+                    SendErrorMessageReply(command.Message, "Error", $"Exception thrown while downloading or reuploading raw attachment data. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
+                }
+                else
+                {
+                    SendErrorMessageReply(command.Message, "Error", "Exception thrown while handling special file scan command (see console for details).");
+                }
+                return null;
+            }
+            if (string.IsNullOrWhiteSpace(inputUrl))
+            {
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", $"`{DenizenMetaBotConstants.COMMAND_PREFIX}{cmdName} <link>`");
+                return null;
+            }
             string rawUrl;
             if (inputUrl.StartsWith(PASTEBIN_URL_BASE))
             {
                 string pastebinCode = inputUrl[PASTEBIN_URL_BASE.Length..];
                 if (!PASTEBIN_CODE_VALIDATOR.IsOnlyMatches(pastebinCode))
                 {
-                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Pastebin URL given does not conform to expected format.");
+                    SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Pastebin URL given does not conform to expected format.");
                     return null;
                 }
                 rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
@@ -64,7 +124,7 @@ namespace DenizenBot.CommandHandlers
                 string pasteCode = inputUrl[OLD_DENIZEN_HASTE_URL_BASE.Length..].Before('/');
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
-                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
+                    SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
                     return null;
                 }
                 rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
@@ -74,14 +134,14 @@ namespace DenizenBot.CommandHandlers
                 string pasteCode = inputUrl[DENIZEN_PASTE_URL_BASE.Length..];
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
-                    SendErrorMessageReply(message, "Command Syntax Incorrect", "Denizen paste URL given does not conform to expected format.");
+                    SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Denizen paste URL given does not conform to expected format.");
                     return null;
                 }
                 rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
             }
             else
             {
-                SendErrorMessageReply(message, "Command Syntax Incorrect", "Input argument must be a link to pastebin or <https://one.denizenscript.com/haste>.");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Input argument must be a link to pastebin or <https://one.denizenscript.com/haste>.");
                 return null;
             }
             try
@@ -90,7 +150,7 @@ namespace DenizenBot.CommandHandlers
                 downloadTask.Wait(WebLinkDownloadTimeout);
                 if (!downloadTask.IsCompleted)
                 {
-                    SendErrorMessageReply(message, "Error", "Download did not complete in time.");
+                    SendErrorMessageReply(command.Message, "Error", "Download did not complete in time.");
                     return null;
                 }
                 return downloadTask.Result;
@@ -100,11 +160,11 @@ namespace DenizenBot.CommandHandlers
                 Console.WriteLine(ex.ToString());
                 if (ex is HttpRequestException)
                 {
-                    SendErrorMessageReply(message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
+                    SendErrorMessageReply(command.Message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
                 }
                 else
                 {
-                    SendErrorMessageReply(message, "Error", "Exception thrown while downloading raw data from link (see console for details).");
+                    SendErrorMessageReply(command.Message, "Error", "Exception thrown while downloading raw data from link (see console for details).");
                 }
                 return null;
             }
@@ -115,14 +175,15 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_LogCheck(CommandData command)
         {
-            if (command.CleanedArguments.Length == 0)
-            {
-                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!logcheck <link>`");
-                return;
-            }
-            string data = GetWebLinkDataForCommand(command.CleanedArguments[0], command.Message);
+            string data = GetWebLinkDataForCommand("logcheck", "log", command);
             if (data == null)
             {
+                return;
+            }
+            if (data.CountCharacter('\n') < 40)
+            {
+                SendErrorMessageReply(command.Message, "Invalid Log", "Log file given is incredibly short. Please post your full `logs/latest.log`, not just the snippet you think is relevant."
+                    + " All information is needed, especially the full startup output, which contains server/plugin versions and usually is where important error messages are found.");
                 return;
             }
             LogChecker checker = new LogChecker(data);
@@ -137,7 +198,7 @@ namespace DenizenBot.CommandHandlers
         {
             if (command.CleanedArguments.Length == 0)
             {
-                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!versioncheck <version text>`");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", $"`{DenizenMetaBotConstants.COMMAND_PREFIX}versioncheck <version text>`");
                 return;
             }
             string combined = string.Join(" ", command.CleanedArguments).Trim();
@@ -278,12 +339,7 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            if (command.CleanedArguments.Length == 0)
-            {
-                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!script <link>`");
-                return;
-            }
-            string data = GetWebLinkDataForCommand(command.CleanedArguments[0], command.Message);
+            string data = GetWebLinkDataForCommand("script", "script", command);
             if (data == null)
             {
                 return;
