@@ -332,7 +332,8 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaMechanism mechanism)
             {
-                builder = builder.WithTitle(mechanism.MechObject + " mechanism: " + mechanism.MechName);
+                builder = builder.WithTitle("Mechanism: " + mechanism.MechName);
+                AutoField(builder, "Object", mechanism.MechObject, true);
                 AutoField(builder, "Input", mechanism.Input, true);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
                 builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description);
