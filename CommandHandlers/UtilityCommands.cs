@@ -25,8 +25,6 @@ namespace DenizenBot.CommandHandlers
         /// Base URL for paste sites.
         /// </summary>
         public const string PASTEBIN_URL_BASE = "https://pastebin.com/",
-            OLD_DENIZEN_PASTE_URL_BASE = "https://one.denizenscript.com/paste/",
-            OLD_DENIZEN_HASTE_URL_BASE = "https://one.denizenscript.com/haste/",
             DENIZEN_PASTE_URL_BASE = "https://paste.denizenscript.com/view/";
 
         /// <summary>
@@ -85,6 +83,8 @@ namespace DenizenBot.CommandHandlers
                                 + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n");
                             if (!string.IsNullOrWhiteSpace(inputUrl))
                             {
+                                inputUrl = inputUrl.Trim();
+                                Console.WriteLine($"Message {type} auto-repaste to {inputUrl}");
                                 SendGenericPositiveMessageReply(command.Message, "Repasted", $"Direct Discord-upload of {type} reuploaded to pastebin at <{inputUrl}>");
                             }
                         }
@@ -119,16 +119,6 @@ namespace DenizenBot.CommandHandlers
                     return null;
                 }
                 rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
-            }
-            else if (inputUrl.StartsWith(OLD_DENIZEN_PASTE_URL_BASE) || inputUrl.StartsWith(OLD_DENIZEN_HASTE_URL_BASE))
-            {
-                string pasteCode = inputUrl[OLD_DENIZEN_HASTE_URL_BASE.Length..].Before('/');
-                if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
-                {
-                    SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Old-Denizen haste URL given does not conform to expected format.");
-                    return null;
-                }
-                rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
             }
             else if (inputUrl.ToLowerFast().StartsWith(DENIZEN_PASTE_URL_BASE))
             {
