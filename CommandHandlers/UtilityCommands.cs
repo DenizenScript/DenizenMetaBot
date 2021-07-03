@@ -274,6 +274,10 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_ScriptCheck(CommandData command)
         {
+            if (MetaCommands.CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             if (command.CleanedArguments.Length == 0)
             {
                 SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "`!script <link>`");

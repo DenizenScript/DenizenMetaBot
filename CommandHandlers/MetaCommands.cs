@@ -25,7 +25,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         /// <param name="message">The message being replied to.</param>
         /// <returns>True if they are denied.</returns>
-        public bool CheckMetaDenied(IUserMessage message)
+        public static bool CheckMetaDenied(IUserMessage message)
         {
             if (!DenizenMetaBot.MetaCommandsAllowed(message.Channel))
             {
