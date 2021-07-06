@@ -171,10 +171,10 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            if (data.CountCharacter('\n') < 40)
+            if (data.CountCharacter('\n') < 100 && !data.Contains("Denizen Version: ") && !data.Contains("Starting minecraft server version"))
             {
-                SendErrorMessageReply(command.Message, "Invalid Log", "Log file given is incredibly short. Please post your full `logs/latest.log`, not just the snippet you think is relevant."
-                    + " All information is needed, especially the full startup output, which contains server/plugin versions and usually is where important error messages are found.");
+                SendErrorMessageReply(command.Message, "Invalid Log", "Log file given looks like a snippet or not a valid log. Please post your full `logs/latest.log`, not just the snippet you think is relevant.\n\n"
+                    + "All information is needed - especially the full startup output, which contains server/plugin versions, and usually is where important error messages are found.");
                 return;
             }
             LogChecker checker = new LogChecker(data);
