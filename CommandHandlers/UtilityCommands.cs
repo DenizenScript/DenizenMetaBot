@@ -78,6 +78,7 @@ namespace DenizenBot.CommandHandlers
                         string data = Program.ReusableWebClient.GetStringAsync(attachment.Url).Result;
                         if (data != null && data.Length > 100 && data.Length < 1024 * 1024 * 5)
                         {
+                            data = data.Replace('\0', ' ');
                             AdminCommands.ReusableWebClient.Headers["Content-Type"] = "application/x-www-form-urlencoded";
                             inputUrl = AdminCommands.ReusableWebClient.UploadString("https://" + $"paste.denizenscript.com/New/{type}", $"pastetype={type}&response=micro&v=200&"
                                 + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n");
