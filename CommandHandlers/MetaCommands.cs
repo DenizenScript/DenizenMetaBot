@@ -528,8 +528,8 @@ namespace DenizenBot.CommandHandlers
                 }
                 combined.Append('`').Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append("`, ");
             }
-            string listText = combined.ToString()[..^2];
-            SendGenericPositiveMessageReply(command.Message, $"Search Results", $"Search results: `{listText}`{suffix}");
+            string listText = combined.ToString()[..^2] + suffix;
+            SendGenericPositiveMessageReply(command.Message, "Search Results", listText);
             if (bestQuality < 5)
             {
                 backupMatchCheck();
