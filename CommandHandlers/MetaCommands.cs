@@ -527,6 +527,10 @@ namespace DenizenBot.CommandHandlers
                     lastQuality = quality;
                 }
                 combined.Append('`').Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append("`, ");
+                if (combined.Length > 1800)
+                {
+                    break;
+                }
             }
             string listText = combined.ToString()[..^2] + suffix;
             SendGenericPositiveMessageReply(command.Message, "Search Results", listText);
