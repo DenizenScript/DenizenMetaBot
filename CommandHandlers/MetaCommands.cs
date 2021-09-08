@@ -518,15 +518,15 @@ namespace DenizenBot.CommandHandlers
             }
             StringBuilder combined = new StringBuilder();
             int bestQuality = results.First().Item1;
-            int lastQuality = bestQuality;
+            int lastQuality = 0;
             foreach ((int quality, MetaObject obj) in results)
             {
                 if (quality != lastQuality)
                 {
-                    combined.Append('\n');
+                    combined.Append("\n[MatchQuality=").Append(quality).Append("] ");
                     lastQuality = quality;
                 }
-                combined.Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append(", ");
+                combined.Append('`').Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append("`, ");
             }
             string listText = combined.ToString()[..^2];
             SendGenericPositiveMessageReply(command.Message, $"Search Results", $"Search results: `{listText}`{suffix}");
