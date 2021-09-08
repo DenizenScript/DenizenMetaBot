@@ -485,45 +485,14 @@ namespace DenizenBot.CommandHandlers
                 cmds[i] = cmds[i].ToLowerFast();
             }
             string fullSearch = string.Join(' ', cmds);
-            List<MetaObject> strongMatch = new List<MetaObject>();
-            List<MetaObject> partialStrongMatch = new List<MetaObject>();
-            List<MetaObject> weakMatch = new List<MetaObject>();
-            List<MetaObject> partialWeakMatch = new List<MetaObject>();
+            List<(int, MetaObject)> results = new List<(int, MetaObject)>();
             foreach (MetaObject obj in MetaDocs.CurrentMeta.AllMetaObjects())
             {
-                if (obj.CleanName.Contains(fullSearch) || obj.Synonyms.Any(s => s.Contains(fullSearch)))
+                int quality = obj.SearchHelper.GetMatchQuality(fullSearch);
+                if (quality > 0)
                 {
-                    strongMatch.Add(obj);
-                    continue;
+                    results.Add((quality, obj));
                 }
-                foreach (string word in cmds)
-                {
-                    if (obj.CleanName.Contains(word) || obj.Synonyms.Any(s => s.Contains(word)))
-                    {
-                        partialStrongMatch.Add(obj);
-                        goto fullContinue;
-                    }
-                }
-                if (obj.Searchable.Contains(fullSearch))
-                {
-                    weakMatch.Add(obj);
-                    continue;
-                }
-                if (fullSearch.Contains(obj.CleanName))
-                {
-                    partialWeakMatch.Add(obj);
-                    continue;
-                }
-                foreach (string word in cmds)
-                {
-                    if (obj.Searchable.Contains(word))
-                    {
-                        partialWeakMatch.Add(obj);
-                        goto fullContinue;
-                    }
-                }
-            fullContinue:
-                continue;
             }
             void backupMatchCheck()
             {
@@ -533,52 +502,37 @@ namespace DenizenBot.CommandHandlers
                     SendDidYouMeanReply(command.Message, "Possible Confusion", $"Did you mean to search for `{possible}`?", $"{DenizenMetaBotConstants.COMMAND_PREFIX}search {possible}");
                 }
             }
-            if (strongMatch.IsEmpty() && partialStrongMatch.IsEmpty() && weakMatch.IsEmpty() && partialWeakMatch.IsEmpty())
+            if (results.IsEmpty())
             {
                 SendErrorMessageReply(command.Message, "Search Command Has No Results", "Input search text could not be found.");
                 backupMatchCheck();
                 return;
             }
             string suffix = ".";
-            void listWrangle(string typeShort, string typeLong, List<MetaObject> objs)
+            results = results.OrderBy(pair => -pair.Item1).ThenBy(pair => StringConversionHelper.GetLevenshteinDistance(fullSearch, pair.Item2.CleanName)).ToList();
+            suffix = ".";
+            if (results.Count > 50)
             {
-                objs = objs.OrderBy((obj) => StringConversionHelper.GetLevenshteinDistance(fullSearch, obj.CleanName)).ToList();
-                suffix = ".";
-                if (objs.Count > 20)
-                {
-                    objs = objs.GetRange(0, 20);
-                    suffix = ", ...";
-                }
-                string listText = string.Join("`, `", objs.Select((obj) => $"{DenizenMetaBotConstants.COMMAND_PREFIX}{obj.Type.Name} {obj.CleanName}"));
-                SendGenericPositiveMessageReply(command.Message, $"{typeShort} Search Results", $"{typeShort} ({typeLong}) search results: `{listText}`{suffix}");
+                results = results.GetRange(0, 50);
+                suffix = ", ...";
             }
-            if (strongMatch.Any())
+            StringBuilder combined = new StringBuilder();
+            int bestQuality = results.First().Item1;
+            int lastQuality = bestQuality;
+            foreach ((int quality, MetaObject obj) in results)
             {
-                listWrangle("Best", "very close", strongMatch);
-            }
-            if (partialStrongMatch.Any())
-            {
-                listWrangle("Probable", "close but imperfect", partialStrongMatch);
-                if (strongMatch.Any())
+                if (quality != lastQuality)
                 {
-                    return;
+                    combined.Append('\n');
+                    lastQuality = quality;
                 }
+                combined.Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append(", ");
             }
-            if (weakMatch.Any())
+            string listText = combined.ToString()[..^2];
+            SendGenericPositiveMessageReply(command.Message, $"Search Results", $"Search results: `{listText}`{suffix}");
+            if (bestQuality < 5)
             {
-                listWrangle("Possible", "might be related", weakMatch);
-                if (strongMatch.Any() || partialStrongMatch.Any())
-                {
-                    return;
-                }
-            }
-            if (partialWeakMatch.Any())
-            {
-                listWrangle("Weak", "if nothing else, some chance of being related", partialWeakMatch);
-                if (!weakMatch.Any() && !partialStrongMatch.Any() && !strongMatch.Any())
-                {
-                    backupMatchCheck();
-                }
+                backupMatchCheck();
             }
         }
     }
