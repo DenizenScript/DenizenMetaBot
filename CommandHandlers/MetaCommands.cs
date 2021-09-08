@@ -523,7 +523,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (quality != lastQuality)
                 {
-                    combined.Append("\n[MatchQuality=").Append(quality).Append("] ");
+                    combined.Append("\n[").Append(MetaObject.SearchableHelpers.SearchQualityName[quality]).Append("] ");
                     lastQuality = quality;
                 }
                 combined.Append('`').Append(DenizenMetaBotConstants.COMMAND_PREFIX).Append(obj.Type.Name).Append(' ').Append(obj.CleanName).Append("`, ");
