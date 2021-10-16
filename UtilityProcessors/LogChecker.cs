@@ -482,9 +482,10 @@ namespace DenizenBot.UtilityProcessors
             string spigotVersionText = versionParts[2];
             string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
             string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
-            if (!double.TryParse(majorMCVersion, out double versionNumb))
+            double versionNumb = DenizenMetaBot.VersionToDouble(majorMCVersion);
+            if (versionNumb == -1)
             {
-                Console.WriteLine($"Major MC version '{majorMCVersion}' is not a double, disregarding check.");
+                Console.WriteLine($"Major MC version '{majorMCVersion}' is not a valid version string, disregarding check.");
                 return "";
             }
             if (versionNumb < DenizenMetaBot.LowestServerVersion)

@@ -147,6 +147,23 @@ namespace DenizenBot
             bot.RegisterCommand(adminCmds.CMD_Reload, "reload");
         }
 
+        /// <summary>Converts a Minecraft version string to a double for comparison reasons. Returns -1 if unparsable.</summary>
+        public static double VersionToDouble(string version)
+        {
+            double scale = 1;
+            double result = 0;
+            foreach (string part in version.Split('.'))
+            {
+                if (!double.TryParse(part, out double partValue))
+                {
+                    return -1;
+                }
+                result += partValue * scale;
+                scale *= 0.01;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Fills fields with data from the config file.
         /// </summary>
@@ -239,7 +256,11 @@ namespace DenizenBot
                 AcceptableServerVersions = configFile.GetStringList("acceptable_server_versions");
                 foreach (string version in AcceptableServerVersions)
                 {
-                    double versionNumber = double.Parse(version);
+                    double versionNumber = VersionToDouble(version);
+                    if (versionNumber == -1)
+                    {
+                        Console.WriteLine($"Invalid version number '{version}' in config acceptable_server_versions");
+                    }
                     if (LowestServerVersion <= 0.01 || versionNumber < LowestServerVersion)
                     {
                         LowestServerVersion = versionNumber;
