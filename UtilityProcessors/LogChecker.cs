@@ -134,7 +134,7 @@ namespace DenizenBot.UtilityProcessors
             // Plugins
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot", "LockProxy", "IPWhitelist");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} Fake online players (this is forbidden by Mojang)", "FakePlayersOnline");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
@@ -489,10 +489,12 @@ namespace DenizenBot.UtilityProcessors
             }
             if (versionNumb < DenizenMetaBot.LowestServerVersion)
             {
+                Console.WriteLine($"Major MC version {versionNumb} is less than minimum version {DenizenMetaBot.LowestServerVersion}, disregarding as outdated.");
                 return $"{WARNING_SYMBOL} Outdated MC version";
             }
             if (versionNumb > DenizenMetaBot.HighestServerVersion)
             {
+                Console.WriteLine($"Major MC version {versionNumb} is higher than minimum version {DenizenMetaBot.HighestServerVersion}, disregarding as too-new (config may need update?).");
                 return "New MC version? Bot may need config update";
             }
             if (subData[0] == "paper")
