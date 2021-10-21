@@ -135,7 +135,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot", "LockProxy", "IPWhitelist");
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
+            //AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} Fake online players (this is forbidden by Mojang)", "FakePlayersOnline");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
@@ -145,7 +145,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To use placeholders with Citizens, just use the normal commands. You don't need a separate plugin for this anymore.", "CitizensPlaceholderAPI");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
-            AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser-Spigot");
+            AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser", "Geyser-Spigot", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
@@ -769,7 +769,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 embed.ThumbnailUrl = Constants.RED_FLAG_ICON;
             }
-            else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0) || ServerVersion.Contains(WARNING_SYMBOL))
+            else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0) || ServerVersion.Contains(WARNING_SYMBOL) || PluginVersions.Contains(WARNING_SYMBOL))
             {
                 embed.ThumbnailUrl = Constants.WARNING_ICON;
             }
@@ -778,7 +778,7 @@ namespace DenizenBot.UtilityProcessors
                 embed.ThumbnailUrl = Constants.INFO_ICON;
             }
             AutoField(embed, "Server Version", ServerVersion, inline: false);
-            AutoField(embed, "Plugin Version(s)", string.Join('\n', PluginVersions), inline: false);
+            AutoField(embed, "Plugin Version(s)", PluginVersions, inline: false);
             if (IsOffline)
             {
                 AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
