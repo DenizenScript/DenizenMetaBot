@@ -332,16 +332,23 @@ namespace DenizenBot.CommandHandlers
                 {
                     string tagBase = cmds[0].Substring(0, dotIndex);
                     string tagSuffix = cmds[0][dotIndex..];
+                    MetaObjectType type = MetaDocs.CurrentMeta.ObjectTypes.GetValueOrDefault(tagBase.ToLowerFast());
                     if (!tagBase.EndsWith("tag"))
                     {
                         secondarySearches.Add(tagBase + "tag" + tagSuffix);
+                        if (type == null)
+                        {
+                            type = MetaDocs.CurrentMeta.ObjectTypes.GetValueOrDefault(tagBase.ToLowerFast() + "tag");
+                        }
                     }
-                    string tagBaseLow = tagBase.ToLowerFast();
-                    if (tagBaseLow == "player" || tagBaseLow == "npc" || tagBaseLow == "playertag" || tagBaseLow == "npctag")
+                    if (type != null && type.BaseTypeName != null)
                     {
-                        secondarySearches.Add("entitytag" + tagSuffix);
+                        foreach (MetaObjectType subType in type.Implements)
+                        {
+                            secondarySearches.Add(subType.CleanName + tagSuffix);
+                        }
+                        secondarySearches.Add(type.BaseTypeName.ToLowerFast() + tagSuffix);
                     }
-                    secondarySearches.Add("elementtag" + tagSuffix);
                 }
             }
             int getDistanceTo(MetaTag tag)
