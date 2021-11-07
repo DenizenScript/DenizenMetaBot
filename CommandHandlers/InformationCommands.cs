@@ -297,7 +297,7 @@ namespace DenizenBot.CommandHandlers
                 if (DenizenMetaBot.Rules.TryGetValue(ruleSearch, out string ruleText))
                 {
                     ruleText = ruleText.Trim();
-                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithDescription(ruleText).Build());
+                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithFooter("This message is not a warning, it is just for your information.").WithDescription(ruleText).Build());
                 }
                 else
                 {
