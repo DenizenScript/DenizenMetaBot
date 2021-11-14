@@ -412,7 +412,7 @@ namespace DenizenBot.CommandHandlers
                 cmds[0] = secondarySearch;
             }
             string[] parts = secondarySearch.Split(' ');
-            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.DoesMatch(parts)));
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.DoesMatch(parts, true, false)));
         }
 
         /// <summary>
