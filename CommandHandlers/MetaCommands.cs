@@ -411,7 +411,8 @@ namespace DenizenBot.CommandHandlers
             {
                 cmds[0] = secondarySearch;
             }
-            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.RegexMatcher.IsMatch(onSearch));
+            string[] parts = secondarySearch.Split(' ');
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.DoesMatch(parts)));
         }
 
         /// <summary>
