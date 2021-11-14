@@ -300,11 +300,8 @@ namespace DenizenBot.UtilityProcessors
             else if (obj is MetaEvent evt)
             {
                 builder.Title = "Event: " + evt.CleanName;
-                if (evt.Events.Length > 1)
-                {
-                    AutoField(builder, "Event Lines", "`" + string.Join("\n", evt.Events.Select(s => s.Replace("'", "")) + "`"));
-                }
-                AutoField(builder, "Switches", string.Join("\n", evt.Switches));
+                AutoField(builder, "Event Lines", "`" + string.Join('\n', evt.Events.Select(s => s.Replace("'", ""))) + "`");
+                AutoField(builder, "Switches", string.Join('\n', evt.Switches));
                 AutoField(builder, "Triggers", evt.Triggers);
                 if (!string.IsNullOrWhiteSpace(evt.Player))
                 {
