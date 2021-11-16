@@ -13,6 +13,7 @@ using DiscordBotBase.CommandHandlers;
 using DiscordBotBase;
 using SharpDenizenTools.ScriptAnalysis;
 using System.Web;
+using System.Net.Http.Headers;
 
 namespace DenizenBot.CommandHandlers
 {
@@ -80,9 +81,9 @@ namespace DenizenBot.CommandHandlers
                         {
                             data = data.Replace('\0', ' ');
                             HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}");
-                            request.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
                             request.Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
                                 + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"));
+                            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
                             HttpResponseMessage response = Program.ReusableWebClient.Send(request);
                             inputUrl = response.Content.ReadAsStringAsync().Result;
                             if (!string.IsNullOrWhiteSpace(inputUrl))
