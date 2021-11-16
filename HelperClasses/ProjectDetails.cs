@@ -15,42 +15,28 @@ using FreneticUtilities.FreneticDataSyntax;
 
 namespace DenizenBot.HelperClasses
 {
-    /// <summary>
-    /// Represents information specific to a project.
-    /// </summary>
+    /// <summary>Represents information specific to a project.</summary>
     public class ProjectDetails
     {
-        /// <summary>
-        /// Properly cased project name.
-        /// </summary>
+        /// <summary>Properly cased project name.</summary>
         public string Name = "";
 
-        /// <summary>
-        /// The icon image URL for this project.
-        /// </summary>
+        /// <summary>The icon image URL for this project.</summary>
         public string Icon = "";
 
-        /// <summary>
-        /// Update message for the project.
-        /// </summary>
+        /// <summary>Update message for the project.</summary>
         public string UpdateMessage = "";
 
-        /// <summary>
-        /// GitHub repo URL.
-        /// </summary>
+        /// <summary>GitHub repo URL.</summary>
         public string GitHub = "";
 
-        /// <summary>
-        /// Gets an update embed message object.
-        /// </summary>
+        /// <summary>Gets an update embed message object.</summary>
         public Embed GetUpdateEmbed()
         {
             return new EmbedBuilder().WithTitle("Update " + Name).WithColor(0, 255, 255).WithThumbnailUrl(Icon).WithDescription(UpdateMessage).Build();
         }
 
-        /// <summary>
-        /// Gets a GitHub link embed message object.
-        /// </summary>
+        /// <summary>Gets a GitHub link embed message object.</summary>
         public Embed GetGithubEmbed()
         {
             if (GitHub.Length > 0)
@@ -65,9 +51,7 @@ namespace DenizenBot.HelperClasses
             }
         }
 
-        /// <summary>
-        /// Gets a GitHub issues link embed message object.
-        /// </summary>
+        /// <summary>Gets a GitHub issues link embed message object.</summary>
         public Embed GetIssuesEmbed()
         {
             if (GitHub.Length > 0)

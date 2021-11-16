@@ -10,29 +10,19 @@ namespace DenizenBot
     /// </summary>
     public static class DenizenMetaBotConstants
     {
-        /// <summary>
-        /// The base for the meta docs URL.
-        /// </summary>
+        /// <summary>The base for the meta docs URL.</summary>
         public static string DOCS_URL_BASE = "https://meta.denizenscript.com/Docs/";
 
-        /// <summary>
-        /// The prefix for non-ping-based command usage.
-        /// </summary>
+        /// <summary>The prefix for non-ping-based command usage.</summary>
         public static string COMMAND_PREFIX = "!";
 
-        /// <summary>
-        /// Link to the GitHub repo for this bot.
-        /// </summary>
+        /// <summary>Link to the GitHub repo for this bot.</summary>
         public const string SOURCE_CODE_URL = "https://github.com/DenizenScript/DenizenMetaBot";
 
-        /// <summary>
-        /// The Denizen logo.
-        /// </summary>
+        /// <summary>The Denizen logo.</summary>
         public const string DENIZEN_LOGO = "https://i.alexgoodwin.media/i/for_real_usage/ec5694.png";
 
-        /// <summary>
-        /// The base for the Jenkins CI URL.
-        /// </summary>
+        /// <summary>The base for the Jenkins CI URL.</summary>
         public const string JENKINS_URL_BASE = "https://ci.citizensnpcs.co";
     }
 }

@@ -16,9 +16,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Symbols that need escaping on Discord.</summary>
         public static AsciiMatcher DiscordEscapableSymbols = new("<>_*:|~");
 
-        /// <summary>
-        /// Escapes some text for safe Discord output.
-        /// </summary>
+        /// <summary>Escapes some text for safe Discord output.</summary>
         /// <param name="input">The input text (unescaped).</param>
         /// <returns>The output text (escaped).</returns>
         public static string EscapeForDiscord(string input)
@@ -48,9 +46,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Symbols that need escaping in URLs.</summary>
         public static AsciiMatcher NeedsUrlEscape = new("<>[]|\"");
 
-        /// <summary>
-        /// Escapes a URL input string.
-        /// </summary>
+        /// <summary>Escapes a URL input string.</summary>
         /// <param name="input">The unescaped input.</param>
         /// <returns>The escaped output.</returns>
         public static string UrlEscape(string input)
@@ -63,9 +59,7 @@ namespace DenizenBot.UtilityProcessors
             return input;
         }
 
-        /// <summary>
-        /// Checks the value as not null or whitespace, then adds it to the embed as a field.
-        /// </summary>
+        /// <summary>Checks the value as not null or whitespace, then adds it to the embed as a field.</summary>
         /// <param name="builder">The embed builder.</param>
         /// <param name="key">The field key.</param>
         /// <param name="value">The field value.</param>
@@ -100,9 +94,7 @@ namespace DenizenBot.UtilityProcessors
             return $"{beforeBlock}```yml\n{code}\n```{afterBlock}";
         }
 
-        /// <summary>
-        /// Processes meta "@link"s for Discord output.
-        /// </summary>
+        /// <summary>Processes meta "@link"s for Discord output.</summary>
         /// <param name="linkedtext">The text which may contain links.</param>
         /// <returns>The text, with links processed.</returns>
         public static string ProcessMetaLinksForDiscord(string linkedtext)
@@ -141,9 +133,7 @@ namespace DenizenBot.UtilityProcessors
             return output.ToString();
         }
 
-        /// <summary>
-        /// Gets a version of the output embed, that showcases related tags.
-        /// </summary>
+        /// <summary>Gets a version of the output embed, that showcases related tags.</summary>
         public static EmbedBuilder GetCommandTagsEmbed(this MetaCommand command)
         {
             EmbedBuilder builder = GetEmbed(command);
@@ -153,12 +143,10 @@ namespace DenizenBot.UtilityProcessors
                 return builder;
             }
             AutoField(builder, "Related Tags", GetTagsField(command.Tags));
-            return builder; 
+            return builder;
         }
 
-        /// <summary>
-        /// Gets a version of the output embed, that showcases sample usages.
-        /// </summary>
+        /// <summary>Gets a version of the output embed, that showcases sample usages.</summary>
         public static EmbedBuilder GetCommandUsagesEmbed(this MetaCommand command)
         {
             EmbedBuilder builder = GetEmbed(command, true);
@@ -255,9 +243,7 @@ namespace DenizenBot.UtilityProcessors
             return tagsFieldBuilder.ToString();
         }
 
-        /// <summary>
-        /// Gets an <see cref="EmbedBuilder"/> for a <see cref="MetaObject"/> to be shown on Discord meta output.
-        /// </summary>
+        /// <summary>Gets an <see cref="EmbedBuilder"/> for a <see cref="MetaObject"/> to be shown on Discord meta output.</summary>
         /// <param name="obj">The meta object to embed.</param>
         /// <param name="hideLargeData">Whether to hide large data parts (eg command descriptions).</param>
         /// <returns>The Discord-ready embed object.</returns>

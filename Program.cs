@@ -10,19 +10,13 @@ using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot
 {
-    /// <summary>
-    /// General program entry and handler.
-    /// </summary>
+    /// <summary>General program entry and handler.</summary>
     public class Program
     {
-        /// <summary>
-        /// Reusable HTTP(S) web client.
-        /// </summary>
+        /// <summary>Reusable HTTP(S) web client.</summary>
         public static HttpClient ReusableWebClient = new();
 
-        /// <summary>
-        /// Software entry point - starts the bot.
-        /// </summary>
+        /// <summary>Software entry point - starts the bot.</summary>
         static void Main(string[] args)
         {
             SpecialTools.Internationalize();
@@ -32,18 +26,14 @@ namespace DenizenBot
             LaunchBotThread(args);
         }
 
-        /// <summary>
-        /// Launches a bot thread.
-        /// </summary>
+        /// <summary>Launches a bot thread.</summary>
         public static void LaunchBotThread(string[] args)
         {
             Thread thr = new(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
             thr.Start(args);
         }
 
-        /// <summary>
-        /// The bot thread rootmost method, takes a string array object as input.
-        /// </summary>
+        /// <summary>The bot thread rootmost method, takes a string array object as input.</summary>
         public static void BotThread(Object obj)
         {
             try

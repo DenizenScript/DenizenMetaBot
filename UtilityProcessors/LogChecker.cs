@@ -11,65 +11,41 @@ using DiscordBotBase;
 
 namespace DenizenBot.UtilityProcessors
 {
-    /// <summary>
-    /// Special class to process log paste checking.
-    /// </summary>
+    /// <summary>Special class to process log paste checking.</summary>
     public class LogChecker
     {
-        /// <summary>
-        /// The emoji code for a yellow warning "!" symbol.
-        /// </summary>
+        /// <summary>The emoji code for a yellow warning "!" symbol.</summary>
         public static string WARNING_SYMBOL = ":warning:";
 
-        /// <summary>
-        /// The emoji code for a red flag symbol.
-        /// </summary>
+        /// <summary>The emoji code for a red flag symbol.</summary>
         public static string RED_FLAG_SYMBOL = ":triangular_flag_on_post:";
 
-        /// <summary>
-        /// The emoji code for a green check mark symbol.
-        /// </summary>
+        /// <summary>The emoji code for a green check mark symbol.</summary>
         public static string GREEN_CHECK_MARK_SYMBOL = ":white_check_mark:";
 
-        /// <summary>
-        /// Plugins that should show version output.
-        /// </summary>
+        /// <summary>Plugins that should show version output.</summary>
         public static string[] VERSION_PLUGINS = new string[] { "Citizens", "Denizen", "Depenizen", "Sentinel", "dDiscordBot" };
 
-        /// <summary>
-        /// The text that comes before the server version report.
-        /// </summary>
+        /// <summary>The text that comes before the server version report.</summary>
         public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version",
             SERVER_VERSION_PREFIX_BACKUP = "This server is running ";
 
-        /// <summary>
-        /// The text that comes before a player UUID post.
-        /// </summary>
+        /// <summary>The text that comes before a player UUID post.</summary>
         public const string PLAYER_UUID_PREFIX = "UUID of player ";
 
-        /// <summary>
-        /// The text that indicates a server is in offline mode.
-        /// </summary>
+        /// <summary>The text that indicates a server is in offline mode.</summary>
         public const string OFFLINE_NOTICE = "**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!";
 
-        /// <summary>
-        /// The prefix on the message before the startup Java version report produced by a few different sources, including Denizen and Sentinel.
-        /// </summary>
+        /// <summary>The prefix on the message before the startup Java version report produced by a few different sources, including Denizen and Sentinel.</summary>
         public const string STARTUP_JAVA_VERSION = " java version: ";
 
-        /// <summary>
-        /// Matcher for valid text in a player UUID.
-        /// </summary>
+        /// <summary>Matcher for valid text in a player UUID.</summary>
         public static AsciiMatcher UUID_ASCII_MATCHER = new("0123456789abcdef-");
 
-        /// <summary>
-        /// A player UUID is always exactly 36 characters long.
-        /// </summary>
+        /// <summary>A player UUID is always exactly 36 characters long.</summary>
         public const int UUID_LENGTH = 36;
 
-        /// <summary>
-        /// The version ID is always at index 14 of a UUID.
-        /// </summary>
+        /// <summary>The version ID is always at index 14 of a UUID.</summary>
         public const int VERSION_ID_LOCATION = 14;
 
         /// <summary>
@@ -108,9 +84,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public static readonly Dictionary<string, string> MONITORED_PLUGINS = new();
 
-        /// <summary>
-        /// Adds a plugin by name to the list of special plugins to track and report.
-        /// </summary>
+        /// <summary>Adds a plugin by name to the list of special plugins to track and report.</summary>
         /// <param name="set">The set of plugins to add to.</param>
         /// <param name="message">The message to include, if any.</param>
         /// <param name="names">The name(s) of plugins to track.</param>
@@ -159,9 +133,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
         }
 
-        /// <summary>
-        /// Gets the text of a plugin name + version, if any.
-        /// </summary>
+        /// <summary>Gets the text of a plugin name + version, if any.</summary>
         /// <param name="plugin">The plugin name to search for.</param>
         /// <returns>The plugin name + version, if any.</returns>
         public string GetPluginText(string plugin)
@@ -196,9 +168,7 @@ namespace DenizenBot.UtilityProcessors
             return pluginLine[pluginNameIndex..endIndex];
         }
 
-        /// <summary>
-        /// Gets a string of the load message for a plugin name.
-        /// </summary>
+        /// <summary>Gets a string of the load message for a plugin name.</summary>
         public static string LoadMessageFor(string plugin)
         {
             return $"[{plugin}] Loading {plugin} v";
@@ -223,9 +193,7 @@ namespace DenizenBot.UtilityProcessors
             return fullLog[index..endIndex];
         }
 
-        /// <summary>
-        /// Utility to limit the length of a string for stabler output.
-        /// </summary>
+        /// <summary>Utility to limit the length of a string for stabler output.</summary>
         public static string LimitStringLength(string input, int maxLength, int cutLength)
         {
             if (input.Length > maxLength)
@@ -235,9 +203,7 @@ namespace DenizenBot.UtilityProcessors
             return input;
         }
 
-        /// <summary>
-        /// Escapes text for Discord output within a code block.
-        /// </summary>
+        /// <summary>Escapes text for Discord output within a code block.</summary>
         /// <param name="text">The text to escape.</param>
         /// <returns>The escaped text.</returns>
         public static string Escape(string text)
@@ -245,9 +211,7 @@ namespace DenizenBot.UtilityProcessors
             return text.Replace('`', '\'');
         }
 
-        /// <summary>
-        /// Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.
-        /// </summary>
+        /// <summary>Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.</summary>
         public static void AutoField(EmbedBuilder builder, string key, string value, bool inline = true)
         {
             if (builder.Length + Math.Min(value.Length, 450) + key.Length > 1800)
@@ -261,84 +225,52 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// The full log text.
-        /// </summary>
+        /// <summary>The full log text.</summary>
         public string FullLogText;
 
-        /// <summary>
-        /// The full log text, lowercased.
-        /// </summary>
+        /// <summary>The full log text, lowercased.</summary>
         public string FullLogTextLower;
 
-        /// <summary>
-        /// The server version (if any).
-        /// </summary>
+        /// <summary>The server version (if any).</summary>
         public string ServerVersion = "";
 
-        /// <summary>
-        /// Any potentially problematic plugins found in the log.
-        /// </summary>
+        /// <summary>Any potentially problematic plugins found in the log.</summary>
         public string SuspiciousPlugins = "";
 
-        /// <summary>
-        /// Any often plugins found in the log.
-        /// </summary>
+        /// <summary>Any often plugins found in the log.</summary>
         public string BadPlugins = "";
 
-        /// <summary>
-        /// Any sometimes-conflictive plugins found in the log.
-        /// </summary>
+        /// <summary>Any sometimes-conflictive plugins found in the log.</summary>
         public string IffyPlugins = "";
 
-        /// <summary>
-        /// Any other relevant plugins found in the log.
-        /// </summary>
+        /// <summary>Any other relevant plugins found in the log.</summary>
         public string OtherPlugins = "";
 
-        /// <summary>
-        /// Plugins whose versions will be listed.
-        /// </summary>
+        /// <summary>Plugins whose versions will be listed.</summary>
         public string PluginVersions = "";
 
-        /// <summary>
-        /// Lines that are suspicious, usually ones that indicate cracked plugins.
-        /// </summary>
+        /// <summary>Lines that are suspicious, usually ones that indicate cracked plugins.</summary>
         public List<string> SuspiciousLines = new();
 
-        /// <summary>
-        /// Lines of note, usually ones that indicate a bad sign.
-        /// </summary>
+        /// <summary>Lines of note, usually ones that indicate a bad sign.</summary>
         public List<string> OtherNoteworthyLines = new();
 
-        /// <summary>
-        /// Whether this server log appears to be offline mode.
-        /// </summary>
+        /// <summary>Whether this server log appears to be offline mode.</summary>
         public bool IsOffline = false;
 
-        /// <summary>
-        /// Whether this server mentions bungee (and thus might not actually be offline).
-        /// </summary>
+        /// <summary>Whether this server mentions bungee (and thus might not actually be offline).</summary>
         public bool IsBungee = false;
 
-        /// <summary>
-        /// Visible UUID version (if anny).
-        /// </summary>
+        /// <summary>Visible UUID version (if anny).</summary>
         public int? UUIDVersion = null;
 
-        /// <summary>
-        /// Whether this looks like a Denizen debug log.
-        /// </summary>
+        /// <summary>Whether this looks like a Denizen debug log.</summary>
         public bool IsDenizenDebug = false;
 
-        /// <summary>
-        /// What Java version is running on this server (if findable).
-        /// </summary>
+        /// <summary>What Java version is running on this server (if findable).</summary>
         public string JavaVersion = "";
 
-        /// <summary>
-        /// Whether the server is likely to be offline.
-        /// </summary>
+        /// <summary>Whether the server is likely to be offline.</summary>
         public bool LikelyOffline
         {
             get
@@ -362,9 +294,7 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// Construct the log checker system.
-        /// </summary>
+        /// <summary>Construct the log checker system.</summary>
         /// <param name="fullLog">The full log text.</param>
         public LogChecker(string fullLog)
         {
@@ -376,9 +306,7 @@ namespace DenizenBot.UtilityProcessors
             FullLogTextLower = FullLogText.ToLowerFast();
         }
 
-        /// <summary>
-        /// Gathers the most basic information from the log.
-        /// </summary>
+        /// <summary>Gathers the most basic information from the log.</summary>
         public void ProcessBasics()
         {
             if (IsDenizenDebug)
@@ -435,9 +363,7 @@ namespace DenizenBot.UtilityProcessors
             Console.WriteLine($"ServerVersionChecked={ServerVersion}");
         }
 
-        /// <summary>
-        /// Processes and formats info about the Java version found in the log (if any).
-        /// </summary>
+        /// <summary>Processes and formats info about the Java version found in the log (if any).</summary>
         public void ProcessJavaVersion()
         {
             if (string.IsNullOrWhiteSpace(JavaVersion?.Trim()))
@@ -453,9 +379,7 @@ namespace DenizenBot.UtilityProcessors
             JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 16, 11, and 8 are fully supported";
         }
 
-        /// <summary>
-        /// Gets the server version status result (outdated vs not) as a string.
-        /// </summary>
+        /// <summary>Gets the server version status result (outdated vs not) as a string.</summary>
         /// <param name="version">The user's version.</param>
         /// <param name="isGood">Whether the result is a positive result (current) or not (outdated or invalid).</param>
         /// <returns>The result string, or an empty string if none.</returns>
@@ -561,9 +485,7 @@ namespace DenizenBot.UtilityProcessors
             return "";
         }
 
-        /// <summary>
-        /// A matcher for hex characters: 0123456789abcdef.
-        /// </summary>
+        /// <summary>A matcher for hex characters: 0123456789abcdef.</summary>
         public static AsciiMatcher HEX_ASCII_MATCHER = new("0123456789abcdef");
 
         /// <summary>
@@ -603,9 +525,7 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// Gathers a UUID version code if possible from the log.
-        /// </summary>
+        /// <summary>Gathers a UUID version code if possible from the log.</summary>
         public void ProcessUUIDCheck()
         {
             string uuid;
@@ -630,9 +550,7 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// Gathers data about plugins loading from the log.
-        /// </summary>
+        /// <summary>Gathers data about plugins loading from the log.</summary>
         public void ProcessPluginLoads()
         {
             foreach (string plugin in VERSION_PLUGINS)
@@ -667,9 +585,7 @@ namespace DenizenBot.UtilityProcessors
             ProcessPluginSet(MONITORED_PLUGINS, ref OtherPlugins, "Monitored/Noteworthy");
         }
 
-        /// <summary>
-        /// Processes a set of monitored plugins, adding them to the output string if found in the log.
-        /// </summary>
+        /// <summary>Processes a set of monitored plugins, adding them to the output string if found in the log.</summary>
         /// <param name="pluginSet">The plugins to track.</param>
         /// <param name="listOutput">The output string to append to.</param>
         /// <param name="type">The category of plugin being checked for.</param>
@@ -701,9 +617,7 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// Looks for dangerous text sometimes found in logs.
-        /// </summary>
+        /// <summary>Looks for dangerous text sometimes found in logs.</summary>
         public void ProcessDangerText(Dictionary<string, string> textMap, List<string> lineList)
         {
             HashSet<string> messagesUsed = new();
@@ -726,9 +640,7 @@ namespace DenizenBot.UtilityProcessors
             }
         }
 
-        /// <summary>
-        /// Performs a test to see if this paste is a Denizen debug log. If it is, <see cref="IsDenizenDebug"/> will be set to true.
-        /// </summary>
+        /// <summary>Performs a test to see if this paste is a Denizen debug log. If it is, <see cref="IsDenizenDebug"/> will be set to true.</summary>
         public void TestForDenizenDebug()
         {
             if (!FullLogText.StartsWith("Java Version: "))
@@ -745,9 +657,7 @@ namespace DenizenBot.UtilityProcessors
             IsDenizenDebug = true;
         }
 
-        /// <summary>
-        /// Runs the log checker in full.
-        /// </summary>
+        /// <summary>Runs the log checker in full.</summary>
         public void Run()
         {
             Console.WriteLine("Running log check...");
@@ -759,9 +669,7 @@ namespace DenizenBot.UtilityProcessors
             ProcessDangerText(SUSPICIOUS_TEXT, SuspiciousLines);
         }
 
-        /// <summary>
-        /// Gets an output embed result.
-        /// </summary>
+        /// <summary>Gets an output embed result.</summary>
         public Embed GetResult()
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results");

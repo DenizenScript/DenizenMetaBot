@@ -17,40 +17,26 @@ using System.Net.Http.Headers;
 
 namespace DenizenBot.CommandHandlers
 {
-    /// <summary>
-    /// Commands to perform utility functions.
-    /// </summary>
+    /// <summary>Commands to perform utility functions.</summary>
     public class UtilityCommands : UserCommands
     {
-        /// <summary>
-        /// Base URL for paste sites.
-        /// </summary>
+        /// <summary>Base URL for paste sites.</summary>
         public const string PASTEBIN_URL_BASE = "https://pastebin.com/",
             DENIZEN_PASTE_URL_BASE = "https://paste.denizenscript.com/view/";
 
-        /// <summary>
-        /// ASCII validator for a pastebin ID.
-        /// </summary>
+        /// <summary>ASCII validator for a pastebin ID.</summary>
         public static AsciiMatcher PASTEBIN_CODE_VALIDATOR = new((c) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 
-        /// <summary>
-        /// ASCII validator for a Denizen haste code.
-        /// </summary>
+        /// <summary>ASCII validator for a Denizen haste code.</summary>
         public static AsciiMatcher HASTE_CODE_VALIDATOR = new((c) => c >= '0' && c <= '9');
 
-        /// <summary>
-        /// The max wait time for a web-link download in a command.
-        /// </summary>
+        /// <summary>The max wait time for a web-link download in a command.</summary>
         public static TimeSpan WebLinkDownloadTimeout = new(hours: 0, minutes: 0, seconds: 15);
 
-        /// <summary>
-        /// File extensions allowed in command attachment links.
-        /// </summary>
+        /// <summary>File extensions allowed in command attachment links.</summary>
         public static HashSet<string> AllowedLinkFileExtensions = new() { "log", "txt", "dsc", "yml" };
 
-        /// <summary>
-        /// For a web-link command like '!logcheck', gets the data from the paste link.
-        /// </summary>
+        /// <summary>For a web-link command like '!logcheck', gets the data from the paste link.</summary>
         public string GetWebLinkDataForCommand(string cmdName, string type, CommandData command)
         {
             string inputUrl = null;
@@ -166,9 +152,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Command to check for common issues in server logs.
-        /// </summary>
+        /// <summary>Command to check for common issues in server logs.</summary>
         public void CMD_LogCheck(CommandData command)
         {
             string data = GetWebLinkDataForCommand("logcheck", "log", command);
@@ -187,9 +171,7 @@ namespace DenizenBot.CommandHandlers
             SendReply(command.Message, checker.GetResult());
         }
 
-        /// <summary>
-        /// Command to check the updatedness of a version string.
-        /// </summary>
+        /// <summary>Command to check the updatedness of a version string.</summary>
         public void CMD_VersionCheck(CommandData command)
         {
             if (command.CleanedArguments.Length == 0)
@@ -250,9 +232,7 @@ namespace DenizenBot.CommandHandlers
         }
 
 
-        /// <summary>
-        /// Gets the result Discord embed for the script check.
-        /// </summary>
+        /// <summary>Gets the result Discord embed for the script check.</summary>
         /// <returns>The embed to send.</returns>
         public Embed GetResult(ScriptChecker checker)
         {
@@ -326,9 +306,7 @@ namespace DenizenBot.CommandHandlers
             return embed.Build();
         }
 
-        /// <summary>
-        /// Command to check for common issues in script pastes.
-        /// </summary>
+        /// <summary>Command to check for common issues in script pastes.</summary>
         public void CMD_ScriptCheck(CommandData command)
         {
             if (MetaCommands.CheckMetaDenied(command.Message))

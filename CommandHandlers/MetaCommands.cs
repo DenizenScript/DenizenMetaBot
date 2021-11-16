@@ -15,14 +15,10 @@ using SharpDenizenTools.MetaObjects;
 
 namespace DenizenBot.CommandHandlers
 {
-    /// <summary>
-    /// Commands to look up meta documentation.
-    /// </summary>
+    /// <summary>Commands to look up meta documentation.</summary>
     public class MetaCommands : UserCommands
     {
-        /// <summary>
-        /// Checks whether meta commands are denied in the relevant channel. If denied, will return 'true' and show a rejection message.
-        /// </summary>
+        /// <summary>Checks whether meta commands are denied in the relevant channel. If denied, will return 'true' and show a rejection message.</summary>
         /// <param name="message">The message being replied to.</param>
         /// <returns>True if they are denied.</returns>
         public static bool CheckMetaDenied(IUserMessage message)
@@ -36,14 +32,10 @@ namespace DenizenBot.CommandHandlers
             return false;
         }
 
-        /// <summary>
-        /// Matcher for A-Z only.
-        /// </summary>
+        /// <summary>Matcher for A-Z only.</summary>
         public static readonly AsciiMatcher AlphabetMatcher = new(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 
-        /// <summary>
-        /// Automatically processes a meta search command.
-        /// </summary>
+        /// <summary>Automatically processes a meta search command.</summary>
         /// <typeparam name="T">The meta object type.</typeparam>
         /// <param name="docs">The docs mapping.</param>
         /// <param name="type">The meta type.</param>
@@ -253,9 +245,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Command meta docs user command.
-        /// </summary>
+        /// <summary>Command meta docs user command.</summary>
         public void CMD_Command(CommandData command)
         {
             void singleReply(MetaCommand cmd)
@@ -292,9 +282,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Mechanism meta docs user command.
-        /// </summary>
+        /// <summary>Mechanism meta docs user command.</summary>
         public void CMD_Mechanism(CommandData command)
         {
             List<string> secondarySearches = new();
@@ -317,9 +305,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Tag meta docs user command.
-        /// </summary>
+        /// <summary>Tag meta docs user command.</summary>
         public void CMD_Tag(CommandData command)
         {
             List<string> secondarySearches = new();
@@ -382,9 +368,7 @@ namespace DenizenBot.CommandHandlers
                 altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
         }
 
-        /// <summary>
-        /// ObjectTypes meta docs user command.
-        /// </summary>
+        /// <summary>ObjectTypes meta docs user command.</summary>
         public void CMD_ObjectTypes(CommandData command)
         {
             int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.ObjectTypes, MetaDocs.META_TYPE_OBJECT, command.CleanedArguments, command.Message);
@@ -398,9 +382,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Event meta docs user command.
-        /// </summary>
+        /// <summary>Event meta docs user command.</summary>
         public void CMD_Event(CommandData command)
         {
             string[] cmds = command.CleanedArguments;
@@ -415,9 +397,7 @@ namespace DenizenBot.CommandHandlers
             AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.TryMatch(parts, true, false) > 0));
         }
 
-        /// <summary>
-        /// Action meta docs user command.
-        /// </summary>
+        /// <summary>Action meta docs user command.</summary>
         public void CMD_Action(CommandData command)
         {
             string[] cmds = command.CleanedArguments;
@@ -430,9 +410,7 @@ namespace DenizenBot.CommandHandlers
             AutoMetaCommand(MetaDocs.CurrentMeta.Actions, MetaDocs.META_TYPE_ACTION, cmds, command.Message);
         }
 
-        /// <summary>
-        /// Language meta docs user command.
-        /// </summary>
+        /// <summary>Language meta docs user command.</summary>
         public void CMD_Language(CommandData command)
         {
             string[] cmds = command.CleanedArguments;
@@ -444,9 +422,7 @@ namespace DenizenBot.CommandHandlers
             AutoMetaCommand(MetaDocs.CurrentMeta.Languages, MetaDocs.META_TYPE_LANGUAGE, cmds, command.Message);
         }
 
-        /// <summary>
-        /// Guide page search user command.
-        /// </summary>
+        /// <summary>Guide page search user command.</summary>
         public void CMD_Guide(CommandData command)
         {
             string[] cmds = command.CleanedArguments;
@@ -473,9 +449,7 @@ namespace DenizenBot.CommandHandlers
             AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, command.Message, altMatchOrderer: altMatchOrderer);
         }
 
-        /// <summary>
-        /// Meta docs total search command.
-        /// </summary>
+        /// <summary>Meta docs total search command.</summary>
         public void CMD_Search(CommandData command)
         {
             if (CheckMetaDenied(command.Message))

@@ -15,20 +15,14 @@ using FreneticUtilities.FreneticDataSyntax;
 
 namespace DenizenBot.HelperClasses
 {
-    /// <summary>
-    /// Represents information specific to a channel.
-    /// </summary>
+    /// <summary>Represents information specific to a channel.</summary>
     public class ChannelDetails
     {
-        /// <summary>
-        /// Projects to update.
-        /// </summary>
+        /// <summary>Projects to update.</summary>
         public ProjectDetails[] Updates = Array.Empty<ProjectDetails>();
 
 
-        /// <summary>
-        /// Whether docs are allowed.
-        /// </summary>
+        /// <summary>Whether docs are allowed.</summary>
         public bool Docs = false;
     }
 }

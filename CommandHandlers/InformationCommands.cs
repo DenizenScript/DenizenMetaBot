@@ -13,21 +13,15 @@ using DiscordBotBase;
 
 namespace DenizenBot.CommandHandlers
 {
-    /// <summary>
-    /// Commands that give basic information to the user.
-    /// </summary>
+    /// <summary>Commands that give basic information to the user.</summary>
     public class InformationCommands : UserCommands
     {
-        /// <summary>
-        /// Simple output string for basic info commands.
-        /// </summary>
+        /// <summary>Simple output string for basic info commands.</summary>
         public static string CmdsInfo =
                 "`help` shows help output\n"
                 + "`hello` shows a source code link\n";
 
-        /// <summary>
-        /// Simple output string for meta commands.
-        /// </summary>
+        /// <summary>Simple output string for meta commands.</summary>
         public static string CmdsMeta =
                 "`command [name] [usage/tags]` to search commands\n"
                 + "`mechanism [name]` to search mechanisms\n"
@@ -39,24 +33,18 @@ namespace DenizenBot.CommandHandlers
                 + "`guide [name]` to search the beginner's guide pages\n"
                 + "`search [keyword]` to search all meta docs";
 
-        /// <summary>
-        /// Simple output string for utility commands.
-        /// </summary>
+        /// <summary>Simple output string for utility commands.</summary>
         public static string CmdsUtility =
                 "`logcheck <link>` gathers information from a server log paste\n"
                 + "`versioncheck <version text>` checks whether a project version is current\n"
                 + "`script <link>` checks a linked script for basic syntax validity";
 
-        /// <summary>
-        /// Simple output string for admin commands.
-        /// </summary>
+        /// <summary>Simple output string for admin commands.</summary>
         public static string CmdsAdmin =
                 "`restart` restarts the bot\n"
                 + "`reload` reloads the meta docs";
 
-        /// <summary>
-        /// User command to get help (shows a list of valid bot commands).
-        /// </summary>
+        /// <summary>User command to get help (shows a list of valid bot commands).</summary>
         public void CMD_Help(CommandData command)
         {
             StringBuilder infoCmds = new(CmdsInfo);
@@ -92,18 +80,14 @@ namespace DenizenBot.CommandHandlers
             SendReply(command.Message, embed.Build());
         }
 
-        /// <summary>
-        /// User command to say 'hello' and get a source link.
-        /// </summary>
+        /// <summary>User command to say 'hello' and get a source link.</summary>
         public void CMD_Hello(CommandData command)
         {
             SendReply(command.Message, new EmbedBuilder().WithTitle("Hello").WithThumbnailUrl(DenizenMetaBotConstants.DENIZEN_LOGO).WithUrl(DenizenMetaBotConstants.SOURCE_CODE_URL)
                 .WithDescription($"Hi! I'm a bot! Find my source code at {DenizenMetaBotConstants.SOURCE_CODE_URL}").Build());
         }
 
-        /// <summary>
-        /// User command to see information on how to update projects.
-        /// </summary>
+        /// <summary>User command to see information on how to update projects.</summary>
         public void CMD_Update(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
@@ -144,9 +128,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// User command to see a link to the GitHub.
-        /// </summary>
+        /// <summary>User command to see a link to the GitHub.</summary>
         public void CMD_GitHub(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
@@ -184,9 +166,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// User command to see a link to the GitHub.
-        /// </summary>
+        /// <summary>User command to see a link to the GitHub.</summary>
         public void CMD_Issues(CommandData command)
         {
             if (DenizenMetaBot.ProjectToDetails.IsEmpty())
@@ -224,9 +204,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// User command to get some predefined informational output.
-        /// </summary>
+        /// <summary>User command to get some predefined informational output.</summary>
         public void CMD_Info(CommandData command)
         {
             if (DenizenMetaBot.InformationalData.IsEmpty())
@@ -272,9 +250,7 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// User command to display a rule.
-        /// </summary>
+        /// <summary>User command to display a rule.</summary>
         public void CMD_Rule(CommandData command)
         {
             if (DenizenMetaBot.Rules.IsEmpty())
@@ -306,16 +282,12 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
-        /// <summary>
-        /// Dictionary of quotes recently seen to the time it was last seen, to reduce duplication.
-        /// </summary>
+        /// <summary>Dictionary of quotes recently seen to the time it was last seen, to reduce duplication.</summary>
         public Dictionary<int, DateTimeOffset> QuotesSeen = new();
 
         private static readonly Random _Random = new();
 
-        /// <summary>
-        /// User command to display a quote.
-        /// </summary>
+        /// <summary>User command to display a quote.</summary>
         public void CMD_Quote(CommandData command)
         {
             if (DenizenMetaBot.Quotes.IsEmpty())

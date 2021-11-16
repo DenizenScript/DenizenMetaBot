@@ -21,22 +21,16 @@ using SharpDenizenTools.MetaHandlers;
 
 namespace DenizenBot
 {
-    /// <summary>
-    /// Discord bot for Denizen 1.x (Bukkit) help.
-    /// </summary>
+    /// <summary>Discord bot for Denizen 1.x (Bukkit) help.</summary>
     public class DenizenMetaBot
     {
-        /// <summary>
-        /// Returns whether a Discord user is a bot commander (via role check).
-        /// </summary>
+        /// <summary>Returns whether a Discord user is a bot commander (via role check).</summary>
         public static bool IsBotCommander(IUser user)
         {
             return (user as SocketGuildUser).Roles.Any((role) => role.Name.ToLowerInvariant() == "botcommander");
         }
 
-        /// <summary>
-        /// Returns whether meta commands are allowed in a given channel.
-        /// </summary>
+        /// <summary>Returns whether meta commands are allowed in a given channel.</summary>
         /// <param name="channel">The channel to check.</param>
         /// <returns>True if allowed, false otherwise.</returns>
         public static bool MetaCommandsAllowed(IMessageChannel channel)
@@ -44,74 +38,46 @@ namespace DenizenBot
             return ChannelToDetails.TryGetValue(channel.Id, out ChannelDetails details) && details.Docs;
         }
 
-        /// <summary>
-        /// Channels the bot will reply in.
-        /// </summary>
+        /// <summary>Channels the bot will reply in.</summary>
         public static HashSet<ulong> ValidChannels = new(32);
 
-        /// <summary>
-        /// Informational replies available, as a map of name to full text.
-        /// </summary>
+        /// <summary>Informational replies available, as a map of name to full text.</summary>
         public static Dictionary<string, string> InformationalData = new(512);
 
-        /// <summary>
-        /// Informational replies names available, only including the primary names.
-        /// </summary>
+        /// <summary>Informational replies names available, only including the primary names.</summary>
         public static List<string> InformationalDataNames = new(128);
 
-        /// <summary>
-        /// A mapping from channel IDs to project names for the update command.
-        /// </summary>
+        /// <summary>A mapping from channel IDs to project names for the update command.</summary>
         public static Dictionary<ulong, ChannelDetails> ChannelToDetails = new(512);
 
-        /// <summary>
-        /// A map of project names to the project's details.
-        /// </summary>
+        /// <summary>A map of project names to the project's details.</summary>
         public static Dictionary<string, ProjectDetails> ProjectToDetails = new(512);
 
-        /// <summary>
-        /// A map of rule IDs to their text.
-        /// </summary>
+        /// <summary>A map of rule IDs to their text.</summary>
         public static Dictionary<string, string> Rules = new(128);
 
-        /// <summary>
-        /// A list of MC versions that are acceptable+known.
-        /// </summary>
+        /// <summary>A list of MC versions that are acceptable+known.</summary>
         public static List<string> AcceptableServerVersions = new();
 
-        /// <summary>
-        /// The lowest (oldest) acceptable server version, as a double.
-        /// </summary>
+        /// <summary>The lowest (oldest) acceptable server version, as a double.</summary>
         public static double LowestServerVersion = 0.0;
 
-        /// <summary>
-        /// The highest (newest) acceptable server version, as a double.
-        /// </summary>
+        /// <summary>The highest (newest) acceptable server version, as a double.</summary>
         public static double HighestServerVersion = 0.0;
 
-        /// <summary>
-        /// All quotes in the quotes file.
-        /// </summary>
+        /// <summary>All quotes in the quotes file.</summary>
         public static string[] Quotes = Array.Empty<string>();
 
-        /// <summary>
-        /// All quotes in the quotes file, pre-lowercased for searching.
-        /// </summary>
+        /// <summary>All quotes in the quotes file, pre-lowercased for searching.</summary>
         public static string[] QuotesLower = Array.Empty<string>();
 
-        /// <summary>
-        /// The informational commands provider.
-        /// </summary>
+        /// <summary>The informational commands provider.</summary>
         public InformationCommands InfoCmds = new();
 
-        /// <summary>
-        /// URLs to send a POST to when reloading.
-        /// </summary>
+        /// <summary>URLs to send a POST to when reloading.</summary>
         public static string[] ReloadWebooks;
 
-        /// <summary>
-        /// Generates default command name->method pairs.
-        /// </summary>
+        /// <summary>Generates default command name->method pairs.</summary>
         void DefaultCommands(DiscordBot bot)
         {
             AdminCommands adminCmds = new() { Bot = bot };
@@ -164,9 +130,7 @@ namespace DenizenBot
             return result;
         }
 
-        /// <summary>
-        /// Fills fields with data from the config file.
-        /// </summary>
+        /// <summary>Fills fields with data from the config file.</summary>
         public void PopulateFromConfig(FDSSection configFile)
         {
             ValidChannels.Clear();
@@ -288,9 +252,7 @@ namespace DenizenBot
             }
         }
 
-        /// <summary>
-        /// Initializes the bot object, connects, and runs the active loop.
-        /// </summary>
+        /// <summary>Initializes the bot object, connects, and runs the active loop.</summary>
         public void InitAndRun(string[] args)
         {
             DiscordBotBaseHelper.StartBotHandler(args, new DiscordBotConfig()
