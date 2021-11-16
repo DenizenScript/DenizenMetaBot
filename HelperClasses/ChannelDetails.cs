@@ -23,7 +23,7 @@ namespace DenizenBot.HelperClasses
         /// <summary>
         /// Projects to update.
         /// </summary>
-        public ProjectDetails[] Updates = new ProjectDetails[0];
+        public ProjectDetails[] Updates = Array.Empty<ProjectDetails>();
 
 
         /// <summary>

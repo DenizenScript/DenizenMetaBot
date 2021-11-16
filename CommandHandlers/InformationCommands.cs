@@ -59,7 +59,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Help(CommandData command)
         {
-            StringBuilder infoCmds = new StringBuilder(CmdsInfo);
+            StringBuilder infoCmds = new(CmdsInfo);
             if (!DenizenMetaBot.ProjectToDetails.IsEmpty())
             {
                 infoCmds.Append("`update [project ...]` shows an update link for the named project(s)\n")
@@ -309,9 +309,9 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Dictionary of quotes recently seen to the time it was last seen, to reduce duplication.
         /// </summary>
-        public Dictionary<int, DateTimeOffset> QuotesSeen = new Dictionary<int, DateTimeOffset>();
+        public Dictionary<int, DateTimeOffset> QuotesSeen = new();
 
-        private static readonly Random _Random = new Random();
+        private static readonly Random _Random = new();
 
         /// <summary>
         /// User command to display a quote.
@@ -363,7 +363,7 @@ namespace DenizenBot.CommandHandlers
                 sendQuote(id - 1);
                 return;
             }
-            List<int> matchedQuoteIDs = new List<int>(32);
+            List<int> matchedQuoteIDs = new(32);
             string rawInputLow = string.Join(" ", command.CleanedArguments).ToLowerInvariant();
             for (int i = 0; i < DenizenMetaBot.Quotes.Length; i++)
             {

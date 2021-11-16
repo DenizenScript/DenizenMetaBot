@@ -47,37 +47,37 @@ namespace DenizenBot
         /// <summary>
         /// Channels the bot will reply in.
         /// </summary>
-        public static HashSet<ulong> ValidChannels = new HashSet<ulong>(32);
+        public static HashSet<ulong> ValidChannels = new(32);
 
         /// <summary>
         /// Informational replies available, as a map of name to full text.
         /// </summary>
-        public static Dictionary<string, string> InformationalData = new Dictionary<string, string>(512);
+        public static Dictionary<string, string> InformationalData = new(512);
 
         /// <summary>
         /// Informational replies names available, only including the primary names.
         /// </summary>
-        public static List<string> InformationalDataNames = new List<string>(128);
+        public static List<string> InformationalDataNames = new(128);
 
         /// <summary>
         /// A mapping from channel IDs to project names for the update command.
         /// </summary>
-        public static Dictionary<ulong, ChannelDetails> ChannelToDetails = new Dictionary<ulong, ChannelDetails>(512);
+        public static Dictionary<ulong, ChannelDetails> ChannelToDetails = new(512);
 
         /// <summary>
         /// A map of project names to the project's details.
         /// </summary>
-        public static Dictionary<string, ProjectDetails> ProjectToDetails = new Dictionary<string, ProjectDetails>(512);
+        public static Dictionary<string, ProjectDetails> ProjectToDetails = new(512);
 
         /// <summary>
         /// A map of rule IDs to their text.
         /// </summary>
-        public static Dictionary<string, string> Rules = new Dictionary<string, string>(128);
+        public static Dictionary<string, string> Rules = new(128);
 
         /// <summary>
         /// A list of MC versions that are acceptable+known.
         /// </summary>
-        public static List<string> AcceptableServerVersions = new List<string>();
+        public static List<string> AcceptableServerVersions = new();
 
         /// <summary>
         /// The lowest (oldest) acceptable server version, as a double.
@@ -102,7 +102,7 @@ namespace DenizenBot
         /// <summary>
         /// The informational commands provider.
         /// </summary>
-        public InformationCommands InfoCmds = new InformationCommands();
+        public InformationCommands InfoCmds = new();
 
         /// <summary>
         /// URLs to send a POST to when reloading.
@@ -114,10 +114,10 @@ namespace DenizenBot
         /// </summary>
         void DefaultCommands(DiscordBot bot)
         {
-            AdminCommands adminCmds = new AdminCommands() { Bot = bot };
-            MetaCommands metaCmds = new MetaCommands() { Bot = bot };
-            UtilityCommands utilCmds = new UtilityCommands() { Bot = bot };
-            CoreCommands coreCmds = new CoreCommands(IsBotCommander) { Bot = bot };
+            AdminCommands adminCmds = new() { Bot = bot };
+            MetaCommands metaCmds = new() { Bot = bot };
+            UtilityCommands utilCmds = new() { Bot = bot };
+            CoreCommands coreCmds = new(IsBotCommander) { Bot = bot };
             // Informational
             bot.RegisterCommand(InfoCmds.CMD_Help, "help", "halp", "helps", "halps", "hel", "hal", "h");
             bot.RegisterCommand(InfoCmds.CMD_Hello, "hello", "hi", "hey", "source", "src");
@@ -207,7 +207,7 @@ namespace DenizenBot
                 foreach (string key in projectDetailsSection.GetRootKeys())
                 {
                     FDSSection detailsSection = projectDetailsSection.GetSection(key);
-                    ProjectDetails detail = new ProjectDetails
+                    ProjectDetails detail = new()
                     {
                         Name = key,
                         Icon = detailsSection.GetString("icon", ""),
@@ -223,8 +223,8 @@ namespace DenizenBot
                 foreach (string key in channelDetailsSection.GetRootKeys())
                 {
                     FDSSection detailsSection = channelDetailsSection.GetSection(key);
-                    ChannelDetails detail = new ChannelDetails();
-                    List<ProjectDetails> projects = new List<ProjectDetails>();
+                    ChannelDetails detail = new();
+                    List<ProjectDetails> projects = new();
                     foreach (string projName in detailsSection.GetString("updates", "").Split(' ', StringSplitOptions.RemoveEmptyEntries))
                     {
                         projects.Add(ProjectToDetails[projName]);

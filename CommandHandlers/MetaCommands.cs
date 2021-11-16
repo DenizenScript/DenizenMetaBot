@@ -39,7 +39,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// Matcher for A-Z only.
         /// </summary>
-        public static readonly AsciiMatcher AlphabetMatcher = new AsciiMatcher(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+        public static readonly AsciiMatcher AlphabetMatcher = new(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 
         /// <summary>
         /// Automatically processes a meta search command.
@@ -150,8 +150,8 @@ namespace DenizenBot.CommandHandlers
                     }
                 }
             }
-            List<T> matched = new List<T>();
-            List<T> strongMatched = new List<T>();
+            List<T> matched = new();
+            List<T> strongMatched = new();
             string searchAZTrim = AlphabetMatcher.TrimToMatches(search);
             int tryProcesSingleMatch(T objVal, string objName, int min)
             {
@@ -297,13 +297,13 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Mechanism(CommandData command)
         {
-            List<string> secondarySearches = new List<string>();
+            List<string> secondarySearches = new();
             if (command.CleanedArguments.Length > 0)
             {
                 int dotIndex = command.CleanedArguments[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    secondarySearches.Add(command.CleanedArguments[0].Substring(0, dotIndex) + "tag" + command.CleanedArguments[0][dotIndex..]);
+                    secondarySearches.Add(command.CleanedArguments[0][..dotIndex] + "tag" + command.CleanedArguments[0][dotIndex..]);
                 }
             }
             int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, command.CleanedArguments, command.Message, secondarySearches);
@@ -322,7 +322,7 @@ namespace DenizenBot.CommandHandlers
         /// </summary>
         public void CMD_Tag(CommandData command)
         {
-            List<string> secondarySearches = new List<string>();
+            List<string> secondarySearches = new();
             string[] cmds = command.CleanedArguments;
             if (cmds.Length > 0)
             {
@@ -330,7 +330,7 @@ namespace DenizenBot.CommandHandlers
                 int dotIndex = cmds[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    string tagBase = cmds[0].Substring(0, dotIndex);
+                    string tagBase = cmds[0][..dotIndex];
                     string tagSuffix = cmds[0][dotIndex..];
                     MetaObjectType type = MetaDocs.CurrentMeta.ObjectTypes.GetValueOrDefault(tagBase.ToLowerFast());
                     if (!tagBase.EndsWith("tag"))
@@ -412,7 +412,7 @@ namespace DenizenBot.CommandHandlers
                 cmds[0] = secondarySearch;
             }
             string[] parts = secondarySearch.Split(' ');
-            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.DoesMatch(parts, true, false)));
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.TryMatch(parts, true, false) > 0));
         }
 
         /// <summary>
@@ -493,7 +493,7 @@ namespace DenizenBot.CommandHandlers
                 cmds[i] = cmds[i].ToLowerFast();
             }
             string fullSearch = string.Join(' ', cmds);
-            List<(int, MetaObject)> results = new List<(int, MetaObject)>();
+            List<(int, MetaObject)> results = new();
             foreach (MetaObject obj in MetaDocs.CurrentMeta.AllMetaObjects())
             {
                 int quality = obj.SearchHelper.GetMatchQuality(fullSearch);
@@ -524,7 +524,7 @@ namespace DenizenBot.CommandHandlers
                 results = results.GetRange(0, 50);
                 suffix = ", ...";
             }
-            StringBuilder combined = new StringBuilder();
+            StringBuilder combined = new();
             int bestQuality = results.First().Item1;
             int lastQuality = 0;
             foreach ((int quality, MetaObject obj) in results)

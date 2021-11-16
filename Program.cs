@@ -18,7 +18,7 @@ namespace DenizenBot
         /// <summary>
         /// Reusable HTTP(S) web client.
         /// </summary>
-        public static HttpClient ReusableWebClient = new HttpClient();
+        public static HttpClient ReusableWebClient = new();
 
         /// <summary>
         /// Software entry point - starts the bot.
@@ -37,7 +37,7 @@ namespace DenizenBot
         /// </summary>
         public static void LaunchBotThread(string[] args)
         {
-            Thread thr = new Thread(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
+            Thread thr = new(new ParameterizedThreadStart(BotThread)) { Name = "denizendiscordbot" };
             thr.Start(args);
         }
 

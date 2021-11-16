@@ -10,17 +10,14 @@ using DiscordBotBase;
 using DiscordBotBase.CommandHandlers;
 using SharpDenizenTools.MetaHandlers;
 using System.Net;
+using System.Net.Http;
 
 namespace DenizenBot.CommandHandlers
 {
-    /// <summary>
-    /// Commands to administrate the bot.
-    /// </summary>
+    /// <summary>Commands to administrate the bot.</summary>
     public class AdminCommands : UserCommands
     {
-        /// <summary>
-        /// Bot meta reload admin command.
-        /// </summary>
+        /// <summary>Bot meta reload admin command.</summary>
         public void CMD_Reload(CommandData command)
         {
             // NOTE: This implies a one-guild bot. A multi-guild bot probably shouldn't have this "BotCommander" role-based verification.
@@ -54,20 +51,13 @@ namespace DenizenBot.CommandHandlers
             {
                 try
                 {
-                    ReusableWebClient.UploadString(url, "");
+                    Program.ReusableWebClient.PostAsync(url, new ByteArrayContent(Array.Empty<byte>())).Wait();
                 }
                 catch (Exception ex)
                 {
                     Console.Error.Write($"Failed to ping webhook URL '{url}': {ex}");
                 }
             }
-        }
-
-        public static WebClient ReusableWebClient = new WebClient();
-
-        public AdminCommands()
-        {
-            ReusableWebClient.Headers["User-Agent"] = "DenizenMetaBot";
         }
     }
 }

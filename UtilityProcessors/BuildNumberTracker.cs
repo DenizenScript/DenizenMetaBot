@@ -40,12 +40,12 @@ namespace DenizenBot.UtilityProcessors
             /// <summary>
             /// How long before an update is needed.
             /// </summary>
-            public static TimeSpan TIME_BEFORE_UPDATE = new TimeSpan(hours: 1, minutes: 0, seconds: 0);
+            public static TimeSpan TIME_BEFORE_UPDATE = new(hours: 1, minutes: 0, seconds: 0);
 
             /// <summary>
             /// The max wait time for a build number download.
             /// </summary>
-            public static TimeSpan DOWNLOAD_TIMEOUT = new TimeSpan(hours: 0, minutes: 1, seconds: 0);
+            public static TimeSpan DOWNLOAD_TIMEOUT = new(hours: 0, minutes: 1, seconds: 0);
 
             /// <summary>
             /// Constructs the build number instance, and grabs the current build number.
@@ -139,7 +139,7 @@ namespace DenizenBot.UtilityProcessors
             /// <summary>
             /// Helper random object to spread out update checks.
             /// </summary>
-            readonly static Random UpdateRandomizer = new Random();
+            readonly static Random UpdateRandomizer = new();
 
             /// <summary>
             /// Immediately (but off-thread) update the value to current.
@@ -230,12 +230,12 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// All currently tracked build numbers.
         /// </summary>
-        public static List<BuildNumber> BuildNumbers = new List<BuildNumber>(64);
+        public static List<BuildNumber> BuildNumbers = new(64);
 
         /// <summary>
         /// A mapping from version names to the relevant paper build number trackers.
         /// </summary>
-        public static Dictionary<string, BuildNumber> PaperBuildTrackers = new Dictionary<string, BuildNumber>();
+        public static Dictionary<string, BuildNumber> PaperBuildTrackers = new();
 
         /// <summary>
         /// Causes all tracked build numbers to update immediately.
@@ -266,7 +266,7 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="version">The version.</param>
         public static void AddPaperTracker(string version)
         {
-            PaperBuildNumber tracker = new PaperBuildNumber("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", version);
+            PaperBuildNumber tracker = new("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", version);
             PaperBuildTrackers.Add(version, tracker);
         }
 

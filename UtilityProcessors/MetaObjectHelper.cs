@@ -14,7 +14,7 @@ namespace DenizenBot.UtilityProcessors
     public static class MetaObjectHelper
     {
         /// <summary>Symbols that need escaping on Discord.</summary>
-        public static AsciiMatcher DiscordEscapableSymbols = new AsciiMatcher("<>_*:|~");
+        public static AsciiMatcher DiscordEscapableSymbols = new("<>_*:|~");
 
         /// <summary>
         /// Escapes some text for safe Discord output.
@@ -27,7 +27,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 return input;
             }
-            StringBuilder output = new StringBuilder(input.Length * 2);
+            StringBuilder output = new(input.Length * 2);
             bool inCodeBlock = false;
             for (int i = 0; i < input.Length; i++)
             {
@@ -46,7 +46,7 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>Symbols that need escaping in URLs.</summary>
-        public static AsciiMatcher NeedsUrlEscape = new AsciiMatcher("<>[]|\"");
+        public static AsciiMatcher NeedsUrlEscape = new("<>[]|\"");
 
         /// <summary>
         /// Escapes a URL input string.
@@ -75,7 +75,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 if (value.Length > 1024)
                 {
-                    value = value.Substring(0, 1000) + "...";
+                    value = value[..1000] + "...";
                 }
                 builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
@@ -113,7 +113,7 @@ namespace DenizenBot.UtilityProcessors
                 return linkedtext;
             }
             int lastStartIndex = 0;
-            StringBuilder output = new StringBuilder(linkedtext.Length);
+            StringBuilder output = new(linkedtext.Length);
             while (nextLinkIndex >= 0)
             {
                 output.Append(linkedtext[lastStartIndex..nextLinkIndex]);
@@ -173,14 +173,14 @@ namespace DenizenBot.UtilityProcessors
                 int firstNewline = usageOut.IndexOf('\n');
                 if (firstNewline > 0)
                 {
-                    nameBar = usageOut.Substring(0, firstNewline);
+                    nameBar = usageOut[..firstNewline];
                     limitLengthRemaining -= nameBar.Length;
                     usageOut = usageOut[(firstNewline + 1)..];
                 }
                 usageOut = $"```yml\n{usageOut}\n```";
                 if (usageOut.Length > 512)
                 {
-                    usageOut = usageOut.Substring(0, 500) + "...";
+                    usageOut = usageOut[..500] + "...";
                 }
                 limitLengthRemaining -= usageOut.Length;
                 AutoField(builder, nameBar, usageOut);
@@ -205,7 +205,7 @@ namespace DenizenBot.UtilityProcessors
         public static string GetTagsField(IEnumerable<string> tags)
         {
             int limitLengthRemaining = 850;
-            StringBuilder tagsFieldBuilder = new StringBuilder(tags.Count() * 30);
+            StringBuilder tagsFieldBuilder = new(tags.Count() * 30);
             int count = 0;
             foreach (string tag in tags.Take(10))
             {
@@ -234,12 +234,12 @@ namespace DenizenBot.UtilityProcessors
                     }
                     else
                     {
-                        tagOut = $"`{tag.Substring(0, endMark)}`{tag[endMark..]}";
+                        tagOut = $"`{tag[..endMark]}`{tag[endMark..]}";
                     }
                 }
                 if (tagOut.Length > 128)
                 {
-                    tagOut = tagOut.Substring(0, 100) + "...";
+                    tagOut = tagOut[..100] + "...";
                 }
                 limitLengthRemaining -= tagOut.Length;
                 tagsFieldBuilder.Append(tagOut).Append('\n');
@@ -294,7 +294,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (!hideLargeData)
                 {
-                    builder.AddField("Description", ProcessBlockTextForDiscord(command.Description.Length > 600 ? command.Description.Substring(0, 500) + "..." : command.Description));
+                    builder.AddField("Description", ProcessBlockTextForDiscord(command.Description.Length > 600 ? command.Description[..500] + "..." : command.Description));
                 }
             }
             else if (obj is MetaEvent evt)
@@ -326,7 +326,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaLanguage language)
             {
-                builder.Description = ProcessBlockTextForDiscord(language.Description.Length > 900 ? language.Description.Substring(0, 800) + "..." : language.Description);
+                builder.Description = ProcessBlockTextForDiscord(language.Description.Length > 900 ? language.Description[..800] + "..." : language.Description);
             }
             else if (obj is MetaMechanism mechanism)
             {
@@ -334,22 +334,22 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(builder, "Object", mechanism.MechObject, true);
                 AutoField(builder, "Input", mechanism.Input, true);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
-                builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description.Substring(0, 500) + "..." : mechanism.Description);
+                builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description[..500] + "..." : mechanism.Description);
             }
             else if (obj is MetaTag tag)
             {
                 AutoField(builder, "Returns", tag.Returns, true);
                 AutoField(builder, "Mechanism", tag.Mechanism, true);
-                builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description.Substring(0, 500) + "..." : tag.Description);
+                builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description[..500] + "..." : tag.Description);
             }
             else if (obj is MetaObjectType objectType)
             {
                 AutoField(builder, "Prefix", objectType.Prefix, true);
                 AutoField(builder, "Base Type", objectType.BaseTypeName, true);
                 AutoField(builder, "Implements", string.Join(", ", objectType.ImplementsNames), true);
-                string format = objectType.Format.Length > 600 ? objectType.Format.Substring(0, 500) + "..." : objectType.Format;
+                string format = objectType.Format.Length > 600 ? objectType.Format[..500] + "..." : objectType.Format;
                 AutoField(builder, "Format", format);
-                builder.Description = ProcessBlockTextForDiscord(objectType.Description.Length > 600 ? objectType.Description.Substring(0, 500) + "..." : objectType.Description);
+                builder.Description = ProcessBlockTextForDiscord(objectType.Description.Length > 600 ? objectType.Description[..500] + "..." : objectType.Description);
             }
             return builder;
         }

@@ -30,22 +30,22 @@ namespace DenizenBot.CommandHandlers
         /// <summary>
         /// ASCII validator for a pastebin ID.
         /// </summary>
-        public static AsciiMatcher PASTEBIN_CODE_VALIDATOR = new AsciiMatcher((c) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+        public static AsciiMatcher PASTEBIN_CODE_VALIDATOR = new((c) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 
         /// <summary>
         /// ASCII validator for a Denizen haste code.
         /// </summary>
-        public static AsciiMatcher HASTE_CODE_VALIDATOR = new AsciiMatcher((c) => c >= '0' && c <= '9');
+        public static AsciiMatcher HASTE_CODE_VALIDATOR = new((c) => c >= '0' && c <= '9');
 
         /// <summary>
         /// The max wait time for a web-link download in a command.
         /// </summary>
-        public static TimeSpan WebLinkDownloadTimeout = new TimeSpan(hours: 0, minutes: 0, seconds: 15);
+        public static TimeSpan WebLinkDownloadTimeout = new(hours: 0, minutes: 0, seconds: 15);
 
         /// <summary>
         /// File extensions allowed in command attachment links.
         /// </summary>
-        public static HashSet<string> AllowedLinkFileExtensions = new HashSet<string>() { "log", "txt", "dsc", "yml" };
+        public static HashSet<string> AllowedLinkFileExtensions = new() { "log", "txt", "dsc", "yml" };
 
         /// <summary>
         /// For a web-link command like '!logcheck', gets the data from the paste link.
@@ -79,9 +79,12 @@ namespace DenizenBot.CommandHandlers
                         if (data != null && data.Length > 100 && data.Length < 1024 * 1024 * 5)
                         {
                             data = data.Replace('\0', ' ');
-                            AdminCommands.ReusableWebClient.Headers["Content-Type"] = "application/x-www-form-urlencoded";
-                            inputUrl = AdminCommands.ReusableWebClient.UploadString("https://" + $"paste.denizenscript.com/New/{type}", $"pastetype={type}&response=micro&v=200&"
-                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n");
+                            HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}");
+                            request.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                            request.Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
+                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"));
+                            HttpResponseMessage response = Program.ReusableWebClient.Send(request);
+                            inputUrl = response.Content.ReadAsStringAsync().Result;
                             if (!string.IsNullOrWhiteSpace(inputUrl))
                             {
                                 inputUrl = inputUrl.Trim();
@@ -178,7 +181,7 @@ namespace DenizenBot.CommandHandlers
                     + "All information is needed - especially the full startup output, which contains server/plugin versions, and usually is where important error messages are found.");
                 return;
             }
-            LogChecker checker = new LogChecker(data);
+            LogChecker checker = new(data);
             checker.Run();
             SendReply(command.Message, checker.GetResult());
         }
@@ -260,8 +263,8 @@ namespace DenizenBot.CommandHandlers
             {
                 if (list.Count > 0)
                 {
-                    HashSet<string> usedKeys = new HashSet<string>();
-                    StringBuilder thisListResult = new StringBuilder(list.Count * 200);
+                    HashSet<string> usedKeys = new();
+                    StringBuilder thisListResult = new(list.Count * 200);
                     foreach (ScriptChecker.ScriptWarning entry in list)
                     {
                         if (usedKeys.Contains(entry.WarningUniqueKey))
@@ -269,7 +272,7 @@ namespace DenizenBot.CommandHandlers
                             continue;
                         }
                         usedKeys.Add(entry.WarningUniqueKey);
-                        StringBuilder lines = new StringBuilder(50);
+                        StringBuilder lines = new(50);
                         if (entry.Line != -1)
                         {
                             lines.Append(entry.Line + 1);
@@ -336,7 +339,7 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            ScriptChecker checker = new ScriptChecker(data);
+            ScriptChecker checker = new(data);
             checker.Run();
             SendReply(command.Message, GetResult(checker));
         }

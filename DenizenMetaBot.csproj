@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DenizenBot</RootNamespace>
     <AssemblyName>DenizenMetaBot</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
     <Product>DenizenMetaBot</Product>
     <PackageId>DenizenMetaBot</PackageId>

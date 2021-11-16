@@ -60,7 +60,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Matcher for valid text in a player UUID.
         /// </summary>
-        public static AsciiMatcher UUID_ASCII_MATCHER = new AsciiMatcher("0123456789abcdef-");
+        public static AsciiMatcher UUID_ASCII_MATCHER = new("0123456789abcdef-");
 
         /// <summary>
         /// A player UUID is always exactly 36 characters long.
@@ -76,37 +76,37 @@ namespace DenizenBot.UtilityProcessors
         /// Lowercase text that is suspicious (like ones that relate to cracked plugins).
         /// Map of text to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> SUSPICIOUS_TEXT = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> SUSPICIOUS_TEXT = new();
 
         /// <summary>
         /// Lowercase text that usually is a bad sign.
         /// Map of text to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> DANGER_TEXT = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> DANGER_TEXT = new();
 
         /// <summary>
         /// Plugins that are suspicious (like ones that relate to cracked servers).
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = new();
 
         /// <summary>
         /// Plugins that WILL cause problems.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> BAD_PLUGINS = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> BAD_PLUGINS = new();
 
         /// <summary>
         /// Plugins that MIGHT cause problems.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> MESSY_PLUGINS = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> MESSY_PLUGINS = new();
 
         /// <summary>
         /// Plugins that should be tracked but aren't a problem.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> MONITORED_PLUGINS = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> MONITORED_PLUGINS = new();
 
         /// <summary>
         /// Adds a plugin by name to the list of special plugins to track and report.
@@ -230,7 +230,7 @@ namespace DenizenBot.UtilityProcessors
         {
             if (input.Length > maxLength)
             {
-                return input.Substring(0, cutLength) + "...";
+                return input[..cutLength] + "...";
             }
             return input;
         }
@@ -304,12 +304,12 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Lines that are suspicious, usually ones that indicate cracked plugins.
         /// </summary>
-        public List<string> SuspiciousLines = new List<string>();
+        public List<string> SuspiciousLines = new();
 
         /// <summary>
         /// Lines of note, usually ones that indicate a bad sign.
         /// </summary>
-        public List<string> OtherNoteworthyLines = new List<string>();
+        public List<string> OtherNoteworthyLines = new();
 
         /// <summary>
         /// Whether this server log appears to be offline mode.
@@ -370,7 +370,7 @@ namespace DenizenBot.UtilityProcessors
         {
             if (fullLog.Length > 1024 * 1024)
             {
-                fullLog = fullLog.Substring(0, 1024 * 1024);
+                fullLog = fullLog[..(1024 * 1024)];
             }
             FullLogText = fullLog.Replace("\r\n", "\n").Replace('\r', '\n');
             FullLogTextLower = FullLogText.ToLowerFast();
@@ -564,7 +564,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// A matcher for hex characters: 0123456789abcdef.
         /// </summary>
-        public static AsciiMatcher HEX_ASCII_MATCHER = new AsciiMatcher("0123456789abcdef");
+        public static AsciiMatcher HEX_ASCII_MATCHER = new("0123456789abcdef");
 
         /// <summary>
         /// Checks the linked server version against the current known server version.
@@ -619,7 +619,7 @@ namespace DenizenBot.UtilityProcessors
             }
             if (uuid.Length >= UUID_LENGTH)
             {
-                uuid = uuid.Substring(0, UUID_LENGTH);
+                uuid = uuid[..UUID_LENGTH];
                 Console.WriteLine($"Player UUID: {uuid}");
                 if (UUID_ASCII_MATCHER.IsOnlyMatches(uuid))
                 {
@@ -706,7 +706,7 @@ namespace DenizenBot.UtilityProcessors
         /// </summary>
         public void ProcessDangerText(Dictionary<string, string> textMap, List<string> lineList)
         {
-            HashSet<string> messagesUsed = new HashSet<string>();
+            HashSet<string> messagesUsed = new();
             foreach ((string sign, string message) in textMap)
             {
                 int signIndex = FullLogTextLower.IndexOf(sign);
