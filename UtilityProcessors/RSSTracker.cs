@@ -115,7 +115,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 try
                 {
-                    Task.Delay(CheckRate, token);
+                    Task.Delay(CheckRate, token).Wait();
                     ScanNow(true);
                 }
                 catch (TaskCanceledException)
