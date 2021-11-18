@@ -68,6 +68,7 @@ namespace DenizenBot.UtilityProcessors
                     string title = itemData.First(e => e.Name == "title").Value;
                     string link = itemData.First(e => e.Name == "link").Value;
                     string creator = itemData.First(e => e.Name.LocalName == "creator").Value;
+                    Console.WriteLine($"RSS feed {URL} found new post {link}");
                     if (doPosts)
                     {
                         EmbedBuilder embed = new()
@@ -79,6 +80,18 @@ namespace DenizenBot.UtilityProcessors
                             Color = new Color(255, 150, 15),
                             Description = $"New post in thread `{title.Replace('`', '\'')}`"
                         };
+                        foreach (ulong chanId in Channels)
+                        {
+                            SocketChannel chan = DiscordBotBaseHelper.CurrentBot.Client.GetChannel(chanId);
+                            if (chan is not SocketTextChannel textChan)
+                            {
+                                Console.WriteLine($"While updating RSS feed {URL} had problem: channel ID {chanId} is invalid");
+                            }
+                            else
+                            {
+                                textChan.SendMessageAsync(embed: embed.Build(), allowedMentions: AllowedMentions.None).Wait();
+                            }
+                        }
                     }
                 }
             }
