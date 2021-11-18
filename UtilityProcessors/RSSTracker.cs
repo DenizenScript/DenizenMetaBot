@@ -69,6 +69,12 @@ namespace DenizenBot.UtilityProcessors
                     string link = itemData.First(e => e.Name == "link").Value;
                     string creator = itemData.First(e => e.Name.LocalName == "creator").Value;
                     Console.WriteLine($"RSS feed {URL} found new post {link}");
+                    DateTimeOffset date = DateTimeOffset.Parse(pubDate);
+                    if (date.AddDays(7) < DateTimeOffset.UtcNow)
+                    {
+                        Console.WriteLine($"Ignore due to being very outdated");
+                        continue;
+                    }
                     if (doPosts)
                     {
                         EmbedBuilder embed = new()
@@ -76,7 +82,7 @@ namespace DenizenBot.UtilityProcessors
                             Title = $"Feed: {siteTitle}",
                             Author = new EmbedAuthorBuilder() { Name = creator },
                             Url = link,
-                            Timestamp = DateTimeOffset.Parse(pubDate),
+                            Timestamp = date,
                             Color = new Color(255, 150, 15),
                             Description = $"New post in thread `{title.Replace('`', '\'')}`"
                         };
