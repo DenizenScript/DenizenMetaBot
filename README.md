@@ -43,6 +43,7 @@ To configure the bot:
     - `acceptable_server_versions` set to a list of server MC versions (just the main version without sub-version, like "1.15", not "1.15.1") that are acceptable + tracked (older = outdated, newer = unknown).
     - `additional_meta_sources` set to a list of additional meta source URLs (should be direct zip links, like `https://github.com/DenizenScript/Denizen/archive/dev.zip`).
     - `reload_webhooks` set to an optional list of URLs to set a POST request to when reloads are triggered.
+    - `rss_feeds` set to an optional submap of RSS feeds, with keys `url` (direct rss.xml link), `channels` (list of channel ids), and `check_rate` (in minutes, decimals allowed)
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -77,6 +78,12 @@ acceptable_server_versions:
     - 1.15
 reload_webhooks:
 - https://example.com
+rss_feeds:
+    f1:
+        url: https://example.com/rss.xml
+        channels:
+        - 123456
+        check_rate: 5
 ```
 
 To start the bot up:

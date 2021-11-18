@@ -77,6 +77,9 @@ namespace DenizenBot
         /// <summary>URLs to send a POST to when reloading.</summary>
         public static string[] ReloadWebooks;
 
+        /// <summary>All RSS trackers.</summary>
+        public static List<RSSTracker> Trackers = new();
+
         /// <summary>Generates default command name->method pairs.</summary>
         void DefaultCommands(DiscordBot bot)
         {
@@ -250,6 +253,24 @@ namespace DenizenBot
                 Quotes = File.ReadAllText(DiscordBot.CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Replace('`', '\'').Split("\n\n", StringSplitOptions.RemoveEmptyEntries);
                 QuotesLower = Quotes.Select(s => s.ToLowerFast()).ToArray();
             }
+            if (configFile.HasKey("rss_feeds"))
+            {
+                FDSSection feeds = configFile.GetSection("rss_feeds");
+                foreach (string hook in feeds.GetRootKeys())
+                {
+                    FDSSection feed = feeds.GetSection(hook);
+                    string url = feed.GetString("url");
+                    List<ulong> channels = new();
+                    foreach (string channel in feed.GetStringList("channels"))
+                    {
+                        channels.Add(ulong.Parse(channel.Trim()));
+                    }
+                    double minutes = feed.GetDouble("check_rate").Value;
+                    RSSTracker tracker = new(url, channels.ToArray(), DiscordBotBaseHelper.CurrentBot.BotMonitor, TimeSpan.FromMinutes(minutes));
+                    tracker.Start();
+                    Trackers.Add(tracker);
+                }
+            }
         }
 
         /// <summary>Initializes the bot object, connects, and runs the active loop.</summary>
@@ -282,6 +303,13 @@ namespace DenizenBot
                 ShouldPayAttentionToMessage = (message) =>
                 {
                     return message.Channel is IGuildChannel;
+                },
+                OnShutdown = () =>
+                {
+                    foreach (RSSTracker tracker in Trackers)
+                    {
+                        tracker.CancelToken.Cancel();
+                    }
                 }
             });
         }
