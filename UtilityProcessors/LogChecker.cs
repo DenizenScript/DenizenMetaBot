@@ -372,12 +372,12 @@ namespace DenizenBot.UtilityProcessors
                 JavaVersion = "";
                 return;
             }
-            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("11") || JavaVersion.StartsWith("1.11") || JavaVersion.StartsWith("16"))
+            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("16") || JavaVersion.StartsWith("17"))
             {
                 JavaVersion = $"`{Escape(JavaVersion)}` {GREEN_CHECK_MARK_SYMBOL}";
                 return;
             }
-            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 16, 11, and 8 are fully supported";
+            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 17, 16, and 8 are fully supported";
         }
 
         /// <summary>Gets the server version status result (outdated vs not) as a string.</summary>
