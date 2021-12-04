@@ -386,15 +386,14 @@ namespace DenizenBot.CommandHandlers
         public void CMD_Event(CommandData command)
         {
             string[] cmds = command.CleanedArguments;
-            string onSearch = string.Join(" ", cmds).ToLowerFast();
-            string secondarySearch = onSearch.StartsWith("on ") ? onSearch["on ".Length..] : onSearch;
-            onSearch = "on " + secondarySearch;
+            string search = string.Join(" ", cmds).ToLowerFast();
+            search = search.StartsWith("on ") ? search["on ".Length..] : search;
             if (cmds.Length > 0)
             {
-                cmds[0] = secondarySearch;
+                cmds[0] = search;
             }
-            string[] parts = secondarySearch.Split(' ');
-            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.CouldMatchers.Any(c => c.TryMatch(parts, true, false) > 0));
+            string[] parts = search.Split(' ');
+            AutoMetaCommand(MetaDocs.CurrentMeta.Events, MetaDocs.META_TYPE_EVENT, cmds, command.Message, secondaryMatcher: (e) => e.OverlyCleanedEvents.Any(s => s.Contains(search)) || e.CouldMatchers.Any(c => c.TryMatch(parts, true, false) > 0));
         }
 
         /// <summary>Action meta docs user command.</summary>
