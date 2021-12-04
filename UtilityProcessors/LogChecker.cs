@@ -259,8 +259,8 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Whether this server log appears to be offline mode.</summary>
         public bool IsOffline = false;
 
-        /// <summary>Whether this server mentions bungee (and thus might not actually be offline).</summary>
-        public bool IsBungee = false;
+        /// <summary>Whether this server mentions a proxy like Bungee or Velocity (and thus might not actually be offline).</summary>
+        public bool IsProxied = false;
 
         /// <summary>Visible UUID version (if anny).</summary>
         public int? UUIDVersion = null;
@@ -287,7 +287,7 @@ namespace DenizenBot.UtilityProcessors
                         return true;
                     }
                 }
-                if (IsOffline && !IsBungee)
+                if (IsOffline && !IsProxied)
                 {
                     return true;
                 }
@@ -313,17 +313,18 @@ namespace DenizenBot.UtilityProcessors
             if (IsDenizenDebug)
             {
                 string mode = GetFromTextTilEndOfLine(FullLogText, "Mode: ");
-                IsBungee = mode.Contains("BungeeCord");
+                IsProxied = mode.Contains("BungeeCord") || mode.Contains("Velocity");
                 IsOffline = mode.Contains("offline");
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, "Server Version: ").After("Server Version: ");
                 JavaVersion = GetFromTextTilEndOfLine(FullLogText, "Java Version: ").After("Java Version: ");
             }
             else
             {
-                IsBungee = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "").Contains("bungee");
-                if (IsBungee && FullLogTextLower.Contains("bungee isn't enabled"))
+                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "");
+                IsProxied = rawMinusBungeeNotice.Contains("bungee") || rawMinusBungeeNotice.Contains("velocity");
+                if (IsProxied && FullLogTextLower.Contains("bungee isn't enabled"))
                 {
-                    IsBungee = false;
+                    IsProxied = false;
                 }
                 IsOffline = FullLogText.Contains(OFFLINE_NOTICE);
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, SERVER_VERSION_PREFIX);
@@ -355,7 +356,7 @@ namespace DenizenBot.UtilityProcessors
                     }
                 }
             }
-            Console.WriteLine($"Offline={IsOffline}, Bungee={IsBungee}");
+            Console.WriteLine($"Offline={IsOffline}, Proxied={IsProxied}");
             Console.WriteLine($"JavaVersion={JavaVersion}");
             ProcessJavaVersion();
             Console.WriteLine($"JavaVersionProcessed={JavaVersion}");
@@ -690,7 +691,7 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Plugin Version(s)", PluginVersions, inline: false);
             if (IsOffline)
             {
-                AutoField(embed, "Online/Offline", IsBungee ? "Offline, but running bungee." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (bungee likely)." : "Offline (bungee status unknown).")));
+                AutoField(embed, "Online/Offline", IsProxied ? "Offline, but proxied." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (proxy likely)." : "Offline (proxy status unknown).")));
             }
             if (UUIDVersion != null)
             {
