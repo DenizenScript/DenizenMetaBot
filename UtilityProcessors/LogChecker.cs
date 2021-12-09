@@ -119,6 +119,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To use placeholders with Citizens, just use the normal commands. You don't need a separate plugin for this anymore.", "CitizensPlaceholderAPI");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Faking having real players online is expressly forbidden by Mojang (for obvious reasons) and can get you in trouble.", "FakePlayers");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser", "Geyser-Spigot", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
@@ -320,7 +321,8 @@ namespace DenizenBot.UtilityProcessors
             }
             else
             {
-                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "");
+                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "")
+                    .Replace("compression from velocity", "").Replace("cipher from velocity", "");
                 IsProxied = rawMinusBungeeNotice.Contains("bungee") || rawMinusBungeeNotice.Contains("velocity");
                 if (IsProxied && FullLogTextLower.Contains("bungee isn't enabled"))
                 {
