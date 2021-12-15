@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Discord.Net;
 using Discord;
 using Discord.WebSocket;
@@ -180,19 +181,28 @@ namespace DenizenBot.UtilityProcessors
         /// Utility to get the text starting at the input text, going to the end of the line.
         /// Returns an empty string if nothing is found.
         /// </summary>
-        public static string GetFromTextTilEndOfLine(string fullLog, string text)
+        public static string GetFromTextTilEndOfLine(string fullLog, string text, int minIndex, out int foundIndex)
         {
-            int index = fullLog.IndexOf(text);
-            if (index == -1)
+            foundIndex = fullLog.IndexOf(text, minIndex);
+            if (foundIndex == -1)
             {
                 return "";
             }
-            int endIndex = fullLog.IndexOf('\n', index);
+            int endIndex = fullLog.IndexOf('\n', foundIndex);
             if (endIndex == -1)
             {
                 endIndex = fullLog.Length;
             }
-            return fullLog[index..endIndex];
+            return fullLog[foundIndex..endIndex];
+        }
+
+        /// <summary>
+        /// Utility to get the text starting at the input text, going to the end of the line.
+        /// Returns an empty string if nothing is found.
+        /// </summary>
+        public static string GetFromTextTilEndOfLine(string fullLog, string text)
+        {
+            return GetFromTextTilEndOfLine(fullLog, text, 0, out _);
         }
 
         /// <summary>Utility to limit the length of a string for stabler output.</summary>
@@ -304,7 +314,9 @@ namespace DenizenBot.UtilityProcessors
             {
                 fullLog = fullLog[..(1024 * 1024)];
             }
-            FullLogText = fullLog.Replace("\r\n", "\n").Replace('\r', '\n');
+            fullLog = fullLog.Replace("\r\n", "\n").Replace('\r', '\n');
+            IEnumerable<string> lines = fullLog.Split('\n').Where(l => !l.EndsWith("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!"));
+            FullLogText = string.Join('\n', lines.ToArray());
             FullLogTextLower = FullLogText.ToLowerFast();
         }
 
@@ -321,7 +333,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else
             {
-                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "")
+                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord or velocity", "").Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "")
                     .Replace("compression from velocity", "").Replace("cipher from velocity", "");
                 IsProxied = rawMinusBungeeNotice.Contains("bungee") || rawMinusBungeeNotice.Contains("velocity");
                 if (IsProxied && FullLogTextLower.Contains("bungee isn't enabled"))
@@ -354,6 +366,10 @@ namespace DenizenBot.UtilityProcessors
                         else if (FullLogText.Contains("java.base/java.lang.Thread.run(Thread.java:832)"))
                         {
                             JavaVersion = "14 or newer (based on stack trace content)";
+                        }
+                        else if (FullLogText.Contains("java.base/java.lang.Thread.run(Thread.java:833)"))
+                        {
+                            JavaVersion = "17 or newer (based on stack trace content)";
                         }
                     }
                 }
@@ -532,14 +548,28 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Gathers a UUID version code if possible from the log.</summary>
         public void ProcessUUIDCheck()
         {
+            int index = 0;
+            while (index != -1)
+            {
+                index = UUIDCheckSingle(index);
+                if (index != -1)
+                {
+                    index = FullLogText.IndexOf('\n', index);
+                }
+            }
+        }
+
+        private int UUIDCheckSingle(int minIndex)
+        {
             string uuid;
+            int result = -1;
             if (IsDenizenDebug)
             {
-                uuid = GetFromTextTilEndOfLine(FullLogText, "p@").After("p@");
+                uuid = GetFromTextTilEndOfLine(FullLogText, "p@", minIndex, out result).After("p@");
             }
             else
             {
-                uuid = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX).After(" is ");
+                uuid = GetFromTextTilEndOfLine(FullLogText, PLAYER_UUID_PREFIX, minIndex, out result).After(" is ");
             }
             if (uuid.Length >= UUID_LENGTH)
             {
@@ -549,9 +579,15 @@ namespace DenizenBot.UtilityProcessors
                 {
                     char versCode = uuid[VERSION_ID_LOCATION];
                     Console.WriteLine($"Player UUID version: {versCode}");
-                    UUIDVersion = (versCode - '0');
+                    int newVers = versCode switch { '4' => 4, '3' => 3, _ => 0 };
+                    if (newVers < UUIDVersion)
+                    {
+                        UUIDVersion = newVers;
+                    }
+                    return result;
                 }
             }
+            return -1;
         }
 
         /// <summary>Gathers data about plugins loading from the log.</summary>
@@ -697,7 +733,7 @@ namespace DenizenBot.UtilityProcessors
             }
             if (UUIDVersion != null)
             {
-                string description = UUIDVersion == 4 ? $"{GREEN_CHECK_MARK_SYMBOL} Online" : (UUIDVersion == 3 ? $"{RED_FLAG_SYMBOL} Offline" : $"{RED_FLAG_SYMBOL} Hacked or Invalid ID");
+                string description = UUIDVersion switch { 4 => $"{GREEN_CHECK_MARK_SYMBOL} Online", 3 => $"{RED_FLAG_SYMBOL} Offline", _ => $"{RED_FLAG_SYMBOL} Hacked or Invalid ID" };
                 AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Java Version", JavaVersion);
