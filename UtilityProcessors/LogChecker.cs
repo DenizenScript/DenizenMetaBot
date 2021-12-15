@@ -580,7 +580,7 @@ namespace DenizenBot.UtilityProcessors
                     char versCode = uuid[VERSION_ID_LOCATION];
                     Console.WriteLine($"Player UUID version: {versCode}");
                     int newVers = versCode switch { '4' => 4, '3' => 3, _ => 0 };
-                    if (newVers < UUIDVersion)
+                    if (UUIDVersion is null || newVers < UUIDVersion)
                     {
                         UUIDVersion = newVers;
                     }
