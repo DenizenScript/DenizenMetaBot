@@ -710,7 +710,7 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>Gets an output embed result.</summary>
-        public Embed GetResult()
+        public EmbedBuilder GetResult()
         {
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results");
             if (UUIDVersion == 3 || UUIDVersion == 0 || (UUIDVersion == null && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
@@ -743,7 +743,7 @@ namespace DenizenBot.UtilityProcessors
             AutoField(embed, "Problematic Plugin(s)", BadPlugins, inline: false);
             AutoField(embed, "Possibly Relevant Plugin(s)", IffyPlugins, inline: false);
             AutoField(embed, "Potentially Bad Line(s)", string.Join('\n', OtherNoteworthyLines), inline: false);
-            return embed.Build();
+            return embed;
         }
     }
 }

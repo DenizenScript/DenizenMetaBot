@@ -37,7 +37,7 @@ namespace DenizenBot.CommandHandlers
         public static HashSet<string> AllowedLinkFileExtensions = new() { "log", "txt", "dsc", "yml" };
 
         /// <summary>For a web-link command like '!logcheck', gets the data from the paste link.</summary>
-        public string GetWebLinkDataForCommand(string cmdName, string type, CommandData command)
+        public string GetWebLinkDataForCommand(string cmdName, string type, CommandData command, out string url)
         {
             string inputUrl = null;
             try
@@ -55,11 +55,13 @@ namespace DenizenBot.CommandHandlers
                         if (attachment.Size < 100 || attachment.Size > 1024 * 1024 * 5)
                         {
                             SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has size {attachment.Size} - file must be non-empty, and less than 5 MiB.");
+                            url = null;
                             return null;
                         }
                         if (!AllowedLinkFileExtensions.Contains(attachment.Filename.AfterLast('.')))
                         {
                             SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has unrecognized or unsupported file extension. Use `.log` for log files, and `.dsc` for Denizen scripts.");
+                            url = null;
                             return null;
                         }
                         string data = Program.ReusableWebClient.GetStringAsync(attachment.Url).Result;
@@ -93,11 +95,13 @@ namespace DenizenBot.CommandHandlers
                 {
                     SendErrorMessageReply(command.Message, "Error", "Exception thrown while handling special file scan command (see console for details).");
                 }
+                url = null;
                 return null;
             }
             if (string.IsNullOrWhiteSpace(inputUrl))
             {
                 SendErrorMessageReply(command.Message, "Command Syntax Incorrect", $"`{DenizenMetaBotConstants.COMMAND_PREFIX}{cmdName} <link>`");
+                url = null;
                 return null;
             }
             string rawUrl;
@@ -107,6 +111,7 @@ namespace DenizenBot.CommandHandlers
                 if (!PASTEBIN_CODE_VALIDATOR.IsOnlyMatches(pastebinCode))
                 {
                     SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Pastebin URL given does not conform to expected format.");
+                    url = null;
                     return null;
                 }
                 rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
@@ -117,13 +122,15 @@ namespace DenizenBot.CommandHandlers
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
                 {
                     SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Denizen paste URL given does not conform to expected format.");
+                    url = null;
                     return null;
                 }
                 rawUrl = $"{DENIZEN_PASTE_URL_BASE}{pasteCode}.txt";
             }
             else
             {
-                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Input argument must be a link to pastebin or <https://one.denizenscript.com/haste>.");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Input argument must be a link to <https://one.denizenscript.com/haste>.");
+                url = null;
                 return null;
             }
             try
@@ -133,8 +140,10 @@ namespace DenizenBot.CommandHandlers
                 if (!downloadTask.IsCompleted)
                 {
                     SendErrorMessageReply(command.Message, "Error", "Download did not complete in time.");
+                    url = null;
                     return null;
                 }
+                url = inputUrl;
                 return downloadTask.Result;
             }
             catch (Exception ex)
@@ -148,6 +157,7 @@ namespace DenizenBot.CommandHandlers
                 {
                     SendErrorMessageReply(command.Message, "Error", "Exception thrown while downloading raw data from link (see console for details).");
                 }
+                url = null;
                 return null;
             }
         }
@@ -155,7 +165,7 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Command to check for common issues in server logs.</summary>
         public void CMD_LogCheck(CommandData command)
         {
-            string data = GetWebLinkDataForCommand("logcheck", "log", command);
+            string data = GetWebLinkDataForCommand("logcheck", "log", command, out string url);
             if (data == null)
             {
                 return;
@@ -168,7 +178,8 @@ namespace DenizenBot.CommandHandlers
             }
             LogChecker checker = new(data);
             checker.Run();
-            SendReply(command.Message, checker.GetResult());
+            EmbedBuilder result = checker.GetResult().WithUrl(url).WithFooter($"Checked on request of <@{command.Message.Author.Id}>");
+            SendReply(command.Message, result.Build());
         }
 
         /// <summary>Command to check the updatedness of a version string.</summary>
@@ -313,7 +324,7 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            string data = GetWebLinkDataForCommand("script", "script", command);
+            string data = GetWebLinkDataForCommand("script", "script", command, out _);
             if (data == null)
             {
                 return;
