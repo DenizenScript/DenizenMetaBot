@@ -35,6 +35,10 @@ namespace DenizenBot
         /// <returns>True if allowed, false otherwise.</returns>
         public static bool MetaCommandsAllowed(IMessageChannel channel)
         {
+            if (channel is SocketThreadChannel threadChannel)
+            {
+                channel = threadChannel.ParentChannel;
+            }
             return ChannelToDetails.TryGetValue(channel.Id, out ChannelDetails details) && details.Docs;
         }
 
