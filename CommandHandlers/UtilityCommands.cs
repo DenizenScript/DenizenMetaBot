@@ -178,7 +178,7 @@ namespace DenizenBot.CommandHandlers
             }
             LogChecker checker = new(data);
             checker.Run();
-            EmbedBuilder result = checker.GetResult().WithUrl(url).WithFooter($"Checked on request of <@{command.Message.Author.Id}>");
+            EmbedBuilder result = checker.GetResult().WithUrl(url).AddField("Checked For", $"<@{command.Message.Author.Id}>");
             SendReply(command.Message, result.Build());
         }
 
