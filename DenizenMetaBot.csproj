@@ -8,7 +8,7 @@
     <LangVersion>Latest</LangVersion>
     <Product>DenizenMetaBot</Product>
     <PackageId>DenizenMetaBot</PackageId>
-    <Copyright>Copyright (C) The DenizenScript Team 2019-2021</Copyright>
+    <Copyright>Copyright (C) The DenizenScript Team 2019-2022</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="**\*.resx" />
