@@ -96,7 +96,8 @@ namespace DenizenBot.CommandHandlers
             }
             if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                ulong chanId = command.Message.Channel is SocketThreadChannel thread ? thread.ParentChannel.Id : command.Message.Channel.Id;
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(chanId, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     SendErrorMessageReply(command.Message, "Unknown input for Update command", $"Please specify which project(s) you want the update link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}update denizen`.");
                     return;
@@ -137,7 +138,8 @@ namespace DenizenBot.CommandHandlers
             }
             if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                ulong chanId = command.Message.Channel is SocketThreadChannel thread ? thread.ParentChannel.Id : command.Message.Channel.Id;
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(chanId, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     SendErrorMessageReply(command.Message, "Unknown input for GitHub command", $"Please specify which project(s) you want the GitHub link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}github denizen`.");
                     return;
@@ -175,7 +177,8 @@ namespace DenizenBot.CommandHandlers
             }
             if (command.CleanedArguments.Length == 0)
             {
-                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(command.Message.Channel.Id, out ChannelDetails details) || details.Updates.Length == 0)
+                ulong chanId = command.Message.Channel is SocketThreadChannel thread ? thread.ParentChannel.Id : command.Message.Channel.Id;
+                if (!DenizenMetaBot.ChannelToDetails.TryGetValue(chanId, out ChannelDetails details) || details.Updates.Length == 0)
                 {
                     SendErrorMessageReply(command.Message, "Unknown input for Issues command", $"Please specify which project(s) you want the Issues link for, like `{DenizenMetaBotConstants.COMMAND_PREFIX}issues denizen`.");
                     return;
