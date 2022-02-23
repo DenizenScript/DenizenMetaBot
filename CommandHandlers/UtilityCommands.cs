@@ -163,10 +163,14 @@ namespace DenizenBot.CommandHandlers
                     url = null;
                     return null;
                 }
-                rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
-                rawUrl = ReuploadPaste(rawUrl, command, command.Message.Author, type);
+                inputUrl = ReuploadPaste($"{PASTEBIN_URL_BASE}raw/{pastebinCode}", command, command.Message.Author, type);
+                if (inputUrl is null)
+                {
+                    url = null;
+                    return null;
+                }
             }
-            else if (inputUrl.ToLowerFast().StartsWith(DENIZEN_PASTE_URL_BASE))
+            if (inputUrl.ToLowerFast().StartsWith(DENIZEN_PASTE_URL_BASE))
             {
                 string pasteCode = inputUrl[DENIZEN_PASTE_URL_BASE.Length..];
                 if (!HASTE_CODE_VALIDATOR.IsOnlyMatches(pasteCode))
@@ -191,7 +195,7 @@ namespace DenizenBot.CommandHandlers
         public void CMD_LogCheck(CommandData command)
         {
             string data = GetWebLinkDataForCommand("logcheck", "log", command, out string url);
-            if (data == null)
+            if (data is null)
             {
                 return;
             }
