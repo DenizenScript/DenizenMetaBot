@@ -25,10 +25,10 @@ namespace DenizenBot.CommandHandlers
             DENIZEN_PASTE_URL_BASE = "https://paste.denizenscript.com/view/";
 
         /// <summary>ASCII validator for a pastebin ID.</summary>
-        public static AsciiMatcher PASTEBIN_CODE_VALIDATOR = new((c) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+        public static AsciiMatcher PASTEBIN_CODE_VALIDATOR = new(AsciiMatcher.BothCaseLetters + AsciiMatcher.Digits);
 
         /// <summary>ASCII validator for a Denizen haste code.</summary>
-        public static AsciiMatcher HASTE_CODE_VALIDATOR = new((c) => c >= '0' && c <= '9');
+        public static AsciiMatcher HASTE_CODE_VALIDATOR = new(AsciiMatcher.Digits);
 
         /// <summary>The max wait time for a web-link download in a command.</summary>
         public static TimeSpan WebLinkDownloadTimeout = new(hours: 0, minutes: 0, seconds: 15);
@@ -36,7 +36,72 @@ namespace DenizenBot.CommandHandlers
         /// <summary>File extensions allowed in command attachment links.</summary>
         public static HashSet<string> AllowedLinkFileExtensions = new() { "log", "txt", "dsc", "yml" };
 
-        /// <summary>For a web-link command like '!logcheck', gets the data from the paste link.</summary>
+        /// <summary>Downloads a string from a web URL, for usage in a command. This is a direct read, not a proper converter/scanner. There is no input protection.</summary>
+        public static string DirectDownloadWebDataForCommand(string url, CommandData command)
+        {
+            try
+            {
+                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(url);
+                downloadTask.Wait(WebLinkDownloadTimeout);
+                if (!downloadTask.IsCompleted)
+                {
+                    SendErrorMessageReply(command.Message, "Error", "Download did not complete in time.");
+                    return null;
+                }
+                return downloadTask.Result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                if (ex is HttpRequestException)
+                {
+                    SendErrorMessageReply(command.Message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
+                }
+                else
+                {
+                    SendErrorMessageReply(command.Message, "Error", "Exception thrown while downloading raw data from link (see console for details).");
+                }
+                return null;
+            }
+        }
+
+        /// <summary>Maximum allowed downloadable paste file size.</summary>
+        public const int MAX_PASTE_LEN = 10 * 1024 * 1024;
+
+        /// <summary>Uploads a paste to the proper pastebin server if needed.</summary>
+        public static string ReuploadPaste(string srcUrl, CommandData command, IUser uploader, string type)
+        {
+            string data = DirectDownloadWebDataForCommand(srcUrl, command);
+            if (data is null)
+            {
+                return null;
+            }
+            if (data.Length < 100 || data.Length > MAX_PASTE_LEN * 2)
+            {
+                SendErrorMessageReply(command.Message, "Cannot Scan Paste", $"Paste data has size {data.Length} - file must be non-empty, and less than 10 MiB.");
+                return null;
+            }
+            if (data.Length > MAX_PASTE_LEN)
+            {
+                data = data[..MAX_PASTE_LEN];
+            }
+            data = data.Replace('\0', ' ');
+            HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}");
+            request.Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
+                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(uploader.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"));
+            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+            HttpResponseMessage response = Program.ReusableWebClient.Send(request);
+            string outputUrl = response.Content.ReadAsStringAsync().Result;
+            if (!string.IsNullOrWhiteSpace(outputUrl))
+            {
+                outputUrl = outputUrl.Trim();
+                Console.WriteLine($"Message {type} auto-repaste to {outputUrl}");
+                SendGenericPositiveMessageReply(command.Message, "Repasted", $"Incorrect upload of {type} reuploaded to pastebin at <{outputUrl}>");
+            }
+            return outputUrl;
+        }
+
+        /// <summary>For a web-link command like '!logcheck', gets the data from the paste link, with automatic link processing.</summary>
         public string GetWebLinkDataForCommand(string cmdName, string type, CommandData command, out string url)
         {
             string inputUrl = null;
@@ -52,9 +117,9 @@ namespace DenizenBot.CommandHandlers
                     if (referenced != null && referenced.Attachments.Any())
                     {
                         IAttachment attachment = referenced.Attachments.First();
-                        if (attachment.Size < 100 || attachment.Size > 1024 * 1024 * 5)
+                        if (attachment.Size < 100 || attachment.Size > MAX_PASTE_LEN * 2)
                         {
-                            SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has size {attachment.Size} - file must be non-empty, and less than 5 MiB.");
+                            SendErrorMessageReply(command.Message, "Cannot Scan Attached File", $"Attached file has size {attachment.Size} - file must be non-empty, and less than 10 MiB.");
                             url = null;
                             return null;
                         }
@@ -64,23 +129,7 @@ namespace DenizenBot.CommandHandlers
                             url = null;
                             return null;
                         }
-                        string data = Program.ReusableWebClient.GetStringAsync(attachment.Url).Result;
-                        if (data != null && data.Length > 100 && data.Length < 1024 * 1024 * 5)
-                        {
-                            data = data.Replace('\0', ' ');
-                            HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}");
-                            request.Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
-                                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(referenced.Author.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"));
-                            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
-                            HttpResponseMessage response = Program.ReusableWebClient.Send(request);
-                            inputUrl = response.Content.ReadAsStringAsync().Result;
-                            if (!string.IsNullOrWhiteSpace(inputUrl))
-                            {
-                                inputUrl = inputUrl.Trim();
-                                Console.WriteLine($"Message {type} auto-repaste to {inputUrl}");
-                                SendGenericPositiveMessageReply(command.Message, "Repasted", $"Direct Discord-upload of {type} reuploaded to pastebin at <{inputUrl}>");
-                            }
-                        }
+                        inputUrl = ReuploadPaste(attachment.Url, command, referenced.Author, type);
                     }
                 }
             }
@@ -115,6 +164,7 @@ namespace DenizenBot.CommandHandlers
                     return null;
                 }
                 rawUrl = $"{PASTEBIN_URL_BASE}raw/{pastebinCode}";
+                rawUrl = ReuploadPaste(rawUrl, command, command.Message.Author, type);
             }
             else if (inputUrl.ToLowerFast().StartsWith(DENIZEN_PASTE_URL_BASE))
             {
@@ -133,33 +183,8 @@ namespace DenizenBot.CommandHandlers
                 url = null;
                 return null;
             }
-            try
-            {
-                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(rawUrl);
-                downloadTask.Wait(WebLinkDownloadTimeout);
-                if (!downloadTask.IsCompleted)
-                {
-                    SendErrorMessageReply(command.Message, "Error", "Download did not complete in time.");
-                    url = null;
-                    return null;
-                }
-                url = inputUrl;
-                return downloadTask.Result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                if (ex is HttpRequestException)
-                {
-                    SendErrorMessageReply(command.Message, "Error", $"Exception thrown while downloading raw data from link. HttpRequestException: `{EscapeUserInput(ex.Message)}`");
-                }
-                else
-                {
-                    SendErrorMessageReply(command.Message, "Error", "Exception thrown while downloading raw data from link (see console for details).");
-                }
-                url = null;
-                return null;
-            }
+            url = inputUrl;
+            return DirectDownloadWebDataForCommand(rawUrl, command);
         }
 
         /// <summary>Command to check for common issues in server logs.</summary>
