@@ -31,6 +31,9 @@ namespace DenizenBot.UtilityProcessors
         public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version",
             SERVER_VERSION_PREFIX_BACKUP = "This server is running ";
 
+        /// <summary>The text that comes before the server's bind address.</summary>
+        public const string BIND_ADDRESS_PREFIX = "Starting Minecraft server on ";
+
         /// <summary>The text that comes before a player UUID post.</summary>
         public const string PLAYER_UUID_PREFIX = "UUID of player ";
 
@@ -370,6 +373,18 @@ namespace DenizenBot.UtilityProcessors
                         else if (FullLogText.Contains("java.base/java.lang.Thread.run(Thread.java:833)"))
                         {
                             JavaVersion = "17 or newer (based on stack trace content)";
+                        }
+                    }
+                }
+                if (IsOffline)
+                {
+                    string bindAddress = GetFromTextTilEndOfLine(FullLogText, BIND_ADDRESS_PREFIX);
+                    if (!string.IsNullOrWhiteSpace(bindAddress))
+                    {
+                        string bindAddrText = bindAddress.After(BIND_ADDRESS_PREFIX);
+                        if (bindAddrText.StartsWith("0.0.0.0:") || bindAddrText.StartsWith("*:"))
+                        {
+                            OtherNoteworthyLines.Add($"`{Escape(bindAddress)}` - server is offline but has no address bind. This might mean you're using a system level firewall, but if not, it means your proxy is bypassable by hackers. Either enable a system level firewall, or bind your server to localhost in `server.properties` via `server-ip=127.0.0.1`.");
                         }
                     }
                 }
