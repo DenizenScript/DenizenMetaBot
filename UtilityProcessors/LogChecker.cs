@@ -336,8 +336,11 @@ namespace DenizenBot.UtilityProcessors
             }
             else
             {
-                string rawMinusBungeeNotice = FullLogTextLower.Replace("makes it possible to use bungeecord or velocity", "").Replace("makes it possible to use bungeecord", "").Replace("will not load bungee bridge.", "")
-                    .Replace("compression from velocity", "").Replace("cipher from velocity", "");
+                string rawMinusBungeeNotice = FullLogTextLower
+                    .Replace("makes it possible to use bungeecord or velocity", "").Replace("compression from velocity", "").Replace("cipher from velocity", "") // Paper Velocity
+                    .Replace("makes it possible to use bungeecord", "") // Spigot Bungee
+                    .Replace("will not load bungee bridge.", "") // Depenizen
+                    .Replace("such as BungeeCord/Spigot", "").Replace("setting is-bungeecord=true in", ""); // BuyCraftX
                 IsProxied = rawMinusBungeeNotice.Contains("bungee") || rawMinusBungeeNotice.Contains("velocity");
                 if (IsProxied && FullLogTextLower.Contains("bungee isn't enabled"))
                 {
