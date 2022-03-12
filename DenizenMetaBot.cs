@@ -37,7 +37,11 @@ namespace DenizenBot
         {
             if (channel is SocketThreadChannel threadChannel)
             {
-                channel = threadChannel.ParentChannel;
+                channel = threadChannel.ParentChannel as IMessageChannel;
+            }
+            if (channel is null)
+            {
+                return false;
             }
             return ChannelToDetails.TryGetValue(channel.Id, out ChannelDetails details) && details.Docs;
         }

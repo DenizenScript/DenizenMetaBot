@@ -50,10 +50,6 @@ namespace DenizenBot.CommandHandlers
             List<string> secondarySearches = null, Func<T, bool> secondaryMatcher = null, Action<T> altSingleOutput = null,
             Func<string> altFindClosest = null, Func<List<T>, List<T>> altMatchOrderer = null) where T: MetaObject
         {
-            if (CheckMetaDenied(message))
-            {
-                return -1;
-            }
             if (cmds.Length == 0)
             {
                 SendErrorMessageReply(message, $"Need input for '{type.Name}' command",
@@ -248,6 +244,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Command meta docs user command.</summary>
         public void CMD_Command(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             void singleReply(MetaCommand cmd)
             {
                 if (command.CleanedArguments.Length >= 2)
@@ -285,6 +285,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Mechanism meta docs user command.</summary>
         public void CMD_Mechanism(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             List<string> secondarySearches = new();
             if (command.CleanedArguments.Length > 0)
             {
@@ -308,6 +312,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Tag meta docs user command.</summary>
         public void CMD_Tag(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             List<string> secondarySearches = new();
             string[] cmds = command.CleanedArguments;
             if (cmds.Length > 0)
@@ -371,6 +379,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>ObjectTypes meta docs user command.</summary>
         public void CMD_ObjectTypes(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.ObjectTypes, MetaDocs.META_TYPE_OBJECT, command.CleanedArguments, command.Message);
             if (closeness > 0)
             {
@@ -385,6 +397,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Event meta docs user command.</summary>
         public void CMD_Event(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             string[] cmds = command.CleanedArguments;
             string search = string.Join(" ", cmds).ToLowerFast();
             search = search.StartsWith("on ") ? search["on ".Length..] : search;
@@ -399,6 +415,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Action meta docs user command.</summary>
         public void CMD_Action(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             string[] cmds = command.CleanedArguments;
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             secondarySearch = secondarySearch.StartsWith("on ") ? secondarySearch["on ".Length..] : secondarySearch;
@@ -412,6 +432,10 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Language meta docs user command.</summary>
         public void CMD_Language(CommandData command)
         {
+            if (CheckMetaDenied(command.Message))
+            {
+                return;
+            }
             string[] cmds = command.CleanedArguments;
             string secondarySearch = string.Join(" ", cmds).ToLowerFast();
             if (cmds.Length > 0)
