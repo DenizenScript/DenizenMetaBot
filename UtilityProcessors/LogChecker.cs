@@ -229,13 +229,13 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Checks the value as not null or whitespace, then adds it to the embed as an inline field in a code block with a length limit applied.</summary>
         public static void AutoField(EmbedBuilder builder, string key, string value, bool inline = true)
         {
-            if (builder.Length + Math.Min(value.Length, 450) + key.Length > 1800)
+            if (builder.Length + Math.Min(value.Length, 850) + key.Length > 3600)
             {
                 return;
             }
             if (!string.IsNullOrWhiteSpace(value))
             {
-                value = LimitStringLength(value, 450, 400);
+                value = LimitStringLength(value, 850, 800);
                 builder.AddField(key, value, inline);
             }
         }
@@ -598,7 +598,7 @@ namespace DenizenBot.UtilityProcessors
                     char versCode = uuid[VERSION_ID_LOCATION];
                     Console.WriteLine($"Player UUID version: {versCode}");
                     int newVers = versCode switch { '4' => 4, '3' => 3, _ => 0 };
-                    if (UUIDVersion is null || newVers < UUIDVersion)
+                    if (UUIDVersion is null || newVers == 3 || (newVers == 0 && UUIDVersion == 4)) // Priority: 3, 0, 4, null
                     {
                         UUIDVersion = newVers;
                     }
@@ -663,11 +663,11 @@ namespace DenizenBot.UtilityProcessors
                         lastmessage = message;
                     }
                     string toOutput = $"`{pluginLoadText}` {message}\n";
-                    if (listOutput.Length + toOutput.Length < 430)
+                    if (listOutput.Length + toOutput.Length < 730)
                     {
                         listOutput += toOutput;
                     }
-                    else if (listOutput.Length + plugin.Length < 430)
+                    else if (listOutput.Length + plugin.Length < 730)
                     {
                         listOutput += $"`{plugin}`\n";
                     }
@@ -728,10 +728,10 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>Gets an output embed result.</summary>
-        public EmbedBuilder GetResult()
+        public EmbedBuilder GetResult(Action<EmbedBuilder> addFields)
         {
             string icon;
-            if (UUIDVersion == 3 || UUIDVersion == 0 || (UUIDVersion == null && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
+            if (UUIDVersion == 3 || (UUIDVersion == null && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
             {
                 icon = Constants.RED_FLAG_ICON;
             }
@@ -746,6 +746,7 @@ namespace DenizenBot.UtilityProcessors
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(icon);
             AutoField(embed, "Server Version", ServerVersion, inline: false);
             AutoField(embed, "Plugin Version(s)", PluginVersions, inline: false);
+            addFields?.Invoke(embed);
             if (IsOffline)
             {
                 AutoField(embed, "Online/Offline", IsProxied ? "Offline, but proxied." : (IsDenizenDebug ? $"{RED_FLAG_SYMBOL} Offline." : (UUIDVersion == 4 ? "Offline (proxy likely)." : "Offline (proxy status unknown).")));
@@ -756,7 +757,7 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Java Version", JavaVersion);
-            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins);
+            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins.Replace("\n", ", "), inline: false);
             AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), inline: false);
             AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, inline: false);
             AutoField(embed, "Problematic Plugin(s)", BadPlugins, inline: false);
