@@ -743,7 +743,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 icon = Constants.INFO_ICON;
             }
-            EmbedBuilder embed = new EmbedBuilder().WithAuthor("Log Check Results", icon);
+            EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results").WithThumbnailUrl(icon);
             AutoField(embed, "Server Version", ServerVersion, inline: false);
             AutoField(embed, "Plugin Version(s)", PluginVersions, inline: false);
             if (IsOffline)
