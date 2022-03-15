@@ -652,7 +652,7 @@ namespace DenizenBot.UtilityProcessors
             string lastmessage = "";
             foreach ((string plugin, string notice) in pluginSet)
             {
-                string pluginLoadText = GetPluginText(plugin);
+                string pluginLoadText = Escape(GetPluginText(plugin));
                 if (pluginLoadText.Length != 0)
                 {
                     Console.WriteLine($"{type} Plugin: {pluginLoadText}");
@@ -662,7 +662,7 @@ namespace DenizenBot.UtilityProcessors
                         message = notice;
                         lastmessage = message;
                     }
-                    string toOutput = $"`{pluginLoadText}` {message}\n";
+                    string toOutput = string.IsNullOrWhiteSpace(message) ? $"`{pluginLoadText}`\n" : $"`{pluginLoadText}` {message}\n";
                     if (listOutput.Length + toOutput.Length < 730)
                     {
                         listOutput += toOutput;
@@ -757,7 +757,7 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(embed, "UUID Version", $"{UUIDVersion} ({description})");
             }
             AutoField(embed, "Java Version", JavaVersion);
-            AutoField(embed, "Other Noteworthy Plugin(s)", OtherPlugins.Replace("\n", ", "), inline: false);
+            AutoField(embed, "Other Noteworthy Plugin(s)", string.Join(", ", OtherPlugins.Split('\n', StringSplitOptions.RemoveEmptyEntries)), inline: false);
             AutoField(embed, "Suspicious Line(s)", string.Join('\n', SuspiciousLines), inline: false);
             AutoField(embed, "Suspicious Plugin(s)", SuspiciousPlugins, inline: false);
             AutoField(embed, "Problematic Plugin(s)", BadPlugins, inline: false);
