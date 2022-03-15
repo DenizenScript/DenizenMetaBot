@@ -730,19 +730,20 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Gets an output embed result.</summary>
         public EmbedBuilder GetResult()
         {
-            EmbedBuilder embed = new EmbedBuilder().WithTitle("Log Check Results");
+            string icon;
             if (UUIDVersion == 3 || UUIDVersion == 0 || (UUIDVersion == null && SuspiciousPlugins.Length > 0) || SuspiciousLines.Count > 0)
             {
-                embed.ThumbnailUrl = Constants.RED_FLAG_ICON;
+                icon = Constants.RED_FLAG_ICON;
             }
             else if (LikelyOffline || (OtherNoteworthyLines.Count > 0) || (BadPlugins.Length + SuspiciousPlugins.Length > 0) || ServerVersion.Contains(WARNING_SYMBOL) || PluginVersions.Contains(WARNING_SYMBOL))
             {
-                embed.ThumbnailUrl = Constants.WARNING_ICON;
+                icon = Constants.WARNING_ICON;
             }
             else
             {
-                embed.ThumbnailUrl = Constants.INFO_ICON;
+                icon = Constants.INFO_ICON;
             }
+            EmbedBuilder embed = new EmbedBuilder().WithAuthor("Log Check Results", icon);
             AutoField(embed, "Server Version", ServerVersion, inline: false);
             AutoField(embed, "Plugin Version(s)", PluginVersions, inline: false);
             if (IsOffline)

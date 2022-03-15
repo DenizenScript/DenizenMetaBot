@@ -230,7 +230,7 @@ namespace DenizenBot.CommandHandlers
                 if (commandSearch == "list" || commandSearch == "all")
                 {
                     string fullList = "`" + string.Join("`, `", DenizenMetaBot.InformationalDataNames) + "`";
-                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle("Available Info Names").WithDescription($"Available info names: {fullList}").Build());
+                    SendReply(command.Message, new EmbedBuilder().WithAuthor("Available Info Names", Constants.INFO_ICON).WithDescription($"Available info names: {fullList}").Build());
                 }
                 else if (DenizenMetaBot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
                 {
@@ -242,7 +242,7 @@ namespace DenizenBot.CommandHandlers
                     }
                     else
                     {
-                        SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Info: {commandSearch}").WithDescription(infoOutput).Build());
+                        SendReply(command.Message, new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON).WithDescription(infoOutput).Build());
                     }
                 }
                 else
@@ -276,7 +276,7 @@ namespace DenizenBot.CommandHandlers
                 if (DenizenMetaBot.Rules.TryGetValue(ruleSearch, out string ruleText))
                 {
                     ruleText = ruleText.Trim();
-                    SendReply(command.Message, new EmbedBuilder().WithThumbnailUrl(Constants.INFO_ICON).WithTitle($"Rule {ruleSearch}").WithFooter("This message is not a warning, it is just for your information.").WithDescription(ruleText).Build());
+                    SendReply(command.Message, new EmbedBuilder().WithAuthor($"Rule {ruleSearch}", Constants.INFO_ICON).WithFooter("This message is not a warning, it is just for your information.").WithDescription(ruleText).Build());
                 }
                 else
                 {
