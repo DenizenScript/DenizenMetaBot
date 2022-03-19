@@ -355,6 +355,7 @@ namespace DenizenBot
                 cmds.Add(infoCommand.Build());
             }
             bot.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
+            Console.WriteLine($"Registered slash commands: {string.Join(", ", cmds.Select(c => c.Name))}");
         }
     }
 }
