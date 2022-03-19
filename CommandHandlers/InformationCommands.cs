@@ -256,9 +256,9 @@ namespace DenizenBot.CommandHandlers
         /// <summary>Slash command to get some predefined informational output.</summary>
         public void SlashCMD_Info(SocketSlashCommand command)
         {
-            command.DeferAsync().Wait();
             if (DenizenMetaBot.InformationalData.IsEmpty())
             {
+                command.DeferAsync().Wait();
                 command.DeleteOriginalResponseAsync().Wait();
                 return;
             }
@@ -295,6 +295,7 @@ namespace DenizenBot.CommandHandlers
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Failed to process 'info' slash command: {ex}");
+                command.DeferAsync().Wait();
                 command.DeleteOriginalResponseAsync().Wait();
                 return;
             }

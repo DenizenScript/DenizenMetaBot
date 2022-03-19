@@ -350,7 +350,7 @@ namespace DenizenBot
             if (InformationalDataNames.Any())
             {
                 SlashCommandBuilder infoCommand = new SlashCommandBuilder().WithName("info").WithDescription("Shows an info-box message.")
-                    .AddOption("info-type", ApplicationCommandOptionType.String, "The name of the info message to display.", isRequired: true, isAutocomplete: true)
+                    .AddOption("info-type", ApplicationCommandOptionType.String, "The name of the info message to display.", isRequired: true, isAutocomplete: false)
                     .AddOption("user", ApplicationCommandOptionType.User, "(Optional) A user to ping the information to.", isRequired: false);
                 cmds.Add(infoCommand.Build());
             }
