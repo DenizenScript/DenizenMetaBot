@@ -285,11 +285,11 @@ namespace DenizenBot.CommandHandlers
                 if (infoOutput.StartsWith("NO_BOX:"))
                 {
                     infoOutput = infoOutput["NO_BOX:".Length..].Trim();
-                    command.RespondAsync($"+++ Info `{commandSearch}`:{prefix} " + infoOutput);
+                    command.RespondAsync($"+++ Info `{commandSearch}`:{prefix} " + infoOutput).Wait();
                 }
                 else
                 {
-                    command.RespondAsync(prefix, embed: new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON).WithDescription(infoOutput).Build());
+                    command.RespondAsync(prefix, embed: new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON).WithDescription(infoOutput).Build()).Wait();
                 }
             }
             catch (Exception ex)

@@ -354,7 +354,7 @@ namespace DenizenBot
                     .AddOption("user", ApplicationCommandOptionType.User, "(Optional) A user to ping the information to.", isRequired: false);
                 cmds.Add(infoCommand.Build());
             }
-            bot.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
+            bot.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray()).Wait();
             Console.WriteLine($"Registered slash commands: {string.Join(", ", cmds.Select(c => c.Name))}");
         }
     }
