@@ -253,6 +253,53 @@ namespace DenizenBot.CommandHandlers
             }
         }
 
+        /// <summary>Slash command to get some predefined informational output.</summary>
+        public void SlashCMD_Info(SocketSlashCommand command)
+        {
+            command.DeferAsync().Wait();
+            if (DenizenMetaBot.InformationalData.IsEmpty())
+            {
+                command.DeleteOriginalResponseAsync().Wait();
+                return;
+            }
+            try
+            {
+                string commandSearch = command.Data.Options.First().Value.ToString().ToLowerFast();
+                if (!DenizenMetaBot.InformationalData.TryGetValue(commandSearch, out string infoOutput))
+                {
+                    string closeName = StringConversionHelper.FindClosestString(DenizenMetaBot.InformationalData.Keys, commandSearch, 20);
+                    SendErrorMessageReply(command, "Cannot Display Info", "Unknown info name." + (closeName == null ? "" : $" Did you mean `{closeName}`?"));
+                    return;
+                }
+                IUser toPing = null;
+                if (command.Data.Options.Count > 1)
+                {
+                    toPing = command.Data.Options.ToList()[1].Value as IUser;
+                }
+                string prefix = "";
+                if (toPing is not null && toPing.Id > 0)
+                {
+                    prefix = $" <@{toPing.Id}>";
+                }
+                infoOutput = infoOutput.Trim();
+                if (infoOutput.StartsWith("NO_BOX:"))
+                {
+                    infoOutput = infoOutput["NO_BOX:".Length..].Trim();
+                    command.RespondAsync($"+++ Info `{commandSearch}`:{prefix} " + infoOutput);
+                }
+                else
+                {
+                    command.RespondAsync(prefix, embed: new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON).WithDescription(infoOutput).Build());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to process 'info' slash command: {ex}");
+                command.DeleteOriginalResponseAsync().Wait();
+                return;
+            }
+        }
+
         /// <summary>User command to display a rule.</summary>
         public void CMD_Rule(CommandData command)
         {

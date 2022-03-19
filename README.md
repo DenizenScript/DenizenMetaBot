@@ -46,6 +46,7 @@ To configure the bot:
     - `additional_meta_sources` set to a list of additional meta source URLs (should be direct zip links, like `https://github.com/DenizenScript/Denizen/archive/dev.zip`).
     - `reload_webhooks` set to an optional list of URLs to set a POST request to when reloads are triggered.
     - `rss_feeds` set to an optional submap of RSS feeds, with keys `url` (direct rss.xml link), `channels` (list of channel ids), and `check_rate` (in minutes, decimals allowed)
+    - `slash_cmd_version` can be incremented to force a slash command re-registration at next startup (eg if the info command list was altered)
 
 `config.fds` sample text content (the channel IDs are the actual ones on the Denizen Discord group):
 ```
@@ -86,6 +87,7 @@ rss_feeds:
         channels:
         - 123456
         check_rate: 5
+slash_cmd_version: 0
 ```
 
 To start the bot up:

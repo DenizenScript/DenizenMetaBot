@@ -122,6 +122,11 @@ namespace DenizenBot
             // Admin
             bot.RegisterCommand(coreCmds.CMD_Restart, "restart");
             bot.RegisterCommand(adminCmds.CMD_Reload, "reload");
+            // --------------
+            // Slash commands
+            // --------------
+            // Informational
+            bot.RegisterSlashCommand(InfoCmds.SlashCMD_Info, "info");
         }
 
         /// <summary>Converts a Minecraft version string to a double for comparison reasons. Returns -1 if unparsable.</summary>
@@ -294,6 +299,22 @@ namespace DenizenBot
                     bot.Client.Ready += () =>
                     {
                         bot.Client.SetGameAsync("Type !help").Wait();
+                        try
+                        {
+                            const string commandVersionFile = "./config/command_registered_version.dat";
+                            const int commandVersion = 1;
+                            int confVersion = bot.ConfigFile.GetInt("slash_cmd_version", 0).Value;
+                            string fullVers = $"{commandVersion}_{confVersion}";
+                            if (!File.Exists(commandVersionFile) || commandVersionFile != fullVers)
+                            {
+                                RegisterSlashCommands(bot);
+                                File.WriteAllText(commandVersionFile, fullVers);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"Failed to update slash commands: {ex}");
+                        }
                         return Task.CompletedTask;
                     };
                 },
@@ -320,6 +341,20 @@ namespace DenizenBot
                     }
                 }
             });
+        }
+
+        /// <summary>Registers all applicable slash commands.</summary>
+        public static void RegisterSlashCommands(DiscordBot bot)
+        {
+            List<ApplicationCommandProperties> cmds = new();
+            if (InformationalDataNames.Any())
+            {
+                SlashCommandBuilder infoCommand = new SlashCommandBuilder().WithName("info").WithDescription("Shows an info-box message.")
+                    .AddOption("info-type", ApplicationCommandOptionType.String, "The name of the info message to display.", isRequired: true, isAutocomplete: true, choices: InformationalDataNames.Select(s => new ApplicationCommandOptionChoiceProperties() { Name = s }).ToArray())
+                    .AddOption("user", ApplicationCommandOptionType.User, "(Optional) A user to ping the information to.", isRequired: false);
+                cmds.Add(infoCommand.Build());
+            }
+            bot.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
         }
     }
 }
