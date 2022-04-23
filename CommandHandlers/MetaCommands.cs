@@ -228,7 +228,7 @@ namespace DenizenBot.CommandHandlers
                     matched = matched.GetRange(0, 20);
                     suffix = ", ...";
                 }
-                string listText = string.Join("`, `", matched.Select((m) => m.Name));
+                string listText = string.Join("`, `", matched.Select((m) => m.SearchName));
                 SendErrorMessageReply(message, $"Cannot Specify Searched {type.Name}", $"Multiple possible {type.Name.ToLowerFast()}s: `{listText}`{suffix}");
                 return StringConversionHelper.GetLevenshteinDistance(search, matched[0].CleanName);
             }
