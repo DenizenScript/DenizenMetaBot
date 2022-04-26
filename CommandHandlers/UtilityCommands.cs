@@ -183,7 +183,7 @@ namespace DenizenBot.CommandHandlers
             }
             else
             {
-                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", "Input argument must be a link to <https://one.denizenscript.com/haste>.");
+                SendErrorMessageReply(command.Message, "Command Syntax Incorrect", $"Input argument must be a link to <https://paste.denizenscript.com/New/{type}>.");
                 url = null;
                 return null;
             }
