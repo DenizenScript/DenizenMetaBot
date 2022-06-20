@@ -115,7 +115,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot", "LockProxy", "IPWhitelist");
             //AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} Fake online players (this is forbidden by Mojang)", "FakePlayersOnline");
-            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PlugMan is dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager", "PlugManX");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Plugin Managers are dangerous and will cause unpredictable issues. Remove it.", "PlugMan", "PluginManager", "PlugManX", "ServerUtils-Bukkit");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} NPC Command plugins have never had a valid reason to exist, as there have always been better ways to do that. The modern way is <https://wiki.citizensnpcs.co/NPC_Commands>.", "CommandNPC", "CitizensCMD", "NPCCommand");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} If you want NPCs that send players to other servers, check <https://wiki.citizensnpcs.co/NPC_Commands>.", "BungeeNPC", "CitizensServerSelector");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To make NPCs speak, use '/npc text', or '/npc command', or Denizen. You don't need a dedicated text plugin for this.", "CitizensText");
@@ -126,7 +126,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Faking having real players online is expressly forbidden by Mojang (for obvious reasons) and can get you in trouble.", "FakePlayers");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser", "Geyser-Spigot", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
-            AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames");
+            AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard or name-edit plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "NametagEdit");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
@@ -136,7 +136,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
             AddReportedEntry(MESSY_PLUGINS, "- 'Lag fix' plugins usually don't actually fix lag, they just delete spawned entities. If you have issues with entities disappearing, this plugin is likely the cause.", "ClearLagg", "LaggRemover");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin has been known to break the plugin load order on many servers, due to usage of the 'loadbefore' directive in its 'plugin.yml'.", "FastAsyncWorldEdit", "SimplePets", "Enchantssquared", "Gringotts", "Orebfuscator");
-            AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib");
+            AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib", "Quests", "BeautyQuests");
         }
 
         /// <summary>Gets the text of a plugin name + version, if any.</summary>
