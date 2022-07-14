@@ -103,7 +103,7 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text
-            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks");
+            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks", "leakmania");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
@@ -124,6 +124,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Faking having real players online is expressly forbidden by Mojang (for obvious reasons) and can get you in trouble.", "FakePlayers");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} ZNetwork has been caught including malware in their plugins: <https://gist.github.com/mergu/62f46ed15bd60e78eeb305ee38ed80f0>", "ServersNPC", "ZNPCs");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser", "Geyser-Spigot", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
             AddReportedEntry(MESSY_PLUGINS, "- Some scoreboard or name-edit plugins may lead to scoreboard control instability.", "FeatherBoard", "MVdWPlaceholderAPI", "AnimatedNames", "NametagEdit");
@@ -580,7 +581,7 @@ namespace DenizenBot.UtilityProcessors
         private int UUIDCheckSingle(int minIndex)
         {
             string uuid;
-            int result = -1;
+            int result;
             if (IsDenizenDebug)
             {
                 uuid = GetFromTextTilEndOfLine(FullLogText, "p@", minIndex, out result).After("p@");
