@@ -248,6 +248,12 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
+            if (command.CleanedArguments.Length == 0)
+            {
+                SendErrorMessageReply(command.Message, "Need input for 'Command' command",
+                    "Please specify a command to search, like `!command SomeCommandHere`. Or, use `!command all` to view all documented commands.\nYou can also use `!command [name] tags` to view tags related to the command, or `!command [name] usage` to view usage examples.");
+                return;
+            }
             void singleReply(MetaCommand cmd)
             {
                 if (command.CleanedArguments.Length >= 2)
