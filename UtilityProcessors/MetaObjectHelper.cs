@@ -71,6 +71,17 @@ namespace DenizenBot.UtilityProcessors
                 {
                     value = value[..1000] + "...";
                 }
+                if (value.Length + builder.Length > 1900)
+                {
+                    if (value.Length > 300)
+                    {
+                        value = value[..300] + "...";
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
                 builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
         }
@@ -243,6 +254,30 @@ namespace DenizenBot.UtilityProcessors
             return tagsFieldBuilder.ToString();
         }
 
+        public static void AddExamples(EmbedBuilder builder, List<string> examples, MetaObject obj)
+        {
+            if (examples is null || examples.Count == 0)
+            {
+                return;
+            }
+            StringBuilder exampleText = new();
+            int shown = 0;
+            foreach (string example in examples.Take(5))
+            {
+                if (example.Length + exampleText.Length > 700 || example.Length + exampleText.Length + builder.Length > 1800)
+                {
+                    continue;
+                }
+                shown++;
+                exampleText.Append($"```yml\n{example}\n```\n");
+            }
+            if (examples.Count > shown)
+            {
+                exampleText.Append(shown == 0 ? "Examples too long to display" : "and more").Append($"... [Check the website for more examples]({DenizenMetaBotConstants.DOCS_URL_BASE}{obj.Type.WebPath}/{UrlEscape(obj.CleanName)})");
+            }
+            builder.AddField("Examples", exampleText.ToString());
+        }
+
         /// <summary>Gets an <see cref="EmbedBuilder"/> for a <see cref="MetaObject"/> to be shown on Discord meta output.</summary>
         /// <param name="obj">The meta object to embed.</param>
         /// <param name="hideLargeData">Whether to hide large data parts (eg command descriptions).</param>
@@ -304,6 +339,7 @@ namespace DenizenBot.UtilityProcessors
                 {
                     AutoField(builder, "Cancellable", "True - this adds `<context.cancelled>` and determines `cancelled` + `cancelled:false`.");
                 }
+                AddExamples(builder, evt.Examples, evt);
             }
             else if (obj is MetaGuidePage guidePage)
             {
@@ -321,12 +357,14 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(builder, "Input", mechanism.Input, true);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
                 builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description[..500] + "..." : mechanism.Description);
+                AddExamples(builder, mechanism.Examples, mechanism);
             }
             else if (obj is MetaTag tag)
             {
                 AutoField(builder, "Returns", tag.Returns, true);
                 AutoField(builder, "Mechanism", tag.Mechanism, true);
                 builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description[..500] + "..." : tag.Description);
+                AddExamples(builder, tag.Examples, tag);
             }
             else if (obj is MetaObjectType objectType)
             {
