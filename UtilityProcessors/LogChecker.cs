@@ -103,14 +103,14 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text
-            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks", "leakmania");
+            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks", "leakmania", "mcleaks");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Log contains error messages.", "caused by: ", "[server thread/error]: ");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL}{WARNING_SYMBOL} Server is likely infected with malware! Detectable via 'javassist' related errors. You must delete all server and plugin jars and reinstall from known-good copies, and should run a malware scan of your PC and server. {WARNING_SYMBOL}{WARNING_SYMBOL}", "class javassist.f from", "is not assignable to 'javassist/ctclass'");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin", "OpeNLogin");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin", "OpeNLogin", "NexAuth");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot", "LockProxy", "IPWhitelist");
             //AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
