@@ -295,7 +295,13 @@ namespace DenizenBot.CommandHandlers
                 }
                 else
                 {
-                    command.RespondAsync(prefix, embed: new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON).WithDescription(infoOutput).Build()).Wait();
+                    EmbedBuilder embed = new EmbedBuilder().WithAuthor($"Info: {commandSearch}", Constants.INFO_ICON);
+                    if (infoOutput.StartsWith("IMAGE:"))
+                    {
+                        embed.ImageUrl = infoOutput.After(':').Before(' ');
+                        infoOutput = infoOutput.After(' ');
+                    }
+                    command.RespondAsync(prefix, embed: embed.WithDescription(infoOutput).Build()).Wait();
                 }
             }
             catch (Exception ex)
