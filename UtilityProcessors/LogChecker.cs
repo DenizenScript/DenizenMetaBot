@@ -131,7 +131,8 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- This plugin adds Below_Name scoreboards to NPCs.", "TAB");
             AddReportedEntry(MESSY_PLUGINS, "- Mixed client vs server versions can sometimes cause packet-related issues.", "ViaVersion", "ProtocolSupport");
             AddReportedEntry(MESSY_PLUGINS, "- HeadDatabase has been known to cause issues with skins.", "HeadDatabase");
-            AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI");
+            AddReportedEntry(MESSY_PLUGINS, "- CMI tends to mess with a large variety of server features and often gets in the way of issue debugging.", "CMI"); 
+            AddReportedEntry(MESSY_PLUGINS, "- GriefDefender v2.2.2 has been seen to mistake NPCs for players in some cases, and may interfere with NPC teleporting.", "GriefDefender");
             AddReportedEntry(MESSY_PLUGINS, "- ModelEngine has Citizens support, but that support is known to be buggy. Issues related to NPCs that use ModelEngine should be reported to ModelEngine support, not Citizens.", "ModelEngine");
             AddReportedEntry(MESSY_PLUGINS, "- 'PlayerProfiles' has been seen to cause breaking issues with Citizens.", "PlayerProfiles");
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
