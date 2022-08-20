@@ -301,7 +301,8 @@ namespace DenizenBot.CommandHandlers
                 int dotIndex = command.CleanedArguments[0].IndexOf('.');
                 if (dotIndex > 0)
                 {
-                    secondarySearches.Add(command.CleanedArguments[0][..dotIndex] + "tag" + command.CleanedArguments[0][dotIndex..]);
+                    string prefix = command.CleanedArguments[0][..dotIndex];
+                    secondarySearches.Add(prefix + (prefix.ToLowerFast().EndsWith("tag") ? "" : "tag") + command.CleanedArguments[0][dotIndex..]);
                 }
             }
             int closeness = AutoMetaCommand(MetaDocs.CurrentMeta.Mechanisms, MetaDocs.META_TYPE_MECHANISM, command.CleanedArguments, command.Message, secondarySearches);
