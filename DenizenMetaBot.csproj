@@ -14,6 +14,7 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FreneticLLC.FreneticUtilities" Version="1.0.1" />
     <PackageReference Include="System.Json" Version="4.7.1" />
     <PackageReference Include="YamlDotNet" Version="12.0.0" />
     <PackageReference Include="Discord.Net" Version="3.7.2" />
@@ -22,14 +23,11 @@
   <ItemGroup>
     <Compile Remove="mcmonkeyDiscordBotBase\*.*" />
     <Compile Remove="mcmonkeyDiscordBotBase\**\*.*" />
-    <Compile Remove="FreneticUtilities\*.*" />
-    <Compile Remove="FreneticUtilities\**\*.*" />
     <Compile Remove="SharpDenizenTools\*.*" />
     <Compile Remove="SharpDenizenTools\**\*.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="mcmonkeyDiscordBotBase\mcmonkeyDiscordBotBase.csproj" />
-    <ProjectReference Include="FreneticUtilities\FreneticUtilities\FreneticUtilities.csproj" />
     <ProjectReference Include="SharpDenizenTools\SharpDenizenTools\SharpDenizenTools.csproj" />
   </ItemGroup>
 </Project>
