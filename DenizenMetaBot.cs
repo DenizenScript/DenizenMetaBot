@@ -294,6 +294,10 @@ namespace DenizenBot
                 CommandPrefix = DenizenMetaBotConstants.COMMAND_PREFIX,
                 Initialize = (bot) =>
                 {
+                    foreach (Extension ext in Extension.Extensions)
+                    {
+                        ext.OnClientInit(bot);
+                    }
                     PopulateFromConfig(bot.ConfigFile);
                     DefaultCommands(bot);
                     bot.Client.Ready += () =>

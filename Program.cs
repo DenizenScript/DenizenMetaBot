@@ -20,6 +20,7 @@ namespace DenizenBot
         static void Main(string[] args)
         {
             SpecialTools.Internationalize();
+            Extension.Init();
             ReusableWebClient.DefaultRequestHeaders.UserAgent.ParseAdd("DenizenMetaBot/1.0");
             MetaDocsLoader.LoadGuideData = true;
             MetaDocs.CurrentMeta = MetaDocsLoader.DownloadAll();
