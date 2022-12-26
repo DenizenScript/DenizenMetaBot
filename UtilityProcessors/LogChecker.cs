@@ -138,6 +138,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
             AddReportedEntry(MESSY_PLUGINS, "- 'Lag fix' plugins usually don't actually fix lag, they just delete spawned entities. If you have issues with entities disappearing, this plugin is likely the cause.", "ClearLagg", "LaggRemover");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin has been known to break the plugin load order on many servers, due to usage of the 'loadbefore' directive in its 'plugin.yml'.", "FastAsyncWorldEdit", "SimplePets", "Enchantssquared", "Gringotts");
+            AddReportedEntry(MESSY_PLUGINS, "- 'Sit on other players' or 'sit on mobs' plugins sometimes allow players to sit on NPCs.", "GSit");
             AddReportedEntry(MONITORED_PLUGINS, "", "WorldGuard", "MythicMobs", "NPC_Destinations", "NPCDestinations_Rancher", "NPCDestinations_Farmer", "NPCDestinations_Animator", "NPC_Police", "ProtocolLib", "Quests", "BeautyQuests");
         }
 
