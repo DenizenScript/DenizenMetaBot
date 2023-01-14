@@ -135,7 +135,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(MESSY_PLUGINS, "- GriefDefender v2.2.2 has been seen to mistake NPCs for players in some cases, and may interfere with NPC teleporting.", "GriefDefender");
             AddReportedEntry(MESSY_PLUGINS, "- ModelEngine has Citizens support, but that support is known to be buggy. Issues related to NPCs that use ModelEngine should be reported to ModelEngine support, not Citizens.", "ModelEngine");
             AddReportedEntry(MESSY_PLUGINS, "- 'PlayerProfiles' has been seen to cause breaking issues with Citizens.", "PlayerProfiles");
-            AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Universes");
+            AddReportedEntry(MESSY_PLUGINS, "- Multi-world configuration plugins may affect NPCs in unexpected ways.", "Multiverse", "Multiverse-Core", "Universes");
             AddReportedEntry(MESSY_PLUGINS, "- 'Lag fix' plugins usually don't actually fix lag, they just delete spawned entities. If you have issues with entities disappearing, this plugin is likely the cause.", "ClearLagg", "LaggRemover");
             AddReportedEntry(MESSY_PLUGINS, "- This plugin has been known to break the plugin load order on many servers, due to usage of the 'loadbefore' directive in its 'plugin.yml'.", "FastAsyncWorldEdit", "SimplePets", "Enchantssquared", "Gringotts");
             AddReportedEntry(MESSY_PLUGINS, "- 'Sit on other players' or 'sit on mobs' plugins sometimes allow players to sit on NPCs.", "GSit");
