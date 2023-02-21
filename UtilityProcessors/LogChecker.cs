@@ -110,7 +110,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Log contains error messages.", "caused by: ", "[server thread/error]: ");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL}{WARNING_SYMBOL} Server is likely infected with malware! Detectable via 'javassist' related errors. You must delete all server and plugin jars and reinstall from known-good copies, and should run a malware scan of your PC and server. {WARNING_SYMBOL}{WARNING_SYMBOL}", "class javassist.f from", "is not assignable to 'javassist/ctclass'");
             // Plugins
-            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin", "OpeNLogin", "NexAuth", "Authy");
+            AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline login authenticator plugin)**", "AuthMe", "UTitleAuth", "LoginSecurity", "nLogin", "PinAuthentication", "LockLogin", "JPremium", "FastLogin", "AmkMcAuth", "RoyalAuth", "JAuth", "AdvancedLogin", "OpeNLogin", "NexAuth", "Authy");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline skins fixer plugin)**", "SkinsRestorer", "MySkin");
             AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Offline exploits fixer plugin)**", "AntiJoinBot", "AJB", "ExploitFixer", "AvakumAntibot", "HamsterAPI", "MineCaptcha", "UUIDSpoof-Fix", "AntiBotDeluxe", "nAntiBot", "LockProxy", "IPWhitelist");
             //AddReportedEntry(SUSPICIOUS_PLUGINS, $"{RED_FLAG_SYMBOL} **(Authentication breaker)**", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
@@ -123,7 +123,7 @@ namespace DenizenBot.UtilityProcessors
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} To use placeholders with Citizens, just use the normal commands. You don't need a separate plugin for this anymore.", "CitizensPlaceholderAPI");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Messing with basic plugin core functionality can lead to unexpected issues.", "PerWorldPlugins");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} PvPManager is known to cause issues related to Citizens and Sentinel.", "PvPManager");
-            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Faking having real players online is expressly forbidden by Mojang (for obvious reasons) and can get you in trouble.", "FakePlayers");
+            AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} Faking having real players online is expressly forbidden by Mojang (for obvious reasons) and can get you in trouble.", "FakePlayers", "FakePlayer", "FakePlayersOnline", "AutoFakePlayers", "XtremeSpoofer");
             AddReportedEntry(BAD_PLUGINS, $"- {WARNING_SYMBOL} ZNetwork has been caught including malware in their plugins: <https://gist.github.com/mergu/62f46ed15bd60e78eeb305ee38ed80f0>", "ServersNPC", "ZNPCs");
             AddReportedEntry(BAD_PLUGINS, "- Bedrock clients are unsupportable. Please do all testing with a Java Edition client.", "Geyser", "Geyser-Spigot", "floodgate-bukkit", "floodgate", "BedrockPlayerManager");
             AddReportedEntry(MESSY_PLUGINS, "- GadgetsMenu has been linked to compatibility issues with Citizens.", "GadgetsMenu");
@@ -149,7 +149,12 @@ namespace DenizenBot.UtilityProcessors
         {
             if (!IsDenizenDebug)
             {
-                return GetFromTextTilEndOfLine(FullLogText, LoadMessageFor(plugin)).After("Loading ");
+                string result = GetFromTextTilEndOfLine(FullLogText, $"[{plugin}] Loading server plugin {plugin} v").After("Loading server plugin ");
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    result = GetFromTextTilEndOfLine(FullLogText, $"[{plugin}] Loading {plugin} v").After("Loading ");
+                }
+                return result;
             }
             int start = FullLogText.IndexOf("\nActive Plugins (");
             int end = FullLogText.IndexOf("\nLoaded Worlds (");
@@ -175,12 +180,6 @@ namespace DenizenBot.UtilityProcessors
                 endIndex = pluginLine.Length;
             }
             return pluginLine[pluginNameIndex..endIndex];
-        }
-
-        /// <summary>Gets a string of the load message for a plugin name.</summary>
-        public static string LoadMessageFor(string plugin)
-        {
-            return $"[{plugin}] Loading {plugin} v";
         }
 
         /// <summary>
