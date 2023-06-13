@@ -62,13 +62,8 @@ namespace DenizenBot.CommandHandlers
                 SendGenericPositiveMessageReply(message, $"All {type.Name}s", $"Find all {type.Name}s at {DenizenMetaBotConstants.DOCS_URL_BASE}{type.WebPath}/");
                 return -1;
             }
-            if (altSingleOutput == null)
-            {
-                altSingleOutput = (singleObj) => SendReply(message, singleObj.GetEmbed().Build());
-            }
-            if (altFindClosest == null)
-            {
-                altFindClosest = () =>
+            altSingleOutput ??= (singleObj) => SendReply(message, singleObj.GetEmbed().Build());
+            altFindClosest ??= () =>
                 {
                     string initialPossibleResult = StringConversionHelper.FindClosestString(docs.Keys, search, out int lowestDistance, 20);
                     Console.WriteLine($"Initial closest match to '{search}' is '{initialPossibleResult}' at distance {lowestDistance}.");
@@ -113,11 +108,7 @@ namespace DenizenBot.CommandHandlers
                     Console.WriteLine($"Final closest match is '{lowestStr}' at distance {lowestDistance}.");
                     return lowestStr;
                 };
-            }
-            if (altMatchOrderer == null)
-            {
-                altMatchOrderer = (list) => list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
-            }
+            altMatchOrderer ??= (list) => list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
             if (docs.TryGetValue(search, out T obj))
             {
                 string multiNameData = string.Join("', '", obj.MultiNames);
@@ -337,10 +328,7 @@ namespace DenizenBot.CommandHandlers
                     if (!tagBase.EndsWith("tag"))
                     {
                         secondarySearches.Add(tagBase + "tag" + tagSuffix);
-                        if (type == null)
-                        {
-                            type = MetaDocs.CurrentMeta.ObjectTypes.GetValueOrDefault(tagBase.ToLowerFast() + "tag");
-                        }
+                        type ??= MetaDocs.CurrentMeta.ObjectTypes.GetValueOrDefault(tagBase.ToLowerFast() + "tag");
                     }
                     if (type != null && type.BaseTypeName != null)
                     {
