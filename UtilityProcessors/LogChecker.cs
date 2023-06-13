@@ -335,6 +335,19 @@ namespace DenizenBot.UtilityProcessors
                 IsOffline = mode.Contains("offline");
                 ServerVersion = GetFromTextTilEndOfLine(FullLogText, "Server Version: ").After("Server Version: ");
                 JavaVersion = GetFromTextTilEndOfLine(FullLogText, "Java Version: ").After("Java Version: ");
+                string players = GetFromTextTilEndOfLine(FullLogText, "Total Players Ever: ").After("Total Players Ever: ");
+                if (players.Contains(" v3"))
+                {
+                    UUIDVersion = 3;
+                }
+                else if (players.Contains(" v0"))
+                {
+                    UUIDVersion = 0;
+                }
+                else if (players.Contains(" normal"))
+                {
+                    UUIDVersion = 4;
+                }
             }
             else
             {
