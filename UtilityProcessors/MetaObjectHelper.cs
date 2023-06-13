@@ -82,6 +82,10 @@ namespace DenizenBot.UtilityProcessors
                         return;
                     }
                 }
+                if (value.SplitFast('\n').Count(s => s.StartsWith("```")) % 2 == 1)
+                {
+                    value += "\n```\n";
+                }
                 builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
         }
