@@ -103,7 +103,7 @@ namespace DenizenBot
             bot.RegisterCommand(InfoCmds.CMD_Quote, "quote", "quotes", "q");
             // Meta Docs
             bot.RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
-            bot.RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m");
+            bot.RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m", "prop", "property", "properties", "props");
             bot.RegisterCommand(metaCmds.CMD_Tag, "tag", "tags", "t");
             bot.RegisterCommand(metaCmds.CMD_ObjectTypes, "objecttype", "objecttypes", "objtype", "objtypes", "otype", "otypes", "ot", "type", "object", "objects", "types", "obj");
             bot.RegisterCommand(metaCmds.CMD_Event, "event", "events", "evt", "evts", "e");
