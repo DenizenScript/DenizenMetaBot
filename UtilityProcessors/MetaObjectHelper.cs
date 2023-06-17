@@ -7,6 +7,8 @@ using SharpDenizenTools.MetaHandlers;
 using Discord;
 using FreneticUtilities.FreneticExtensions;
 using FreneticUtilities.FreneticToolkit;
+using YamlDotNet.Core.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -59,6 +61,22 @@ namespace DenizenBot.UtilityProcessors
             return input;
         }
 
+        /// <summary>Trims text in a way that doesn't break code blocks.</summary>
+        public static string TrimIntelligent(string text, int maxLen, int trimTo)
+        {
+            if (string.IsNullOrWhiteSpace(text) || text.Length <= maxLen)
+            {
+                return text;
+            }
+            text = text[..trimTo];
+            string[] lines = text.SplitFast('\n').ToArray();
+            if (lines.Count(s => s.StartsWith("<code>")) > lines.Count(s => s.StartsWith("</code>")))
+            {
+                text += "\n</code>\n";
+            }
+            return text + "...";
+        }
+
         /// <summary>Checks the value as not null or whitespace, then adds it to the embed as a field.</summary>
         /// <param name="builder">The embed builder.</param>
         /// <param name="key">The field key.</param>
@@ -67,25 +85,17 @@ namespace DenizenBot.UtilityProcessors
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                if (value.Length > 1024)
-                {
-                    value = value[..1000] + "...";
-                }
+                value = TrimIntelligent(value, 1024, 1000);
                 if (value.Length + builder.Length > 1900)
                 {
-                    if (value.Length > 300)
+                    if (value.Length > 300 && builder.Length < 1700)
                     {
-                        value = value[..300] + "...";
+                        value = TrimIntelligent(value, 300, 290);
                     }
                     else
                     {
                         return;
                     }
-                }
-                string[] lines = value.SplitFast('\n').ToArray();
-                if (lines.Count(s => s.StartsWith("<code>")) > lines.Count(s => s.StartsWith("</code>")))
-                {
-                    value += "\n</code>\n";
                 }
                 builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
@@ -320,7 +330,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (!hideLargeData)
                 {
-                    builder.AddField("Description", ProcessBlockTextForDiscord(command.Description.Length > 600 ? command.Description[..500] + "..." : command.Description));
+                    builder.AddField("Description", ProcessBlockTextForDiscord(TrimIntelligent(command.Description, 600, 500)));
                 }
             }
             else if (obj is MetaEvent evt)
@@ -353,7 +363,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else if (obj is MetaLanguage language)
             {
-                builder.Description = ProcessBlockTextForDiscord(language.Description.Length > 900 ? language.Description[..800] + "..." : language.Description);
+                builder.Description = ProcessBlockTextForDiscord(TrimIntelligent(language.Description, 900, 800));
             }
             else if (obj is MetaMechanism mechanism)
             {
@@ -361,14 +371,14 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(builder, "Object", mechanism.MechObject, true);
                 AutoField(builder, "Input", mechanism.Input, true);
                 AutoField(builder, "Tags", GetTagsField(mechanism.Tags));
-                builder.Description = ProcessBlockTextForDiscord(mechanism.Description.Length > 600 ? mechanism.Description[..500] + "..." : mechanism.Description);
+                builder.Description = ProcessBlockTextForDiscord(TrimIntelligent(mechanism.Description, 600, 500));
                 AddExamples(builder, mechanism.Examples, mechanism);
             }
             else if (obj is MetaTag tag)
             {
                 AutoField(builder, "Returns", tag.Returns, true);
                 AutoField(builder, "Mechanism", tag.Mechanism, true);
-                builder.Description = ProcessBlockTextForDiscord(tag.Description.Length > 600 ? tag.Description[..500] + "..." : tag.Description);
+                builder.Description = ProcessBlockTextForDiscord(TrimIntelligent(tag.Description, 600, 500));
                 AddExamples(builder, tag.Examples, tag);
             }
             else if (obj is MetaObjectType objectType)
@@ -378,7 +388,7 @@ namespace DenizenBot.UtilityProcessors
                 AutoField(builder, "Implements", string.Join(", ", objectType.ImplementsNames), true);
                 string format = objectType.Format.Length > 600 ? objectType.Format[..500] + "..." : objectType.Format;
                 AutoField(builder, "Format", format);
-                builder.Description = ProcessBlockTextForDiscord(objectType.Description.Length > 600 ? objectType.Description[..500] + "..." : objectType.Description);
+                builder.Description = ProcessBlockTextForDiscord(TrimIntelligent(objectType.Description, 600, 500));
             }
             return builder;
         }
