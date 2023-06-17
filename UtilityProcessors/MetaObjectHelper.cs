@@ -82,9 +82,10 @@ namespace DenizenBot.UtilityProcessors
                         return;
                     }
                 }
-                if (value.SplitFast('\n').Count(s => s.StartsWith("```")) % 2 == 1)
+                string[] lines = value.SplitFast('\n').ToArray();
+                if (lines.Count(s => s.StartsWith("<code>")) > lines.Count(s => s.StartsWith("</code>")))
                 {
-                    value += "\n```\n";
+                    value += "\n</code>\n";
                 }
                 builder.AddField(key, ProcessBlockTextForDiscord(value), inline);
             }
