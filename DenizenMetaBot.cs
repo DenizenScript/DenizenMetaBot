@@ -102,16 +102,27 @@ namespace DenizenBot
             bot.RegisterCommand(InfoCmds.CMD_Rule, "rule", "rules");
             bot.RegisterCommand(InfoCmds.CMD_Quote, "quote", "quotes", "q");
             // Meta Docs
-            bot.RegisterCommand(metaCmds.CMD_Command, "command", "commands", "cmd", "cmds", "c");
-            bot.RegisterCommand(metaCmds.CMD_Mechanism, "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m", "prop", "property", "properties", "props");
-            bot.RegisterCommand(metaCmds.CMD_Tag, "tag", "tags", "t");
-            bot.RegisterCommand(metaCmds.CMD_ObjectTypes, "objecttype", "objecttypes", "objtype", "objtypes", "otype", "otypes", "ot", "type", "object", "objects", "types", "obj");
-            bot.RegisterCommand(metaCmds.CMD_Event, "event", "events", "evt", "evts", "e");
-            bot.RegisterCommand(metaCmds.CMD_Action, "action", "actions", "act", "acts", "a");
-            bot.RegisterCommand(metaCmds.CMD_Language, "language", "languages", "lang", "langs", "l");
+            bot.RegisterCommand(c => metaCmds.CMD_Command(c, MetaDocs.CurrentMeta), "command", "commands", "cmd", "cmds", "c");
+            bot.RegisterCommand(c => metaCmds.CMD_Mechanism(c, MetaDocs.CurrentMeta), "mechanism", "mechanisms", "mech", "mechs", "mec", "mecs", "m", "prop", "property", "properties", "props");
+            bot.RegisterCommand(c => metaCmds.CMD_Tag(c, MetaDocs.CurrentMeta), "tag", "tags", "t");
+            bot.RegisterCommand(c => metaCmds.CMD_ObjectTypes(c, MetaDocs.CurrentMeta), "objecttype", "objecttypes", "objtype", "objtypes", "otype", "otypes", "ot", "type", "object", "objects", "types", "obj");
+            bot.RegisterCommand(c => metaCmds.CMD_Event(c, MetaDocs.CurrentMeta), "event", "events", "evt", "evts", "e");
+            bot.RegisterCommand(c => metaCmds.CMD_Action(c, MetaDocs.CurrentMeta), "action", "actions", "act", "acts", "a");
+            bot.RegisterCommand(c => metaCmds.CMD_Language(c, MetaDocs.CurrentMeta), "language", "languages", "lang", "langs", "l");
             bot.RegisterCommand(metaCmds.CMD_Guide, "guide", "guides", "g", "beginner", "beginners", "beginnersguide", "guidepage", "guidespage");
-            bot.RegisterCommand(metaCmds.CMD_Search, "search", "s", "find", "f", "get", "locate", "what", "where", "how",
+            bot.RegisterCommand(c => metaCmds.CMD_Search(c, MetaDocs.CurrentMeta), "search", "s", "find", "f", "get", "locate", "what", "where", "how",
                 "w", "meta", "metainfo", "docs", "doc", "documentation", "documentations", "document", "documents");
+            // Client Meta Docs
+            bot.RegisterCommand(c => metaCmds.CMD_Command(c, Program.ClientMeta), "clientcommand", "clientcommands", "clientcmd", "clientcmds", "clientc");
+            bot.RegisterCommand(c => metaCmds.CMD_Mechanism(c, Program.ClientMeta), "clientmechanism", "clientmechanisms", "clientmech", "clientmechs", "clientmec",
+                "clientmecs", "clientm", "clientprop", "clientproperty", "clientproperties", "clientprops");
+            bot.RegisterCommand(c => metaCmds.CMD_Tag(c, Program.ClientMeta), "clienttag", "clienttags", "clientt");
+            bot.RegisterCommand(c => metaCmds.CMD_ObjectTypes(c, Program.ClientMeta), "clientobjecttype", "clientobjecttypes", "clientobjtype", "clientobjtypes",
+                "clientotype", "clientotypes", "clientot", "clienttype", "clientobject", "clientobjects", "clienttypes", "clientobj");
+            bot.RegisterCommand(c => metaCmds.CMD_Event(c, Program.ClientMeta), "clientevent", "clientevents", "clientevt", "clientevts", "cliente");
+            bot.RegisterCommand(c => metaCmds.CMD_Language(c, Program.ClientMeta), "clientlanguage", "clientlanguages", "clientlang", "clientlangs", "clientl");
+            bot.RegisterCommand(c => metaCmds.CMD_Search(c, Program.ClientMeta), "clientsearch", "clients", "clientfind", "clientf", "clientget", "clientlocate", "clientwhat", "clientwhere",
+                "clienthow", "clientw", "clientmeta", "clientmetainfo", "clientdocs", "clientdoc", "clientdocumentation", "clientdocumentations", "clientdocument", "clientdocuments");
             // Utility
             bot.RegisterCommand(utilCmds.CMD_LogCheck, "logcheck", "checklog", "logscheck", "checklogs");
             bot.RegisterCommand(utilCmds.CMD_VersionCheck, "versioncheck", "checkversion", "iscurrent", "isuptodate", "isupdated", "checkcurrent", "currentcheck");

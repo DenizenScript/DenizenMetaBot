@@ -288,7 +288,8 @@ namespace DenizenBot.UtilityProcessors
             }
             if (examples.Count > shown)
             {
-                exampleText.Append(shown == 0 ? "Examples too long to display" : "and more").Append($"... [Check the website for more examples]({DenizenMetaBotConstants.DOCS_URL_BASE}{obj.Type.WebPath}/{UrlEscape(obj.CleanName)})");
+                string docBase = obj.Meta == Program.ClientMeta ? DenizenMetaBotConstants.CLIENTDOCS_URL_BASE : DenizenMetaBotConstants.DOCS_URL_BASE;
+                exampleText.Append(shown == 0 ? "Examples too long to display" : "and more").Append($"... [Check the website for more examples]({docBase}{obj.Type.WebPath}/{UrlEscape(obj.CleanName)})");
             }
             builder.AddField("Examples", exampleText.ToString());
         }
@@ -302,7 +303,8 @@ namespace DenizenBot.UtilityProcessors
             EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(obj.Type.Name + ": " + obj.Name);
             if (obj is not MetaGuidePage)
             {
-                builder = builder.WithUrl(DenizenMetaBotConstants.DOCS_URL_BASE + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
+                string docBase = obj.Meta == Program.ClientMeta ? DenizenMetaBotConstants.CLIENTDOCS_URL_BASE : DenizenMetaBotConstants.DOCS_URL_BASE;
+                builder = builder.WithUrl(docBase + obj.Type.WebPath + "/" + UrlEscape(obj.CleanName));
             }
             AutoField(builder, "Required Plugins or Platforms", obj.Plugin, true);
             AutoField(builder, "Group", obj.Group, true);

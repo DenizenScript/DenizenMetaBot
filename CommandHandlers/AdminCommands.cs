@@ -31,12 +31,19 @@ namespace DenizenBot.CommandHandlers
             BuildNumberTracker.UpdateAll();
             MetaDocs docs = MetaDocsLoader.DownloadAll();
             MetaDocs.CurrentMeta = docs;
+            Program.LoadClientMeta();
             EmbedBuilder embed = new EmbedBuilder().WithTitle("Reload Complete").WithDescription("Documentation reloaded successfully.");
             if (docs.LoadErrors.Count > 0)
             {
                 List<string> errors = docs.LoadErrors.Count > 5 ? docs.LoadErrors.GetRange(0, 5) : docs.LoadErrors;
                 SendErrorMessageReply(command.Message, "Error(s) While Reloading", string.Join("\n", errors));
                 embed.AddField("Errors", docs.LoadErrors.Count, true);
+            }
+            if (Program.ClientMeta.LoadErrors.Count > 0)
+            {
+                List<string> errors = Program.ClientMeta.LoadErrors.Count > 5 ? Program.ClientMeta.LoadErrors.GetRange(0, 5) : Program.ClientMeta.LoadErrors;
+                SendErrorMessageReply(command.Message, "Error(s) While Reloading Client Meta", string.Join("\n", errors));
+                embed.AddField("Clientizen Errors", Program.ClientMeta.LoadErrors.Count, true);
             }
             embed.AddField("Commands", docs.Commands.Count, true);
             embed.AddField("Mechanisms", docs.Mechanisms.Count, true);

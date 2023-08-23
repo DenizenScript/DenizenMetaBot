@@ -16,6 +16,14 @@ namespace DenizenBot
         /// <summary>Reusable HTTP(S) web client.</summary>
         public static HttpClient ReusableWebClient = new();
 
+        public static MetaDocs ClientMeta;
+
+        /// <summary>Triggers an immediate download of Clientizen meta.</summary>
+        public static void LoadClientMeta()
+        {
+            ClientMeta = MetaDocsLoader.DownloadAll(new[] { "https://github.com/DenizenScript/Clientizen/archive/master.zip", "https://github.com/DenizenScript/Denizen-Core/archive/master.zip" });
+        }
+
         /// <summary>Software entry point - starts the bot.</summary>
         static void Main(string[] args)
         {
@@ -24,6 +32,7 @@ namespace DenizenBot
             ReusableWebClient.DefaultRequestHeaders.UserAgent.ParseAdd("DenizenMetaBot/1.0");
             MetaDocsLoader.LoadGuideData = true;
             MetaDocs.CurrentMeta = MetaDocsLoader.DownloadAll();
+            LoadClientMeta();
             LaunchBotThread(args);
         }
 
