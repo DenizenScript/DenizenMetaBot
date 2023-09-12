@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Discord;
 using Discord.WebSocket;
+using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -52,7 +53,7 @@ namespace DenizenBot.UtilityProcessors
         {
             try
             {
-                string content = Program.ReusableWebClient.GetStringAsync(URL, CancelToken.Token).Result;
+                string content = StringConversionHelper.UTF8Encoding.GetString(Program.ReusableWebClient.GetByteArrayAsync(URL, CancelToken.Token).Result);
                 XElement root = XDocument.Parse(content).Root;
                 XElement channel = root.Nodes().Cast<XElement>().First(e => e.Name == "channel");
                 string siteTitle = channel.Nodes().Cast<XElement>().First(e => e.Name == "title").Value;

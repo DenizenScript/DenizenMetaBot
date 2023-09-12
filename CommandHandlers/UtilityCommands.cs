@@ -41,14 +41,14 @@ namespace DenizenBot.CommandHandlers
         {
             try
             {
-                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(url);
+                Task<byte[]> downloadTask = Program.ReusableWebClient.GetByteArrayAsync(url);
                 downloadTask.Wait(WebLinkDownloadTimeout);
                 if (!downloadTask.IsCompleted)
                 {
                     SendErrorMessageReply(command.Message, "Error", "Download did not complete in time.");
                     return null;
                 }
-                return downloadTask.Result;
+                return StringConversionHelper.UTF8Encoding.GetString(downloadTask.Result);
             }
             catch (Exception ex)
             {
@@ -86,9 +86,11 @@ namespace DenizenBot.CommandHandlers
                 data = data[..MAX_PASTE_LEN];
             }
             data = data.Replace('\0', ' ');
-            HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}");
-            request.Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
-                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(uploader.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"));
+            HttpRequestMessage request = new(HttpMethod.Post, "https://" + $"paste.denizenscript.com/New/{type}")
+            {
+                Content = new ByteArrayContent(StringConversionHelper.UTF8Encoding.GetBytes($"pastetype={type}&response=micro&v=200&"
+                + $"pastetitle=DenizenMetaBot Auto-Repaste Of {type} From {HttpUtility.UrlEncode(uploader.Username)}&pastecontents={HttpUtility.UrlEncode(data)}\n\n"))
+            };
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
             HttpResponseMessage response = Program.ReusableWebClient.Send(request);
             string outputUrl = response.Content.ReadAsStringAsync().Result;

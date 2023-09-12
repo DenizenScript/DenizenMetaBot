@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using FreneticUtilities.FreneticExtensions;
 using YamlDotNet.RepresentationModel;
 using System.Json;
+using FreneticUtilities.FreneticToolkit;
 
 namespace DenizenBot.UtilityProcessors
 {
@@ -137,13 +138,13 @@ namespace DenizenBot.UtilityProcessors
             /// <summary>Return the current build number. -1 indicates no valid value.</summary>
             public virtual int DirectGrabCurrent()
             {
-                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(JenkinsURL);
+                Task<byte[]> downloadTask = Program.ReusableWebClient.GetByteArrayAsync(JenkinsURL);
                 downloadTask.Wait(DOWNLOAD_TIMEOUT);
                 if (!downloadTask.IsCompleted)
                 {
                     return -1;
                 }
-                return int.Parse(downloadTask.Result.Trim());
+                return int.Parse(StringConversionHelper.UTF8Encoding.GetString(downloadTask.Result).Trim());
             }
         }
 
@@ -163,13 +164,13 @@ namespace DenizenBot.UtilityProcessors
 
             public override int DirectGrabCurrent()
             {
-                Task<string> downloadTask = Program.ReusableWebClient.GetStringAsync(PAPER_API_PATH.Replace("{VERSION}", Version));
+                Task<byte[]> downloadTask = Program.ReusableWebClient.GetByteArrayAsync(PAPER_API_PATH.Replace("{VERSION}", Version));
                 downloadTask.Wait(DOWNLOAD_TIMEOUT);
                 if (!downloadTask.IsCompleted)
                 {
                     return -1;
                 }
-                JsonValue json = JsonValue.Parse(downloadTask.Result);
+                JsonValue json = JsonValue.Parse(StringConversionHelper.UTF8Encoding.GetString(downloadTask.Result));
                 JsonArray array = (JsonArray)json["builds"];
                 JsonValue lastBuild = array[^1];
                 return (int)lastBuild["build"];
