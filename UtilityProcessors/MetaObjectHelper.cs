@@ -69,7 +69,7 @@ namespace DenizenBot.UtilityProcessors
                 return text;
             }
             text = text[..trimTo];
-            string[] lines = text.SplitFast('\n').ToArray();
+            string[] lines = [.. text.SplitFast('\n')];
             if (lines.Count(s => s.StartsWith("<code>")) > lines.Count(s => s.StartsWith("</code>")))
             {
                 text += "\n</code>\n";
@@ -226,7 +226,7 @@ namespace DenizenBot.UtilityProcessors
                 count++;
                 string tagPreSpace = tag.BeforeAndAfter(" ", out string tagAfterSpace);
                 string tagOut;
-                if (tagPreSpace.EndsWith(">") && string.IsNullOrWhiteSpace(tagAfterSpace))
+                if (tagPreSpace.EndsWith('>') && string.IsNullOrWhiteSpace(tagAfterSpace))
                 {
                     tagOut = $"`{tag}`";
                     MetaTag realTag = MetaDocs.CurrentMeta.FindTag(tag);

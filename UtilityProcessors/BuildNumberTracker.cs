@@ -149,18 +149,14 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>Build number tracker but for Paper.</summary>
-        public class PaperBuildNumber : BuildNumber
+        public class PaperBuildNumber(string projectName, string regexText, string _version) : BuildNumber(projectName, regexText, "Paper", "(Paper API)")
         {
-            public PaperBuildNumber(string projectName, string regexText, string _version) : base(projectName, regexText, "Paper", "(Paper API)")
-            {
-                Version = _version;
-            }
 
             /// <summary>The webpath for the paper API build info JSON.</summary>
             public static string PAPER_API_PATH = "https://papermc.io/api/v2/projects/paper/version_group/{VERSION}/builds";
 
             /// <summary>The relevant server version, like "1.16".</summary>
-            public string Version;
+            public string Version = _version;
 
             public override int DirectGrabCurrent()
             {
@@ -188,7 +184,7 @@ namespace DenizenBot.UtilityProcessors
         public static List<BuildNumber> BuildNumbers = new(64);
 
         /// <summary>A mapping from version names to the relevant paper build number trackers.</summary>
-        public static Dictionary<string, BuildNumber> PaperBuildTrackers = new();
+        public static Dictionary<string, BuildNumber> PaperBuildTrackers = [];
 
         /// <summary>Causes all tracked build numbers to update immediately.</summary>
         public static void UpdateAll()
@@ -252,7 +248,7 @@ namespace DenizenBot.UtilityProcessors
             {
                 version = version["version ".Length..];
             }
-            if (name.EndsWith(":"))
+            if (name.EndsWith(':'))
             {
                 name = name[0..^1];
             }

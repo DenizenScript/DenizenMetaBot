@@ -131,8 +131,8 @@ namespace DenizenBot.CommandHandlers
                     }
                 }
             }
-            List<T> matched = new();
-            List<T> strongMatched = new();
+            List<T> matched = [];
+            List<T> strongMatched = [];
             string searchAZTrim = AlphabetMatcher.TrimToMatches(search);
             int tryProcesSingleMatch(T objVal, string objName, int min)
             {
@@ -252,11 +252,11 @@ namespace DenizenBot.CommandHandlers
                 if (command.CleanedArguments.Length >= 2)
                 {
                     string outputType = command.CleanedArguments[1].ToLowerFast();
-                    if (outputType.StartsWith("u"))
+                    if (outputType.StartsWith('u'))
                     {
                         SendReply(command.Message, cmd.GetCommandUsagesEmbed().Build());
                     }
-                    else if (outputType.StartsWith("t"))
+                    else if (outputType.StartsWith('t'))
                     {
                         SendReply(command.Message, cmd.GetCommandTagsEmbed().Build());
                     }
@@ -288,7 +288,7 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            List<string> secondarySearches = new();
+            List<string> secondarySearches = [];
             if (command.CleanedArguments.Length > 0)
             {
                 int dotIndex = command.CleanedArguments[0].IndexOf('.');
@@ -316,7 +316,7 @@ namespace DenizenBot.CommandHandlers
             {
                 return;
             }
-            List<string> secondarySearches = new();
+            List<string> secondarySearches = [];
             string[] cmds = command.CleanedArguments;
             if (cmds.Length > 0)
             {
@@ -464,7 +464,7 @@ namespace DenizenBot.CommandHandlers
                 {
                     list = betterMatches.ToList();
                 }
-                return list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
+                return [.. list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName))];
             }
             AutoMetaCommand(MetaDocs.CurrentMeta.GuidePages, MetaDocs.META_TYPE_GUIDEPAGE, cmds, command.Message, altMatchOrderer: altMatchOrderer);
         }
@@ -487,7 +487,7 @@ namespace DenizenBot.CommandHandlers
                 cmds[i] = cmds[i].ToLowerFast();
             }
             string fullSearch = string.Join(' ', cmds);
-            List<(int, MetaObject)> results = new();
+            List<(int, MetaObject)> results = [];
             foreach (MetaObject obj in docs.AllMetaObjects())
             {
                 int quality = obj.SearchHelper.GetMatchQuality(fullSearch);
@@ -511,7 +511,7 @@ namespace DenizenBot.CommandHandlers
                 return;
             }
             string suffix = ".";
-            results = results.OrderBy(pair => -pair.Item1).ThenBy(pair => StringConversionHelper.GetLevenshteinDistance(fullSearch, pair.Item2.CleanName)).ToList();
+            results = [.. results.OrderBy(pair => -pair.Item1).ThenBy(pair => StringConversionHelper.GetLevenshteinDistance(fullSearch, pair.Item2.CleanName))];
             suffix = ".";
             if (results.Count > 50)
             {

@@ -13,31 +13,23 @@ using FreneticUtilities.FreneticToolkit;
 namespace DenizenBot.UtilityProcessors
 {
     /// <summary>Tracks and announces RSS feeds.</summary>
-    public class RSSTracker
+    /// <remarks>Constructs the tracker.</remarks>
+    public class RSSTracker(string _url, ulong[] _channels, ConnectionMonitor _monitor, TimeSpan _checkRate)
     {
         /// <summary>The URL to track.</summary>
-        public string URL;
+        public string URL = _url;
 
         /// <summary>The channel(s) to post messages into.</summary>
-        public ulong[] Channels;
+        public ulong[] Channels = _channels;
 
         /// <summary>How often to check for updates.</summary>
-        public TimeSpan CheckRate = new(hours: 0, minutes: 5, seconds: 0);
+        public TimeSpan CheckRate = _checkRate;
 
         /// <summary>Used to cancel the tracker.</summary>
         public CancellationTokenSource CancelToken = new();
 
         /// <summary>Associated monitor object.</summary>
-        public ConnectionMonitor Monitor;
-
-        /// <summary>Constructs the tracker.</summary>
-        public RSSTracker(string _url, ulong[] _channels, ConnectionMonitor _monitor, TimeSpan _checkRate)
-        {
-            URL = _url;
-            Channels = _channels;
-            CheckRate = _checkRate;
-            Monitor = _monitor;
-        }
+        public ConnectionMonitor Monitor = _monitor;
 
         /// <summary>Starts the tracker.</summary>
         public void Start()
@@ -46,7 +38,7 @@ namespace DenizenBot.UtilityProcessors
         }
 
         /// <summary>Seen RSS feed 'pubDates' value. The publish date is the easiest way to reliably differentiate most feeds.</summary>
-        public HashSet<string> SeenDates = new();
+        public HashSet<string> SeenDates = [];
 
         /// <summary>Does the actual scan and update.</summary>
         public void ScanNow(bool doPosts)

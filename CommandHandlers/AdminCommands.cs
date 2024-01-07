@@ -58,7 +58,7 @@ namespace DenizenBot.CommandHandlers
             {
                 try
                 {
-                    Program.ReusableWebClient.PostAsync(url, new ByteArrayContent(Array.Empty<byte>())).Wait();
+                    Program.ReusableWebClient.PostAsync(url, new ByteArrayContent([])).Wait();
                 }
                 catch (Exception ex)
                 {

@@ -21,7 +21,7 @@ namespace DenizenBot
         /// <summary>Triggers an immediate download of Clientizen meta.</summary>
         public static void LoadClientMeta()
         {
-            ClientMeta = MetaDocsLoader.DownloadAll(new[] { "https://github.com/DenizenScript/Clientizen/archive/main.zip", "https://github.com/DenizenScript/Denizen-Core/archive/master.zip" });
+            ClientMeta = MetaDocsLoader.DownloadAll(["https://github.com/DenizenScript/Clientizen/archive/main.zip", "https://github.com/DenizenScript/Denizen-Core/archive/master.zip"]);
         }
 
         /// <summary>Software entry point - starts the bot.</summary>
@@ -54,7 +54,7 @@ namespace DenizenBot
             {
                 Console.WriteLine("Discord crash: " + ex.ToString());
                 Thread.Sleep(10 * 1000);
-                LaunchBotThread(Array.Empty<string>());
+                LaunchBotThread([]);
             }
         }
     }

@@ -34,7 +34,7 @@ namespace DenizenBot.CommandHandlers
         public static TimeSpan WebLinkDownloadTimeout = new(hours: 0, minutes: 0, seconds: 15);
 
         /// <summary>File extensions allowed in command attachment links.</summary>
-        public static HashSet<string> AllowedLinkFileExtensions = new() { "log", "txt", "dsc", "yml" };
+        public static HashSet<string> AllowedLinkFileExtensions = ["log", "txt", "dsc", "yml"];
 
         /// <summary>Downloads a string from a web URL, for usage in a command. This is a direct read, not a proper converter/scanner. There is no input protection.</summary>
         public static string DirectDownloadWebDataForCommand(string url, CommandData command)
@@ -286,7 +286,7 @@ namespace DenizenBot.CommandHandlers
             {
                 if (list.Count > 0)
                 {
-                    HashSet<string> usedKeys = new();
+                    HashSet<string> usedKeys = [];
                     StringBuilder thisListResult = new(list.Count * 200);
                     foreach (ScriptChecker.ScriptWarning entry in list)
                     {

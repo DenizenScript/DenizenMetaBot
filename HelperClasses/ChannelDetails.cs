@@ -19,7 +19,7 @@ namespace DenizenBot.HelperClasses
     public class ChannelDetails
     {
         /// <summary>Projects to update.</summary>
-        public ProjectDetails[] Updates = Array.Empty<ProjectDetails>();
+        public ProjectDetails[] Updates = [];
 
 
         /// <summary>Whether docs are allowed.</summary>

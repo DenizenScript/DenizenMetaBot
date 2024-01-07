@@ -25,7 +25,7 @@ namespace DenizenBot.UtilityProcessors
         public static string GREEN_CHECK_MARK_SYMBOL = ":white_check_mark:";
 
         /// <summary>Plugins that should show version output.</summary>
-        public static string[] VERSION_PLUGINS = new string[] { "Citizens", "Denizen", "Depenizen", "Sentinel", "dDiscordBot" };
+        public static string[] VERSION_PLUGINS = ["Citizens", "Denizen", "Depenizen", "Sentinel", "dDiscordBot"];
 
         /// <summary>The text that comes before the server version report.</summary>
         public const string SERVER_VERSION_PREFIX = "This server is running CraftBukkit version",
@@ -56,37 +56,37 @@ namespace DenizenBot.UtilityProcessors
         /// Lowercase text that is suspicious (like ones that relate to cracked plugins).
         /// Map of text to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> SUSPICIOUS_TEXT = new();
+        public static readonly Dictionary<string, string> SUSPICIOUS_TEXT = [];
 
         /// <summary>
         /// Lowercase text that usually is a bad sign.
         /// Map of text to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> DANGER_TEXT = new();
+        public static readonly Dictionary<string, string> DANGER_TEXT = [];
 
         /// <summary>
         /// Plugins that are suspicious (like ones that relate to cracked servers).
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = new();
+        public static readonly Dictionary<string, string> SUSPICIOUS_PLUGINS = [];
 
         /// <summary>
         /// Plugins that WILL cause problems.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> BAD_PLUGINS = new();
+        public static readonly Dictionary<string, string> BAD_PLUGINS = [];
 
         /// <summary>
         /// Plugins that MIGHT cause problems.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> MESSY_PLUGINS = new();
+        public static readonly Dictionary<string, string> MESSY_PLUGINS = [];
 
         /// <summary>
         /// Plugins that should be tracked but aren't a problem.
         /// Map of plugin names to messages.
         /// </summary>
-        public static readonly Dictionary<string, string> MONITORED_PLUGINS = new();
+        public static readonly Dictionary<string, string> MONITORED_PLUGINS = [];
 
         /// <summary>Adds a plugin by name to the list of special plugins to track and report.</summary>
         /// <param name="set">The set of plugins to add to.</param>
@@ -267,10 +267,10 @@ namespace DenizenBot.UtilityProcessors
         public string PluginVersions = "";
 
         /// <summary>Lines that are suspicious, usually ones that indicate cracked plugins.</summary>
-        public List<string> SuspiciousLines = new();
+        public List<string> SuspiciousLines = [];
 
         /// <summary>Lines of note, usually ones that indicate a bad sign.</summary>
-        public List<string> OtherNoteworthyLines = new();
+        public List<string> OtherNoteworthyLines = [];
 
         /// <summary>Whether this server log appears to be offline mode.</summary>
         public bool IsOffline = false;
@@ -425,7 +425,7 @@ namespace DenizenBot.UtilityProcessors
                 JavaVersion = "";
                 return;
             }
-            if (JavaVersion.StartsWith("8") || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("16") || JavaVersion.StartsWith("17"))
+            if (JavaVersion.StartsWith('8') || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("16") || JavaVersion.StartsWith("17"))
             {
                 JavaVersion = $"`{Escape(JavaVersion)}` {GREEN_CHECK_MARK_SYMBOL}";
                 return;
@@ -694,7 +694,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>Looks for dangerous text sometimes found in logs.</summary>
         public void ProcessDangerText(Dictionary<string, string> textMap, List<string> lineList)
         {
-            HashSet<string> messagesUsed = new();
+            HashSet<string> messagesUsed = [];
             foreach ((string sign, string message) in textMap)
             {
                 int signIndex = FullLogTextLower.IndexOf(sign);

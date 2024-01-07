@@ -323,7 +323,7 @@ namespace DenizenBot.CommandHandlers
             string[] cmds = command.CleanedArguments;
             if (cmds.Length == 0)
             {
-                cmds = new string[] { "all" };
+                cmds = ["all"];
             }
             if (cmds.Length > 5)
             {
@@ -346,7 +346,7 @@ namespace DenizenBot.CommandHandlers
         }
 
         /// <summary>Dictionary of quotes recently seen to the time it was last seen, to reduce duplication.</summary>
-        public Dictionary<int, DateTimeOffset> QuotesSeen = new();
+        public Dictionary<int, DateTimeOffset> QuotesSeen = [];
 
         private static readonly Random _Random = new();
 

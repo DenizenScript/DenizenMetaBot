@@ -27,7 +27,7 @@ namespace DenizenBot
         /// <summary>Returns whether a Discord user is a bot commander (via role check).</summary>
         public static bool IsBotCommander(IUser user)
         {
-            return (user as SocketGuildUser).Roles.Any((role) => role.Name.ToLowerInvariant() == "botcommander");
+            return (user as SocketGuildUser).Roles.Any((role) => role.Name.ToLowerFast() == "botcommander");
         }
 
         /// <summary>Returns whether meta commands are allowed in a given channel.</summary>
@@ -62,7 +62,7 @@ namespace DenizenBot
         public static Dictionary<string, string> Rules = new(128);
 
         /// <summary>A list of MC versions that are acceptable+known.</summary>
-        public static List<string> AcceptableServerVersions = new();
+        public static List<string> AcceptableServerVersions = [];
 
         /// <summary>The lowest (oldest) acceptable server version, as a double.</summary>
         public static double LowestServerVersion = 0.0;
@@ -71,10 +71,10 @@ namespace DenizenBot
         public static double HighestServerVersion = 0.0;
 
         /// <summary>All quotes in the quotes file.</summary>
-        public static string[] Quotes = Array.Empty<string>();
+        public static string[] Quotes = [];
 
         /// <summary>All quotes in the quotes file, pre-lowercased for searching.</summary>
-        public static string[] QuotesLower = Array.Empty<string>();
+        public static string[] QuotesLower = [];
 
         /// <summary>The informational commands provider.</summary>
         public InformationCommands InfoCmds = new();
@@ -83,7 +83,7 @@ namespace DenizenBot
         public static string[] ReloadWebooks;
 
         /// <summary>All RSS trackers.</summary>
-        public static List<RSSTracker> Trackers = new();
+        public static List<RSSTracker> Trackers = [];
 
         /// <summary>Generates default command name->method pairs.</summary>
         void DefaultCommands(DiscordBot bot)
@@ -212,12 +212,12 @@ namespace DenizenBot
                 {
                     FDSSection detailsSection = channelDetailsSection.GetSection(key);
                     ChannelDetails detail = new();
-                    List<ProjectDetails> projects = new();
+                    List<ProjectDetails> projects = [];
                     foreach (string projName in detailsSection.GetString("updates", "").Split(' ', StringSplitOptions.RemoveEmptyEntries))
                     {
                         projects.Add(ProjectToDetails[projName]);
                     }
-                    detail.Updates = projects.ToArray();
+                    detail.Updates = [.. projects];
                     detail.Docs = detailsSection.GetBool("docs", false).Value;
                     ChannelToDetails.Add(ulong.Parse(key), detail);
                 }
@@ -264,10 +264,10 @@ namespace DenizenBot
             {
                 MetaDocsLoader.SourcesToUse = MetaDocsLoader.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
             }
-            ReloadWebooks = Array.Empty<string>();
+            ReloadWebooks = [];
             if (configFile.HasKey("reload_webhooks"))
             {
-                ReloadWebooks = configFile.GetStringList("reload_webhooks").ToArray();
+                ReloadWebooks = [.. configFile.GetStringList("reload_webhooks")];
             }
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))
             {
@@ -281,13 +281,13 @@ namespace DenizenBot
                 {
                     FDSSection feed = feeds.GetSection(hook);
                     string url = feed.GetString("url");
-                    List<ulong> channels = new();
+                    List<ulong> channels = [];
                     foreach (string channel in feed.GetStringList("channels"))
                     {
                         channels.Add(ulong.Parse(channel.Trim()));
                     }
                     double minutes = feed.GetDouble("check_rate").Value;
-                    RSSTracker tracker = new(url, channels.ToArray(), DiscordBotBaseHelper.CurrentBot.BotMonitor, TimeSpan.FromMinutes(minutes));
+                    RSSTracker tracker = new(url, [.. channels], DiscordBotBaseHelper.CurrentBot.BotMonitor, TimeSpan.FromMinutes(minutes));
                     tracker.Start();
                     Trackers.Add(tracker);
                 }
@@ -338,7 +338,7 @@ namespace DenizenBot
                     }
                     else if (command.CleanedArguments.Length == 0 && InformationalData.ContainsKey(name.ToLowerFast()))
                     {
-                        InfoCmds.CMD_Info(new CommandData() { Message = command.Message, CleanedArguments = new string[] { name.ToLowerFast() } });
+                        InfoCmds.CMD_Info(new CommandData() { Message = command.Message, CleanedArguments = [name.ToLowerFast()] });
                     }
                 },
                 ShouldPayAttentionToMessage = (message) =>
@@ -358,7 +358,7 @@ namespace DenizenBot
         /// <summary>Registers all applicable slash commands.</summary>
         public static void RegisterSlashCommands(DiscordBot bot)
         {
-            List<ApplicationCommandProperties> cmds = new();
+            List<ApplicationCommandProperties> cmds = [];
             if (InformationalDataNames.Any())
             {
                 SlashCommandBuilder infoCommand = new SlashCommandBuilder().WithName("info").WithDescription("Shows an info-box message.")
@@ -366,7 +366,7 @@ namespace DenizenBot
                     .AddOption("user", ApplicationCommandOptionType.User, "(Optional) A user to ping the information to.", isRequired: false);
                 cmds.Add(infoCommand.Build());
             }
-            bot.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray()).Wait();
+            bot.Client.BulkOverwriteGlobalApplicationCommandsAsync([.. cmds]).Wait();
             Console.WriteLine($"Registered slash commands: {string.Join(", ", cmds.Select(c => c.Name))}");
         }
     }
