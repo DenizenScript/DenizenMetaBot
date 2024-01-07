@@ -21,7 +21,7 @@ namespace DenizenBot
         /// <summary>Triggers an immediate download of Clientizen meta.</summary>
         public static void LoadClientMeta()
         {
-            ClientMeta = MetaDocsLoader.DownloadAll(new[] { "https://github.com/DenizenScript/Clientizen/archive/master.zip", "https://github.com/DenizenScript/Denizen-Core/archive/master.zip" });
+            ClientMeta = MetaDocsLoader.DownloadAll(new[] { "https://github.com/DenizenScript/Clientizen/archive/main.zip", "https://github.com/DenizenScript/Denizen-Core/archive/master.zip" });
         }
 
         /// <summary>Software entry point - starts the bot.</summary>
