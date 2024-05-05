@@ -26,7 +26,7 @@ namespace DenizenBot.HelperClasses
         /// <summary>Removes the actual reactions from the message.</summary>
         public void RemoveReactions()
         {
-            Message.RemoveReactionsAsync(DiscordBotBaseHelper.CurrentBot.Client.CurrentUser, new IEmote[] { new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI) }).Wait();
+            Message.RemoveReactionsAsync(DiscordBotBaseHelper.CurrentBot.Client.CurrentUser, [new Emoji(Constants.ACCEPT_EMOJI), new Emoji(Constants.DENY_EMOJI)]).Wait();
         }
     }
 }

@@ -110,7 +110,7 @@ namespace DenizenBot.CommandHandlers
                     Console.WriteLine($"Final closest match is '{lowestStr}' at distance {lowestDistance}.");
                     return lowestStr;
                 };
-            altMatchOrderer ??= (list) => list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName)).ToList();
+            altMatchOrderer ??= (list) => [.. list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName))];
             if (docs.TryGetValue(search, out T obj))
             {
                 string multiNameData = string.Join("', '", obj.MultiNames);
@@ -370,7 +370,7 @@ namespace DenizenBot.CommandHandlers
                 return lowestStr;
             }
             AutoMetaCommand(docs.Tags, MetaDocs.META_TYPE_TAG, cmds, command.Message, secondarySearches, altFindClosest: findClosestTag,
-                altMatchOrderer: (list) => list.OrderBy(getDistanceTo).ToList());
+                altMatchOrderer: (list) => [.. list.OrderBy(getDistanceTo)]);
         }
 
         /// <summary>ObjectTypes meta docs user command.</summary>
