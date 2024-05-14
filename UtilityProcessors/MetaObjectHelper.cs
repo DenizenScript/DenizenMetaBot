@@ -300,7 +300,7 @@ namespace DenizenBot.UtilityProcessors
         /// <returns>The Discord-ready embed object.</returns>
         public static EmbedBuilder GetEmbed(this MetaObject obj, bool hideLargeData = false)
         {
-            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle(obj.Type.Name + ": " + obj.Name);
+            EmbedBuilder builder = new EmbedBuilder().WithColor(0, 255, 255).WithTitle($"{obj.Type.Name}: {obj.Name}");
             if (obj is not MetaGuidePage)
             {
                 string docBase = obj.Meta == Program.ClientMeta ? DenizenMetaBotConstants.CLIENTDOCS_URL_BASE : DenizenMetaBotConstants.DOCS_URL_BASE;
