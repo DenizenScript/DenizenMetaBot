@@ -103,7 +103,7 @@ namespace DenizenBot.UtilityProcessors
         static LogChecker()
         {
             // Danger text (lowercase matches)
-            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks", "leakmania", "mcleaks", "[libsdisguises] registered to: 1592 ", "this plugin has been cracked", "xanthe protections", "spigotunlocked.com");
+            AddReportedEntry(SUSPICIOUS_TEXT, $"{RED_FLAG_SYMBOL} Server is likely running cracked plugins.", "cracked by", "crack by", "cracked version", "blackspigot", "leaked by", "@bsmc", "directleaks", "leakmania", "mcleaks", "[libsdisguises] registered to: 1592 ", "this plugin has been cracked", "xanthe protections", "spigotunlocked.com", "infected with malware");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} NEVER reload your server. If you change plugin files, you MUST RESTART your server properly.", "issued server command: /reload", "issued server command: /rl", ": reload complete.");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} Free server providers cannot be properly supported. Refer to <https://wiki.citizensnpcs.co/Frequently_Asked_Questions#I_have_a_free_server_.28Aternos.2C_Minehut.2C_....29_but_there.27s_problems>.", "minehut", "aternos");
             AddReportedEntry(DANGER_TEXT, $"{WARNING_SYMBOL} You should not have the CitizensAPI in your plugins folder, you only need the Citizens jar itself.", "could not load 'plugins/citizensapi");
