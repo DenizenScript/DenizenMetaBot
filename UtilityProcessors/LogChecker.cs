@@ -471,7 +471,7 @@ namespace DenizenBot.UtilityProcessors
             }
             else
             {
-                Console.WriteLine("Server version almost matched expected format but failed on details, disregarding check.");
+                Console.WriteLine($"Server version almost matched expected format but failed on details (2='{subData[2]}', 3='{subData[3]}'), disregarding check.");
                 return "";
             }
             double versionNumb = DenizenMetaBot.VersionToDouble(majorMCVersion);
