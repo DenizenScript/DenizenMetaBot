@@ -457,16 +457,15 @@ namespace DenizenBot.UtilityProcessors
                 return "";
             }
             string[] versionParts = subData[2].Split('-', 3);
-            string spigotVersionText, majorMCVersion;
+            string spigotVersionText, mcVersionText;
             if (subData[3].StartsWith("(mc: "))
             {
                 spigotVersionText = versionParts[2];
-                string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
-                majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
+                mcVersionText = subData[3]["(mc: ".Length..].Before(')');
             }
             else if (subData[2].Contains('/') && subData[2].Contains('@') && subData[3].EndsWith("z)"))
             {
-                majorMCVersion = versionParts[0];
+                mcVersionText = versionParts[0];
                 spigotVersionText = versionParts[1];
             }
             else
@@ -474,6 +473,7 @@ namespace DenizenBot.UtilityProcessors
                 Console.WriteLine($"Server version almost matched expected format but failed on details (2='{subData[2]}', 3='{subData[3]}'), disregarding check.");
                 return "";
             }
+            string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
             double versionNumb = DenizenMetaBot.VersionToDouble(majorMCVersion);
             if (versionNumb == -1)
             {
@@ -499,7 +499,7 @@ namespace DenizenBot.UtilityProcessors
                 }
                 if (!BuildNumberTracker.PaperBuildTrackers.TryGetValue(majorMCVersion, out BuildNumberTracker.BuildNumber buildTracker))
                 {
-                    Console.WriteLine($"Paper version {paperVersionNumber} is not tracked, disregarding check.");
+                    Console.WriteLine($"Paper version {majorMCVersion} is not tracked, disregarding check.");
                     return "";
                 }
                 if (buildTracker.Value == 0)
