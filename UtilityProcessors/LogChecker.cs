@@ -451,15 +451,29 @@ namespace DenizenBot.UtilityProcessors
                 versionInput = versionInput["this server is running ".Length..];
             }
             string[] subData = versionInput.Split(' ', 4);
-            if (subData.Length != 4 || subData[1] != "version" || subData[2].CountCharacter('-') < 2 || !subData[3].StartsWith("(mc: "))
+            if (subData.Length != 4 || subData[1] != "version" || subData[2].CountCharacter('-') < 2)
             {
                 Console.WriteLine("Server version doesn't match expected format, disregarding check.");
                 return "";
             }
             string[] versionParts = subData[2].Split('-', 3);
-            string spigotVersionText = versionParts[2];
-            string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
-            string majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
+            string spigotVersionText, majorMCVersion;
+            if (subData[3].StartsWith("(mc: "))
+            {
+                spigotVersionText = versionParts[2];
+                string mcVersionText = subData[3]["(mc: ".Length..].Before(')');
+                majorMCVersion = mcVersionText.CountCharacter('.') == 2 ? mcVersionText.BeforeLast('.') : mcVersionText;
+            }
+            else if (subData[2].Contains('/') && subData[2].Contains('@') && subData[3].EndsWith("z)"))
+            {
+                majorMCVersion = versionParts[0];
+                spigotVersionText = versionParts[1];
+            }
+            else
+            {
+                Console.WriteLine("Server version almost matched expected format but failed on details, disregarding check.");
+                return "";
+            }
             double versionNumb = DenizenMetaBot.VersionToDouble(majorMCVersion);
             if (versionNumb == -1)
             {
@@ -545,6 +559,7 @@ namespace DenizenBot.UtilityProcessors
         /// <summary>
         /// Checks the linked server version against the current known server version.
         /// Expects a version output of the format: "This server is running {TYPE} version git-{TYPE}-{VERS} (MC: {MCVERS}) (Implementing API version {MCVERS}-{SUBVERS}-SNAPSHOT)".
+        /// Or modern Paper format                : "This server is running {TYPE} version {MCVERS}-{BUILD}-ver/{MCVERS}@{commit} ({DATE}) (Implementing API version {MCVERS}-{SUBVERS}-SNAPSHOT)".
         /// Will note on outdated MCVERS (per config), or note on newer. Will identify an outdated Spigot (or paper) sub-version.
         /// </summary>
         public void CheckServerVersion()
