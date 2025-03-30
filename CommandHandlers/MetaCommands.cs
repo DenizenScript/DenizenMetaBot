@@ -120,7 +120,7 @@ namespace DenizenBot.CommandHandlers
             }
             if (secondarySearches != null)
             {
-                secondarySearches = secondarySearches.Select(s => s.ToLowerFast()).ToList();
+                secondarySearches = [.. secondarySearches.Select(s => s.ToLowerFast())];
                 foreach (string secondSearch in secondarySearches)
                 {
                     if (docs.TryGetValue(secondSearch, out obj))
@@ -462,7 +462,7 @@ namespace DenizenBot.CommandHandlers
                 IEnumerable<MetaGuidePage> betterMatches = list.Where(page => !page.IsSubPage);
                 if (!betterMatches.IsEmpty())
                 {
-                    list = betterMatches.ToList();
+                    list = [.. betterMatches];
                 }
                 return [.. list.OrderBy((mat) => StringConversionHelper.GetLevenshteinDistance(search, mat.CleanName))];
             }

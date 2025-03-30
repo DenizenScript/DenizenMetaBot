@@ -321,7 +321,7 @@ namespace DenizenBot.UtilityProcessors
             }
             fullLog = fullLog.Replace("\r\n", "\n").Replace('\r', '\n');
             IEnumerable<string> lines = fullLog.Split('\n').Where(l => !l.EndsWith("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!"));
-            FullLogText = string.Join('\n', lines.ToArray());
+            FullLogText = string.Join('\n', [.. lines]);
             FullLogTextLower = FullLogText.ToLowerFast();
         }
 
@@ -354,6 +354,7 @@ namespace DenizenBot.UtilityProcessors
                 string rawMinusBungeeNotice = FullLogTextLower
                     .Replace("makes it possible to use bungeecord or velocity", "").Replace("compression from velocity", "").Replace("cipher from velocity", "") // Paper Velocity
                     .Replace("makes it possible to use bungeecord", "") // Spigot Bungee
+                    .Replace("adventure-text-serializer-bungeecord-", "") // Citizens libraries
                     .Replace("will not load bungee bridge.", "") // Depenizen
                     .Replace("  initializing bungeecord", "") // CMI
                     .Replace("such as BungeeCord/Spigot", "").Replace("setting is-bungeecord=true in", ""); // BuyCraftX

@@ -262,7 +262,7 @@ namespace DenizenBot
             }
             if (configFile.HasKey("additional_meta_sources"))
             {
-                MetaDocsLoader.SourcesToUse = MetaDocsLoader.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct().ToArray();
+                MetaDocsLoader.SourcesToUse = [.. MetaDocsLoader.SourcesToUse.JoinWith(configFile.GetStringList("additional_meta_sources")).Distinct()];
             }
             ReloadWebooks = [];
             if (configFile.HasKey("reload_webhooks"))
@@ -272,7 +272,7 @@ namespace DenizenBot
             if (File.Exists(DiscordBot.CONFIG_FOLDER + "quotes.txt"))
             {
                 Quotes = File.ReadAllText(DiscordBot.CONFIG_FOLDER + "quotes.txt").Replace("\r", "").Replace('`', '\'').Split("\n\n", StringSplitOptions.RemoveEmptyEntries);
-                QuotesLower = Quotes.Select(s => s.ToLowerFast()).ToArray();
+                QuotesLower = [.. Quotes.Select(s => s.ToLowerFast())];
             }
             if (configFile.HasKey("rss_feeds"))
             {

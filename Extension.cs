@@ -18,7 +18,7 @@ namespace DenizenBot
             {
                 return;
             }
-            Extensions = Assembly.GetExecutingAssembly().DefinedTypes.Where(t => t.IsSubclassOf(typeof(Extension))).Select(t => t.AsType().GetConstructor([]).Invoke(null) as Extension).ToList();
+            Extensions = [.. Assembly.GetExecutingAssembly().DefinedTypes.Where(t => t.IsSubclassOf(typeof(Extension))).Select(t => t.AsType().GetConstructor([]).Invoke(null) as Extension)];
         }
 
         public virtual void OnClientInit(DiscordBot bot)
