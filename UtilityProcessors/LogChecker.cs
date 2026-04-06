@@ -498,9 +498,9 @@ namespace DenizenBot.UtilityProcessors
                     Console.WriteLine($"Paper version '{spigotVersionText}' is not an integer, disregarding check.");
                     return "";
                 }
-                if (!BuildNumberTracker.PaperBuildTrackers.TryGetValue(majorMCVersion, out BuildNumberTracker.BuildNumber buildTracker))
+                if (!BuildNumberTracker.PaperBuildTrackers.TryGetValue(majorMCVersion, out BuildNumberTracker.BuildNumber buildTracker) && !BuildNumberTracker.PaperBuildTrackers.TryGetValue(mcVersionText, out buildTracker))
                 {
-                    Console.WriteLine($"Paper version {majorMCVersion} is not tracked, disregarding check.");
+                    Console.WriteLine($"Paper version {majorMCVersion} or {mcVersionText} is not tracked, disregarding check.");
                     return "";
                 }
                 if (buildTracker.Value == 0)
