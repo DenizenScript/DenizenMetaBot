@@ -426,12 +426,12 @@ namespace DenizenBot.UtilityProcessors
                 JavaVersion = "";
                 return;
             }
-            if (JavaVersion.StartsWith('8') || JavaVersion.StartsWith("1.8") || JavaVersion.StartsWith("16") || JavaVersion.StartsWith("17") || JavaVersion.StartsWith("21"))
+            if (JavaVersion.StartsWith("16") || JavaVersion.StartsWith("17") || JavaVersion.StartsWith("21") || JavaVersion.StartsWith("25"))
             {
                 JavaVersion = $"`{Escape(JavaVersion)}` {GREEN_CHECK_MARK_SYMBOL}";
                 return;
             }
-            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 21 or 17 are fully supported (or 8 for legacy Minecraft)";
+            JavaVersion = $"`{Escape(JavaVersion)}` {WARNING_SYMBOL} - Only Java versions 25, 21, or 17 are fully supported";
         }
 
         /// <summary>Gets the server version status result (outdated vs not) as a string.</summary>
