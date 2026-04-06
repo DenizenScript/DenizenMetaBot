@@ -153,7 +153,7 @@ namespace DenizenBot.UtilityProcessors
         {
 
             /// <summary>The webpath for the paper API build info JSON.</summary>
-            public static string PAPER_API_PATH = "https://papermc.io/api/v2/projects/paper/version_group/{VERSION}/builds";
+            public static string PAPER_API_PATH = "https://fill.papermc.io/v3/projects/paper/versions/{VERSION}/builds";
 
             /// <summary>The relevant server version, like "1.16".</summary>
             public string Version = _version;
@@ -167,9 +167,9 @@ namespace DenizenBot.UtilityProcessors
                     return -1;
                 }
                 JsonValue json = JsonValue.Parse(StringConversionHelper.UTF8Encoding.GetString(downloadTask.Result));
-                JsonArray array = (JsonArray)json["builds"];
-                JsonValue lastBuild = array[^1];
-                return (int)lastBuild["build"];
+                JsonArray array = (JsonArray)json;
+                JsonValue topBuild = array[0];
+                return (int)topBuild["id"];
             }
         }
 
@@ -209,8 +209,8 @@ namespace DenizenBot.UtilityProcessors
         /// <param name="version">The version.</param>
         public static void AddPaperTracker(string version)
         {
-            //PaperBuildNumber tracker = new("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", version);
-            //PaperBuildTrackers.Add(version, tracker);
+            PaperBuildNumber tracker = new("Paper-" + version, $"git-Paper-(\\d+) \\(MC: {Regex.Escape(version)}(\\.\\d+)?\\)", version);
+            PaperBuildTrackers.Add(version, tracker);
         }
 
         /// <summary>

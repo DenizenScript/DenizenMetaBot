@@ -140,6 +140,10 @@ namespace DenizenBot
         /// <summary>Converts a Minecraft version string to a double for comparison reasons. Returns -1 if unparsable.</summary>
         public static double VersionToDouble(string version)
         {
+            if (version.StartsWith("countonly="))
+            {
+                version = version["countonly=".Length..];
+            }
             double scale = 1;
             double result = 0;
             foreach (string part in version.Split('.'))
@@ -257,7 +261,10 @@ namespace DenizenBot
                     {
                         HighestServerVersion = versionNumber;
                     }
-                    BuildNumberTracker.AddPaperTracker(version);
+                    if (!version.StartsWith("countonly="))
+                    {
+                        BuildNumberTracker.AddPaperTracker(version);
+                    }
                 }
             }
             if (configFile.HasKey("additional_meta_sources"))
