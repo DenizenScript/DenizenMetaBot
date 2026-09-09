@@ -307,6 +307,8 @@ namespace DenizenBot
             DiscordBotBaseHelper.StartBotHandler(args, new DiscordBotConfig()
             {
                 CommandPrefix = DenizenMetaBotConstants.COMMAND_PREFIX,
+                AlwaysDownloadUsers = false,
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent | GatewayIntents.GuildMessageReactions,
                 Initialize = (bot) =>
                 {
                     foreach (Extension ext in Extension.Extensions)
